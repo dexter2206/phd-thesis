@@ -1,19 +1,19 @@
 \chapter{Ising model and complexity theory}
 
 \section{Ising model}
-Consider a simple, undirected graph $G$ with $N$ nodes. With each node, we associate a dichotomous spin variable $s_i \in \{-1, 1\}$. To each edge $\{i, j\}$, we assign an interaction strength $J_{ij}$ and to each node we assign local magnetic field $h_i$. Here, all $J_{ij}$ and $h_i$ are real numbers. For such system, one can define the following energy function (Hamiltonian)
+Consider a simple, undirected graph $G = (V, E)$ with $N$ nodes labelled by consecutive natural numbers. With each node $i \in V$, we associate a dichotomous spin variable $s_i \in \{-1, 1\}$. To each edge $\{i, j\} \in E$, we assign an interaction strength $J_{ij}$ and to each node $i \in V$ we assign local magnetic field $h_i$. Here, all $J_{ij}$ and $h_i$ are real numbers. For such system, one can define the following energy function (Hamiltonian)
 \begin{equation}
 \label{eq:ising-hamiltonian}
 H(\mathbf{s}) = \sum_{\langle i, j \rangle} J_{ij} s_i s_j +  \sum_{i=1}^N h_i s_i,
 \end{equation}
-where $\mathbf{s} = (s_i, \ldots, s_N)$ and the first sum runs over all pairs of adjacent nodes in $G$\footnote{In the literature, the Ising Hamiltonian \eqref{eq:ising-hamiltonian} is often negated. However, definition provided here is consistent with the one used by D-Wave, and thus more suitable for use in this thesis}.
+where $\mathbf{s} = (s_i, \ldots, s_N)$ and the first sum runs over all edges in $E$\footnote{In the literature, the Ising Hamiltonian \eqref{eq:ising-hamiltonian} is often negated. However, definition provided here is consistent with the one used by D-Wave, and thus more suitable for use in this thesis}.
 \begin{figure}
     \centering
     \includegraphics{figures/spins.pdf}
     \caption{An example of Ising  spin--glass defined on graph with $N=16$ nodes. Here, $h_i$ is a real number associated with $i$-th node, and $J_{ij}$ denotes coupling strength associated with edge between $i$-th and $j$-th node. Configuration of each spin is marked by a red arrow pointing upwards (+1) or a blue arrow pointing downwards (-1).}
     \label{fig:my_label}
 \end{figure}
-For fixed model coefficients, one is typically interested in finding its \emph{ground state}, a configuration $\mathbf{s}$ that minimizes $H$. More generally, it might be desirable to search $k << 2^N$ configurations with lowest energy, the so called \emph{low--energy spectrum}. 
+For fixed model coefficients, one is typically interested in finding its \emph{ground state}, a configuration $\mathbf{s}$ that minimizes $H$. More generally, it might be desirable to search for $k << 2^N$ configurations with lowest energy, the so called \emph{low--energy spectrum}.
 
 The model was introduced in 1920 by Wilhelm Lenz \cite{lenz} as a description of ferromagnetism in solids, but is named after his student Ernst Ising, who studied and solved it in one-dimensional case \cite{ising}.  Despite the simple formulation, the problem of finding a ground state of Ising spin--glass is computationally hard \cite{barahoma}. Before expanding on this idea, let us first introduce hierarchy of complexity classes.
 
