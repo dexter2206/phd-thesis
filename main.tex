@@ -1,0 +1,45 @@
+\documentclass[12pt]{thesis}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{todonotes}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{hyperref}
+\usepackage{physics}
+\usepackage{mathtools}
+\usepackage{tikz}
+\usepackage{bm}
+\usepackage[linesnumbered,ruled]{algorithm2e}
+\usepackage{listings}
+\DeclareRobustCommand\tikzdot{\tikz[overlay,yshift=0.5ex] \fill[blue!90] (0.ex,0.ex) circle (0.3ex);}
+\DeclareRobustCommand\tikzcircle{\tikz[overlay,yshift=0.5ex] \draw[red,thick] (0.ex,0.ex) circle (0.4ex);}
+\DeclareRobustCommand\tikzquad{\tikz[overlay,yshift=0.ex,xshift=0.1ex] \draw[green,thick] (0.ex,0.ex) rectangle (1ex,1ex);}
+\title{Simulating quantum systems with near-term technologies}
+
+\newcommand{\bg}[1]{\textcolor{red}{bg: #1}}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+
+\newtheorem{lemma}{Lemma}
+
+\include{definitions}
+
+% Styles
+
+\author{Konrad Jałowiecki}
+\date{September 2019}
+
+\begin{document}
+
+\maketitle
+
+\input{chapters/introduction.tex}
+\input{chapters/ising.tex}
+\input{chapters/near-term-technologies.tex}
+\input{chapters/simulating-dynamics-with-dwave.tex}
+\input{chapters/tensor_networks}
+\input{chapters/bruteforce.tex}
+
+\bibliographystyle{plain}
+\bibliography{ref.bib}
+\end{document}

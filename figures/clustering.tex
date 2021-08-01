@@ -1,0 +1,167 @@
+\documentclass[dvipsnames]{standalone}
+\usepackage{tikz}
+\usetikzlibrary{fit,positioning,calc,arrows,arrows.meta}
+
+\begin{document}
+\tikzstyle{ghost}=[on grid,thick,circle]
+\tikzstyle{graph_vertex}=[
+    on grid,circle,thick,draw=blue!75,fill=blue!20
+]
+\tikzstyle{cluster_vertex}=[
+    on grid,circle,thick,minimum size=0.5cm,draw=red,fill=red!20
+    ]
+
+\tikzstyle{intra}=[draw=red,thick]
+\tikzstyle{inter}=[draw=ForestGreen,thick]
+\tikzstyle{cedge}=[draw=ForestGreen,very thick]
+
+\tikzstyle{cluster}=[draw=red,thick,dashed,rounded corners=0.3cm]
+
+\newcommand{\rowheight}{0.75cm}
+\newcommand{\colwidth}{1cm}
+\newcommand{\cellhspacing}{3cm}
+\newcommand{\cellvspacing}{-4cm}
+
+\begin{tikzpicture}
+    \begin{scope}
+        \node [graph_vertex] (v1) {};
+        \node [graph_vertex, right=\colwidth of v1] (v2) {};
+        \node [graph_vertex, below=\rowheight of v1] (v3) {};
+        \node [graph_vertex, below=\rowheight of v2] (v4) {};
+        \node [graph_vertex, below=\rowheight of v3] (v5) {};
+        \node [graph_vertex, below=\rowheight of v4] (v6) {};
+        \node [graph_vertex, below=\rowheight of v5] (v7) {};
+        \node [graph_vertex, below=\rowheight of v6] (v8) {};
+        \node [fit=(v1)(v8), draw, cluster] {};
+        
+        \draw[intra] (v1) -- (v2);
+        \draw[intra] (v3) -- (v4);
+        \draw[intra] (v5) -- (v6);
+        \draw[intra] (v7) -- (v8);
+        \draw[intra] (v1) -- (v3);
+        \draw[intra] (v2) -- (v4);
+        \draw[intra] (v3) -- (v5);
+        \draw[intra] (v4) -- (v6);
+        \draw[intra] (v5) -- (v7);
+        \draw[intra] (v6) -- (v8);
+        
+    \end{scope}
+    
+    \begin{scope}[xshift=\cellhspacing]
+        \node [ghost] (w1) {};
+        \node [ghost, below right=3*\rowheight and \colwidth of w1] (w2) {};
+        \node [graph_vertex, below right=1.5 * \rowheight and 0.5 \colwidth of w1] (w3) {};
+        \node [fit=(w1)(w2), draw, cluster] {};
+    \end{scope}
+    
+    \begin{scope}[xshift=2*\cellhspacing]
+        \node [graph_vertex] (u1) {};
+        \node [graph_vertex, right=\colwidth of u1] (u2) {};
+        \node [graph_vertex, below=\rowheight of u1] (u3) {};
+        \node [graph_vertex, below=\rowheight of u2] (u4) {};
+        \node [graph_vertex, below=\rowheight of u3] (u5) {};
+        \node [graph_vertex, below=\rowheight of u4] (u6) {};
+        \node [graph_vertex, below=\rowheight of u5] (u7) {};
+        \node [graph_vertex, below=\rowheight of u6] (u8) {};
+        \node [fit=(u1)(u8), draw, cluster] {};
+        
+        \draw[intra] (u1) -- (u2);
+        \draw[intra] (u1) -- (u4);
+        \draw[intra] (u1) -- (u6);
+        \draw[intra] (u1) -- (u8);
+        \draw[intra] (u3) -- (u2);
+        \draw[intra] (u3) -- (u4);
+        \draw[intra] (u3) -- (u6);
+        \draw[intra] (u3) -- (u8);
+        \draw[intra] (u5) -- (u2);
+        \draw[intra] (u5) -- (u4);
+        \draw[intra] (u5) -- (u6);
+        \draw[intra] (u5) -- (u8);
+        \draw[intra] (u7) -- (u2);
+        \draw[intra] (u7) -- (u4);
+        \draw[intra] (u7) -- (u6);
+        \draw[intra] (u7) -- (u8);
+    \end{scope}
+    
+    \begin{scope}[yshift=\cellvspacing]
+        \node [graph_vertex] (s1) {};
+        \node [graph_vertex, right=\colwidth of s1] (s2) {};
+        \node [graph_vertex, below=\rowheight of s1] (s3) {};
+        \node [graph_vertex, below=\rowheight of s2] (s4) {};
+        \node [fit=(s1)(s4), draw, cluster] {};
+        
+        \draw[intra] (s1) -- (s2);
+        \draw[intra] (s3) -- (s4);
+        \draw[intra] (s1) -- (s3);
+        \draw[intra] (s2) -- (s4);
+    \end{scope}
+    
+    \begin{scope}[xshift=\cellhspacing,yshift=\cellvspacing]
+        \node [ghost] (t1) {};
+        \node [ghost, below right=\rowheight and \colwidth of t1] (t2) {};
+        \node [graph_vertex, right=0.5*\colwidth of t1] (t3) {};
+        \node [graph_vertex, below=\rowheight of t3] (t4) {};
+        \node [fit=(t1)(t2), draw, cluster] {};
+        
+        \draw[intra] (t3) -- (t4);
+    \end{scope}
+    
+    \begin{scope}[yshift=\cellvspacing,xshift=2*\cellhspacing]
+        \node [graph_vertex] (z1) {};
+        \node [graph_vertex, right=\colwidth of z1] (z2) {};
+        \node [graph_vertex, below=\rowheight of z1] (z3) {};
+        \node [graph_vertex, below=\rowheight of z2] (z4) {};
+        \node [fit=(z1)(z4), draw, cluster] {};
+        
+        \draw[intra] (z1) -- (z4);
+        \draw[intra] (z2) -- (z3);
+    \end{scope}
+    
+    % Intercluster edges
+    \draw[inter] (v3) to [bend right] (s1);
+    \draw[inter] (v7) to [bend right] (s3);
+    \draw[inter] (v2) to [bend right] (s2);
+    \draw[inter] (v4) to [bend right] (s4);
+    \draw[inter] (v2) to [bend left] (w3);
+    \draw[inter] (v4) to [bend left] (w3);
+    \draw[inter] (v6) to [bend left] (w3);
+    \draw[inter] (v8) to [bend left] (w3);
+    \draw[inter] (w3) to [bend left] (u3);
+    \draw[inter] (w3) to [bend left] (u5);
+    \draw[inter] (s2) to [bend left] (t3);
+    \draw[inter] (s4) to [bend left] (t4);
+    \draw[inter] (t3) to [bend left] (z1);
+    \draw[inter] (t4) to [bend left] (z1);
+    \draw[inter] (t4) to [bend left] (z3);
+    
+    \draw[inter] (u5) to [bend right] (z1);
+    \draw[inter] (u7) to [bend right] (z2);
+    \draw[inter] (u8) to [bend right] (z2);
+    \draw[inter] (w3) to [bend right] (t3);
+    \draw[inter] (w3) to [bend right] (t4);
+    
+    % Arrow between graphs
+    \node [ghost, right=1cm of u8] (arrowstart) {};
+    \node [ghost, right=2cm of arrowstart] (arrowstop) {};
+    \draw [-{Triangle[width=12pt,length=15pt]}, line width=4pt] (arrowstart) -> (arrowstop);
+    
+    % Clustered graph
+    
+    \begin{scope}[xshift=3.5 * \cellhspacing, yshift=-1.1cm]
+        \node [cluster_vertex] (c1) {};
+        \node [cluster_vertex,right=2 *\colwidth of c1] (c2) {};
+        \node [cluster_vertex,right=2 *\colwidth of c2] (c3) {};
+        \node [cluster_vertex,below=3 * \rowheight of c1] (c4) {};
+        \node [cluster_vertex,below=3 * \rowheight of c2] (c5) {};
+        \node [cluster_vertex,below=3 * \rowheight of c3] (c6) {};
+        
+        \draw[cedge] (c1) -- (c2);
+        \draw[cedge] (c2) -- (c3);
+        \draw[cedge] (c4) -- (c5);
+        \draw[cedge] (c5) -- (c6);
+        \draw[cedge] (c1) -- (c4);
+        \draw[cedge] (c2) -- (c5);
+        \draw[cedge] (c3) -- (c6);
+    \end{scope}
+\end{tikzpicture}
+\end{document}

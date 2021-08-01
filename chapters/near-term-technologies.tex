@@ -1,0 +1,112 @@
+\chapter{Technologies involved}
+\label{chapter:near-term}
+
+ In this chapter we discuss technologies used for performing research presented in this work.
+ First, we discuss quantum annealing, a quantum computation paradigm witnessing rapid development in recent years. The second discussed technology, Nvidia CUDA, is present on the market for well over a decade, yet each and every iteration of GPUs brings to the table new functionalities and performance improvements. 
+
+\section{Quantum annealers}
+In the previous century we witnessed the so called digital revolution. Invention of digital computers and progressive minimization of these devices gave scientists and engineers a computational power that was previously unimaginable and allowed them to solve formerly intractable problems. The progress influenced also physics, as rapid development of computers allowed physicists for simulating almost arbitrary differential equations describing classical systems.
+
+Present century brings us closer to what one might call a quantum revolution, i.e. introduction of fully working quantum computers powerful enough to simulate quantum systems and solve real-life optimization problems. Prototypes of some of those devices are already available to the public. Without doubt, those devices are far from perfect and are burdened with multiple error sources of varying nature, ranging from noise to DAC quantization. \todo{influence of environment, decoherence and such} Nevertheless, as exemplified by our research, already this noise intermediate-scale quantum devices are capable of assisting one in simulating quantum systems in hybrid classical-quantum setup. 
+\subsection{Brief history of quantum computing}
+History of quantum computing reaches as far as to early 1980s, when Paul Benioff proposed a first quantum model of the Turing machine and Richard Feynmann suggested that quantum devices can be used to carry on simulations exceeding possibilities of classical computers. \todo{expand on Feynmanns idea, "turn the table around"} Discovery of a quantum algorithm for factoring integers in polynomial time by Peter Shor in 1994 fueled interest in quantum computing, as it demonstrated that quantum computers can be, in principle, used for solving NP-hard problems relevant to the fields outside of physics.
+
+\subsection{Adiabatic quantum computation and quantum annealing}
+\todo{quantum computing can be implemented in various ways (always utilizing quantum resources)}
+The early developments in quantum computing focused mainly on so called \emph{gate model} of computations. In this model, a sequence of gates is applied to the initially prepared qubits which are finally measured to obtain results of computation. \todo{verify timeline, avoid Polish bias}Despite its generality, constructing its physical implementation with sufficient number of qubits proved to be extremely challenging.
+
+One of the possible alternatives to the gate model, is adiabatic quantum computation, which realizes metaheuristics known as quantum annealing. In adiabatic quantum computing a goal is to minimize value of some target function $f$. In order to do so, one first has to find some hamiltonian $\mathcal{H}$ whose ground state encodes the optimal solution to the problem. Then, the system is prepared in a ground state of some initial, simpler hamiltonian $\mathcal{H}_0$. After that. the system is slowly driven in such a way that its hamiltonian changes from $\mathcal{H}_0$ to $\mathcal{H}$, i.e. the evolution of the system is governed by the following governed hamiltonian $\mathcal{h}_\text{total}$
+\begin{equation}
+    \label{eq:aqc}
+    \mathcal{H}_\text{total} = a(s) \mathcal{H}_0 + b(s)\mathcal{H}, \quad s \in [0, \tau] 
+\end{equation}
+where $a(\tau) = b(0) = 0$, and $a$ and $b$ are decreasing and increasing functions respectively.
+
+\todo{cite classic works on adiabatic quantum theorem} \todo{idea: driving system slowly so that the system can react slowly eanough, make the state follow hamiltonian} \todo{idea: quantum computing happens between simple, initial hamiltonian and the target hamiltonian} By adiabatic quantum theorem, if the evolution described by the equation \eqref{eq:aqc} is slow enough, the system will stay in ground state of $\mathcal{H}_\text{total}(s)$ for every $s \in [0, \tau]$. In particular, after reaching the target $s=\tau$, the state of the system should encode an optimal solution to target optimization problem, encoded as a ground state of $\mathcal{H}_\text{total}$.
+
+
+\subsection{D-Wave quantum annealers}
+
+The first commercially available quantum annealer was introduced by D-Wave company in 2011. At the time of writing, the newest series of D-Wave annealers is D-Wave 2000Q \todo{Update information on D-Wave architecture} utilizing chip with 2048 qubits arranged in so called \emph{Chimera} topology.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=\textwidth]{figures/chimera.pdf}
+    \caption{\textbf{a.} Example of Chimera topology. Graph presented here consists of $2 \times 2$ grid of unit cells (hence $C_2$ name). Note the sparse connectivity of presented graph as compared to full graph with the same number of nodes. \textbf{b.} Full $K_9$ graph embedded in Chimera graph from \textbf{a.}. The nodes are labelled with numbers corresponding to groups of logical qubits they were constructed from.}
+    \label{fig:chimera}
+\end{figure}
+
+In Chimera topology, qubits are arranged in a bipartite graph. Conceptually this graph can be thought of as a $n \times m$ grid of unit cells, where each unit cell consists of $8$ qubits. Each unit cell is a bipartite graph itself. An example of chimera topology can be seen in figure \ref{fig:chimera}.
+
+\section{Nvidia CUDA}
+History of specialized hardware for manipulating graphics ranges as far as to 1970s. Initially these devices, that later became known as Graphics Processing Units (GPU), offered limited functionalities. Increasing demand for performance in gaming industry and professional graphics processing drove the evolution of GPUs, which quickly became highly sophisticated devices supporting advanced 2D and 3D image manipulation. Performing such arithmetically intensive operations requires enormous computational power, and it was only the matter of time until it was realised that the power of these devices can be harnessed for general purpose computations (so called GPGPU - General Purpose computing on GPU). 
+
+Early efforts in development of GPGPU required framing of computational problem in terms of operations performed on graphical primitives, as this was the only way for using specialized API of GPUs. This changed with the development of devices and toolkits that supported operations needed for general purpose computations out of the box. Notably, in 2007 Nvidia introduced its massively parallel CUDA architecture.
+
+\subsection{Differences between CPU and GPU}
+Principles behind operation of CUDA-enabled devices are fundamentally different than the ones governing execution of program on traditional CPU-only architecture. In current x86 based computers, CPU runs given sequence of instructions (so called thread of execution) using one of its cores. Such processor is the ''brain'' of a computer, and it can perform a wide variety of tasks ranging from arithmetic operations, through accessing system's RAM, to performing IO operations and controlling other components of the system. Typical CPUs are optimized for sequential execution, and as such are usually equipped with moderate (as compared to the GPUs) number of high-performance cores. 
+
+On the other hand, GPUs are more specialized. They are well suited for performing a large number of arithmetic operations and accessing memory in parallel. They typically have more cores than a traditional CPU (with even modern commodity GPUs boasting thousands of them). Although those cores are less performant than their CPU counterparts and support much narrower set of operations, their large number combined with fast memory access gives modern GPUs advantage over CPUs in multiple areas.
+
+\subsection{Processing flow on CUDA}
+Considering the architectural differences between CPUs and GPUs, it is hardly surprising that both of these types of devices are programmed quite differently. The first major difference is that GPUs cannot operate on their own and are themselves controlled by CPU. This is why CUDA is a type of \emph{heterogenous} architectures (as opposed to CPU-only \emph{homogenous} architectures). The processing flow on CUDA is summarized in Figure \ref{fig:cuda_flow}.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.7\textwidth]{figures/CUDA_processing_flow_(En).png}
+    \caption{{\protect\todo[inline]{Important: this figure is only here temporarily, I will prepare my own graph once the text is done.}} Processing flow on CUDA. The CPU sends input data to GPU memory, and launches computational kernel. The kernel's code is executed, in parallel, using GPU. Once the execution is done, results are copied form GPU memory to system's RAM.}
+    \label{fig:cuda_flow}
+\end{figure}
+
+Programs run on GPU are organized in \emph{kernels}. For the most part kernels might be viewed as functions or subroutines (which is indeed how they are implemented) that don't have a return value. On a CPU, such function would be executed by some core as a part of a thread. In CUDA however, the very same kernel is executed by multiple threads. Executing a kernel requires specifying a \emph{grid} that will be used for running it. A grid can be 1, 2 or 3 dimensional and is itself divided into blocks. Each block is in turn also organized in 1, 2, or 3 dimensional structure of threads (the same for every block in the grid). Schematic view of a two-dimensional grid is presented on Figure \ref{fig:cuda_grid}.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figures/grid-of-thread-blocks.png}
+    \caption{{\protect \todo[inline]{This is also a temporary figure...}} A schematic view of an example two-dimensional CUDA grid. Presented here is a 2 $\times$ 3 grid of 3 $\times$ 4 blocks.}
+    \label{fig:cuda_grid}
+\end{figure}
+
+As already mentioned, each thread in the grid executes \emph{precisely the same} kernel. It might therefore seem surprising that nevertheless they are able to access different parts of memory. This is possible, because each thread is identified by its indices in both the grid and the block. Those indices can be used e.g. for computing offsets in arrays that are being processed. A more sophisticated use of thread and block indices will be exemplified in chapter \ref{chapter:bruteforce}.
+
+\subsection{Programming environment}
+CUDA devices can be programmed directly using either C/C++ or Fortran. The C/C++ code can be compiled using Nvidia's nvcc compiler, shipped out of the box with CUDA toolkit, while using Fortran requires installing its third-party distribution (e.g. PG Fortran developed by Portland Group). Giving a comprehensive walkthrough of using either C/C++ or Fortran with CUDA is well beyond the scope of this thesis, but for the sake of completeness we present a short example of CUDA Fortran code in listing \ref{lst:cuda_fortran} \todo{Note to self: remember to either replace it with my own example or cite the source (CUDA Fortran documentatoin)}. 
+
+\begin{lstlisting}[
+    language=Fortran,
+    label=lst:cuda_fortran,
+    captionpos=b,
+    caption={Example code in CUDA Fortran. Presented here are an example kernel performing saxpy operation together with a host subroutine that uses it.},
+    frame=tlrb,
+    aboveskip=2em,
+    belowskip=2em
+]{fortran}
+! Kernel definition
+attributes(global) subroutine ksaxpy( n, a, x, y )
+   real, dimension(*) :: x,y
+   real, value :: a
+   integer, value :: n, i
+   i = (blockidx%x-1) * blockdim%x + threadidx%x
+   if( i <= n ) y(i) = a * x(i) + y(i)
+end subroutine
+
+! Host subroutine
+subroutine solve( n, a, x, y )
+   real, device, dimension(*) :: x, y
+   real :: a
+   integer :: n
+   ! call the kernel
+   call ksaxpy<<<n/64, 64>>>( n, a, x, y )
+end subroutine
+\end{lstlisting}
+
+Along the nvcc compiler, the CUDA toolkit contains several, more specialized libraries. Among others, those include:
+\begin{itemize}
+    \item cuBLAS -- CUDA Basic Linear Algebra Subroutines library,
+    \item cuFFT -- CUDA Fast Fourier Transform library,
+    \item cuRAND -- CUDA Random Number Generation library,
+    \item cuSPARSE -- CUDA library for manipulating sparse matrices.
+\end{itemize}
+For many high-level languages, there exist third-party wrappers enabling use of CUDA (e.g. PyCuda for Python).
+
+
