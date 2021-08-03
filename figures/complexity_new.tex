@@ -1,0 +1,45 @@
+\documentclass{standalone}
+
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta}
+\usetikzlibrary{positioning}
+
+\begin{document}
+\begin{tikzpicture}
+
+  % ---------- Left side (P != NP) ----------
+
+  % Shapes
+  \draw (0,-1.14cm) ellipse (1.4cm and 0.84cm);
+  \draw (0, 2.75) ellipse (3.6cm and 2.0cm);
+  \draw (0, 0) ellipse (2.5cm and 2.0cm);
+
+  % Labels
+  \node at (0, 0.1) (NP1) {\small\textbf{NP}};
+  \node at (0, -1.1) (P1) {\small\textbf{P}};
+  \node at (0, 1.3) (NPC1) {\small\textbf{NP--complete}};
+  \node at (0, 3) (NPH1) {\small\textbf{NP--hard}};
+
+
+
+
+  % ---------- Right side (P = NP)----------
+
+  % Shapes
+  \draw (8, 0.4) ellipse (2.5cm and 1.4cm);
+  \draw (8, 1.5) ellipse (3.6cm and 2.5cm);
+
+  % Labels
+  \node at (8, 2.75) (NPH1) {\small\textbf{NP--hard}};
+  \node[text width=4cm, align=center] at (8, 0.4) (PNP) {{\small\textbf{NP} = \textbf{P} = \textbf{NP--complete}}};
+
+
+  % ---------- Titles ----------
+  \node at (0, 5.5) (P1) {\small\textbf{P $\ne$ NP}};
+  \node at (8, 5.5) (P1) {\small\textbf{P = NP}};
+
+  % ---------- Lines ----------
+  \draw[gray] (4, -2) -- (4, 6);
+  \draw[gray] (-4, 5) -- (12, 5);
+\end{tikzpicture}
+\end{document}
