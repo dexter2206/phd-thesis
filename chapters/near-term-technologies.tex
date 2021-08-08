@@ -4,30 +4,20 @@
  In this chapter we discuss technologies used for performing research presented in this work.
  First, we discuss quantum annealing, a quantum computation paradigm witnessing rapid development in recent years. The second discussed technology, Nvidia CUDA, is present on the market for well over a decade, yet each and every iteration of GPUs brings to the table new functionalities and performance improvements. 
 
-\section{Quantum annealers}
-In the previous century we witnessed the so called digital revolution. Invention of digital computers and progressive minimization of these devices gave scientists and engineers a computational power that was previously unimaginable and allowed them to solve formerly intractable problems. The progress influenced also physics, as rapid development of computers allowed physicists for simulating almost arbitrary differential equations describing classical systems.
 
-Present century brings us closer to what one might call a quantum revolution, i.e. introduction of fully working quantum computers powerful enough to simulate quantum systems and solve real-life optimization problems. Prototypes of some of those devices are already available to the public. Without doubt, those devices are far from perfect and are burdened with multiple error sources of varying nature, ranging from noise to DAC quantization. \todo{influence of environment, decoherence and such} Nevertheless, as exemplified by our research, already this noise intermediate-scale quantum devices are capable of assisting one in simulating quantum systems in hybrid classical-quantum setup. 
-\subsection{Brief history of quantum computing}
-History of quantum computing reaches as far as to early 1980s, when Paul Benioff proposed a first quantum model of the Turing machine and Richard Feynmann suggested that quantum devices can be used to carry on simulations exceeding possibilities of classical computers. \todo{expand on Feynmanns idea, "turn the table around"} Discovery of a quantum algorithm for factoring integers in polynomial time by Peter Shor in 1994 fueled interest in quantum computing, as it demonstrated that quantum computers can be, in principle, used for solving NP-hard problems relevant to the fields outside of physics.
-
-\subsection{Adiabatic quantum computation and quantum annealing}
-\todo{quantum computing can be implemented in various ways (always utilizing quantum resources)}
-The early developments in quantum computing focused mainly on so called \emph{gate model} of computations. In this model, a sequence of gates is applied to the initially prepared qubits which are finally measured to obtain results of computation. \todo{verify timeline, avoid Polish bias}Despite its generality, constructing its physical implementation with sufficient number of qubits proved to be extremely challenging.
-
-One of the possible alternatives to the gate model, is adiabatic quantum computation, which realizes metaheuristics known as quantum annealing. In adiabatic quantum computing a goal is to minimize value of some target function $f$. In order to do so, one first has to find some hamiltonian $\mathcal{H}$ whose ground state encodes the optimal solution to the problem. Then, the system is prepared in a ground state of some initial, simpler hamiltonian $\mathcal{H}_0$. After that. the system is slowly driven in such a way that its hamiltonian changes from $\mathcal{H}_0$ to $\mathcal{H}$, i.e. the evolution of the system is governed by the following governed hamiltonian $\mathcal{h}_\text{total}$
+\section{Adiabatic quantum computation and quantum annealing}
+One of the possible alternatives to the gate model is adiabatic quantum computation which relies on adiabatic quantum theorem \cite{born}. Informally, the theorem states that if the physical system starting from its instantenous ground state is driven slowly enough, the evolution follows hamiltonian and the system stays in the instantenous ground state. Adiabatic quantum computing might be realized in a form of quantum annealing. In this metaheuristics, a goal is to minimize value of some target function $f$. In order to do so, one first has to find some Ising hamiltonian $H$ whose ground state encodes the optimal solution to the problem. Then, the system is prepared in a ground state of some initial, simpler hamiltonian $H_0$. After that. the system is slowly perturbed in such a way that its hamiltonian changes from $H_0$ to $H$, i.e. the evolution of the system is governed by the following hamiltonian $H_\text{total}$
 \begin{equation}
     \label{eq:aqc}
-    \mathcal{H}_\text{total} = a(s) \mathcal{H}_0 + b(s)\mathcal{H}, \quad s \in [0, \tau] 
+    {H}_\text{total}(s) = a(s) {H}_0 + b(s){H}, \quad s \in [0, \tau]
 \end{equation}
 where $a(\tau) = b(0) = 0$, and $a$ and $b$ are decreasing and increasing functions respectively.
+By adiabatic quantum theorem, if the evolution described by the equation \eqref{eq:aqc} is slow enough, the system will stay in ground state of ${H}_\text{total}(s)$ for every $s \in [0, \tau]$. In particular, after reaching the target $s=\tau$, i.e. when $H_\text{total} = H$, the state of the system should encode an optimal solution to target optimization problem.
 
-\todo{cite classic works on adiabatic quantum theorem} \todo{idea: driving system slowly so that the system can react slowly eanough, make the state follow hamiltonian} \todo{idea: quantum computing happens between simple, initial hamiltonian and the target hamiltonian} By adiabatic quantum theorem, if the evolution described by the equation \eqref{eq:aqc} is slow enough, the system will stay in ground state of $\mathcal{H}_\text{total}(s)$ for every $s \in [0, \tau]$. In particular, after reaching the target $s=\tau$, the state of the system should encode an optimal solution to target optimization problem, encoded as a ground state of $\mathcal{H}_\text{total}$.
 
+\section{D-Wave quantum annealers}
 
-\subsection{D-Wave quantum annealers}
-
-The first commercially available quantum annealer was introduced by D-Wave company in 2011. At the time of writing, the newest series of D-Wave annealers is D-Wave 2000Q \todo{Update information on D-Wave architecture} utilizing chip with 2048 qubits arranged in so called \emph{Chimera} topology.
+The first commercially available quantum annealer was introduced by D-Wave company in 2011. At the time of writing, the newest series of D-Wave annealers is The Advantage System utilizing chip with at least 5000 qubits arranged in so called \emph{Pegasus} topology. These novel devices deomnstrate a significant improvement over previous 2000Q generation which used at most 2048 qubit chip arranged in Chimera topology.
 
 \begin{figure}[h]
     \centering
@@ -37,6 +27,7 @@ The first commercially available quantum annealer was introduced by D-Wave compa
 \end{figure}
 
 In Chimera topology, qubits are arranged in a bipartite graph. Conceptually this graph can be thought of as a $n \times m$ grid of unit cells, where each unit cell consists of $8$ qubits. Each unit cell is a bipartite graph itself. An example of chimera topology can be seen in figure \ref{fig:chimera}.
+\todo{describe pegasus topology}
 
 \section{Nvidia CUDA}
 History of specialized hardware for manipulating graphics ranges as far as to 1970s. Initially these devices, that later became known as Graphics Processing Units (GPU), offered limited functionalities. Increasing demand for performance in gaming industry and professional graphics processing drove the evolution of GPUs, which quickly became highly sophisticated devices supporting advanced 2D and 3D image manipulation. Performing such arithmetically intensive operations requires enormous computational power, and it was only the matter of time until it was realised that the power of these devices can be harnessed for general purpose computations (so called GPGPU - General Purpose computing on GPU). 
@@ -110,3 +101,8 @@ Along the nvcc compiler, the CUDA toolkit contains several, more specialized lib
 For many high-level languages, there exist third-party wrappers enabling use of CUDA (e.g. PyCuda for Python).
 
 
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "../main"
+%%% End:
