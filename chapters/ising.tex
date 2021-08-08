@@ -1,5 +1,7 @@
 \chapter{Ising model and complexity theory}
 
+This chapter serves as an introduction to Ising model, a fundamental concept for the rest of the thesis. To formally discuss how hard it is to find the ground state of Ising spin--glass, we laso briefly discuss the complexity--theoretical aspects of the problem. The chapter is concluded with a brief overview of existing heuristic algorithms for solving Ising spin--glasses.
+
 \section{Ising model}
 Consider a simple, undirected graph $G = (V, E)$ with $N$ nodes labelled by consecutive natural numbers. With each node $i \in V$ we associate a dichotomous spin variable $s_i \in \{-1, 1\}$. To each edge $\{i, j\} \in E$, we assign an interaction strength $J_{ij}$ and to each node $i \in V$ we assign local magnetic field $h_i$. Here, all $J_{ij}$ and $h_i$ are real numbers. For such system, one can define the following energy function (Hamiltonian)
 \begin{equation}
