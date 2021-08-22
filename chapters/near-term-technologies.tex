@@ -6,28 +6,28 @@
 
 
 \section{Adiabatic quantum computation and quantum annealing}
-One of the possible alternatives to the gate model is adiabatic quantum computation which relies on adiabatic quantum theorem \cite{born}. Informally, the theorem states that if the physical system starting from its instantenous ground state is driven slowly enough, the evolution follows hamiltonian and the system stays in the instantenous ground state. Adiabatic quantum computing might be realized in a form of quantum annealing. In this metaheuristics, a goal is to minimize value of some target function $f$. In order to do so, one first has to find some Ising hamiltonian $H$ whose ground state encodes the optimal solution to the problem. Then, the system is prepared in a ground state of some initial, simpler hamiltonian $H_0$. After that. the system is slowly perturbed in such a way that its hamiltonian changes from $H_0$ to $H$, i.e. the evolution of the system is governed by the following hamiltonian $H_\text{total}$
+One of the possible alternatives to the standard gate model is adiabatic quantum computation which relies on adiabatic quantum theorem \cite{born}. Informally, the theorem states that if the physical system starting from its instantenous ground state is driven slowly enough, the evolution follows hamiltonian and the system stays in the instantenous ground state. Adiabatic quantum computing might be realized in a form of quantum annealing. In this metaheuristics, a goal is to minimize value of some target function $f$. In order to do so, one first has to find some Ising hamiltonian $H$ whose ground state encodes the optimal solution to the problem. Then, the system is prepared in a ground state of some initial, simpler hamiltonian $H_0$. After that. the system is slowly perturbed in such a way that its hamiltonian changes from $H_0$ to $H$, i.e. the evolution of the system is governed by the following hamiltonian $H_\text{total}$
 \begin{equation}
     \label{eq:aqc}
     {H}_\text{total}(s) = a(s) {H}_0 + b(s){H}, \quad s \in [0, \tau]
 \end{equation}
-where $a(\tau) = b(0) = 0$, and $a$ and $b$ are decreasing and increasing functions respectively.
-By adiabatic quantum theorem, if the evolution described by the equation \eqref{eq:aqc} is slow enough, the system will stay in ground state of ${H}_\text{total}(s)$ for every $s \in [0, \tau]$. In particular, after reaching the target $s=\tau$, i.e. when $H_\text{total} = H$, the state of the system should encode an optimal solution to target optimization problem.
+where $a(\tau) = b(0) = 0, \; a(0) = b(\tau) = 1$, and $a$ and $b$ are decreasing and increasing functions respectively.
+By adiabatic quantum theorem, if the evolution described by the equation \eqref{eq:aqc} is slow enough, the system will stay in ground state of ${H}_\text{total}(s)$ for every $s \in [0, \tau]$. In particular, after reaching $s=\tau$, i.e. when $H_\text{total} = H$, the state of the system should encode an optimal solution to target optimization problem.
 
 
-\section{D-Wave quantum annealers}
+\subsection{D-Wave quantum annealers}
 
-The first commercially available quantum annealer was introduced by D-Wave company in 2011. At the time of writing, the newest series of D-Wave annealers is The Advantage System utilizing chip with at least 5000 qubits arranged in so called \emph{Pegasus} topology. These novel devices deomnstrate a significant improvement over previous 2000Q generation which used at most 2048 qubit chip arranged in Chimera topology.
+The first commercially available quantum annealer was introduced by D-Wave company in 2011. At the time of writing, the newest series of D-Wave annealers is The Advantage System utilizing chip with at least 5000 qubits arranged in so called \emph{Pegasus} topology. These novel devices deomnstrate a significant improvement over previous 2000Q generation, which used at most 2048 qubit chip arranged in Chimera topology. Since most research utilizing quantum annealers in this work was conducted using 2000Q devices, in what follows we mostly limit our attention to their specific qubit arrangement. We refer an interested reader to \cite{boothby} for detailed description of Pegasus topology and adequate minor embeddings.
 
 \begin{figure}[h]
     \centering
     \includegraphics[width=\textwidth]{figures/chimera.pdf}
-    \caption{\textbf{a.} Example of Chimera topology. Graph presented here consists of $2 \times 2$ grid of unit cells (hence $C_2$ name). Note the sparse connectivity of presented graph as compared to full graph with the same number of nodes. \textbf{b.} Full $K_9$ graph embedded in Chimera graph from \textbf{a.}. The nodes are labelled with numbers corresponding to groups of logical qubits they were constructed from.}
+    \caption{\textbf{a.} Example of Chimera topology. Graph presented here consists of $2 \times 2$ grid of unit cells (hence $C_2$ name). Note the sparse connectivity of the presented graph as compared to the full graph with the same number of nodes. \textbf{b.} Full $K_9$ graph embedded in Chimera graph from \textbf{a.}. The nodes are labelled with numbers corresponding to groups of logical qubits they were constructed from.}
     \label{fig:chimera}
 \end{figure}
 
-In Chimera topology, qubits are arranged in a bipartite graph. Conceptually this graph can be thought of as a $n \times m$ grid of unit cells, where each unit cell consists of $8$ qubits. Each unit cell is a bipartite graph itself. An example of chimera topology can be seen in figure \ref{fig:chimera}.
-\todo{describe pegasus topology}
+In Chimera topology, qubits are arranged in a bipartite graph. Conceptually this graph can be thought of as a $n \times m$ grid of unit cells, where each unit cell is a bipartite graph consisting of $8$ qubits. Figure \ref{fig:chimera} shows an example of Chimera $C_{2}$ topology.
+
 
 \section{Nvidia CUDA}
 History of specialized hardware for manipulating graphics ranges as far as to 1970s. Initially these devices, that later became known as Graphics Processing Units (GPU), offered limited functionalities. Increasing demand for performance in gaming industry and professional graphics processing drove the evolution of GPUs, which quickly became highly sophisticated devices supporting advanced 2D and 3D image manipulation. Performing such arithmetically intensive operations requires enormous computational power, and it was only the matter of time until it was realised that the power of these devices can be harnessed for general purpose computations (so called GPGPU - General Purpose computing on GPU). 
