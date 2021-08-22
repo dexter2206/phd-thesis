@@ -17,7 +17,7 @@ By adiabatic quantum theorem, if the evolution described by the equation \eqref{
 
 \subsection{D-Wave quantum annealers}
 
-The first commercially available quantum annealer was introduced by D-Wave company in 2011. At the time of writing, the newest series of D-Wave annealers is The Advantage System utilizing chip with at least 5000 qubits arranged in so called \emph{Pegasus} topology. These novel devices deomnstrate a significant improvement over previous 2000Q generation, which used at most 2048 qubit chip arranged in Chimera topology. Since most research utilizing quantum annealers in this work was conducted using 2000Q devices, in what follows we mostly limit our attention to their specific qubit arrangement. We refer an interested reader to \cite{boothby} for detailed description of Pegasus topology and adequate minor embeddings.
+The first commercially available quantum annealer was introduced by D-Wave company in 2011. At the time of writing, the newest series of D-Wave annealers is The Advantage System utilizing chip with at least 5000 qubits. These novel devices deomnstrate a significant improvement over previous 2000Q generation, which used at most 2048 qubit chip with sparser connectivity. Since most research utilizing quantum annealers in this work was conducted using 2000Q devices, in what follows we mostly limit our attention to this specific devices.
 
 \begin{figure}[h]
     \centering
@@ -26,7 +26,12 @@ The first commercially available quantum annealer was introduced by D-Wave compa
     \label{fig:chimera}
 \end{figure}
 
-In Chimera topology, qubits are arranged in a bipartite graph. Conceptually this graph can be thought of as a $n \times m$ grid of unit cells, where each unit cell is a bipartite graph consisting of $8$ qubits. Figure \ref{fig:chimera} shows an example of Chimera $C_{2}$ topology.
+
+\subsection{Annealer topologies and minor embeddings}
+
+The Ising model described in previous chapter allows arbitrary interactions between spins. However, this is often not the case with physical devices like quantum annealers. For instance, in D-Wave devices spins are arranged into a specific \emph{topology} with limited connectivity. Thus, the possible graph on which the optimization problems can be defined is much sparser than the complete $K_{N}$ graph. Spins in 2000Q devices are arranged in the so called \emph{Chimera} topology depicted in figure \ref{fig:chimera}. The Chimera graph can be thought of as a $n \times m$ lattice of unit cells, where each cell is a complete bipartite $K_{4,4}$. Qubits are also connected to two qubits in neighbouring cells via external couplers (unless they reside on the border or a corner of the lattice), resulting in at most total 6 connections per qubit. Straightforward calculation shows that Chimera graph has total of $16mn + 4(m-1)n + 4(n-1)m$ edges.
+
+The new Advantage system uses \emph{Pegasus} topology, which increases maximum degree of vertex in the graph to 15. For the details of this topology we refer interested reader to \cite{boothby}.
 
 
 \section{Nvidia CUDA}
