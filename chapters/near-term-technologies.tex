@@ -27,12 +27,23 @@ The first commercially available quantum annealer was introduced by D-Wave compa
 \end{figure}
 
 
-\subsection{Annealer topologies and minor embeddings}
+\subsection{Annealer topologies}
 
 The Ising model described in previous chapter allows arbitrary interactions between spins. However, this is often not the case with physical devices like quantum annealers. For instance, in D-Wave devices spins are arranged into a specific \emph{topology} with limited connectivity. Thus, the possible graph on which the optimization problems can be defined is much sparser than the complete $K_{N}$ graph. Spins in 2000Q devices are arranged in the so called \emph{Chimera} topology depicted in figure \ref{fig:chimera}. The Chimera graph can be thought of as a $n \times m$ lattice of unit cells, where each cell is a complete bipartite $K_{4,4}$. Qubits are also connected to two qubits in neighbouring cells via external couplers (unless they reside on the border or a corner of the lattice), resulting in at most total 6 connections per qubit. Straightforward calculation shows that Chimera graph has total of $16mn + 4(m-1)n + 4(n-1)m$ edges.
 
 The new Advantage system uses \emph{Pegasus} topology, which increases maximum degree of vertex in the graph to 15. For the details of this topology we refer interested reader to \cite{boothby}.
 
+\subsection{Minor embeddings}
+Not every Ising problem one might wish to solve is compatible with topology of physical quantum annealer. This problem can sometimes be circumvented using procedure called \emph{minor embedding}. In this approach one considers groups of several physical spins connected in a chain as a single logical one. Vertices corresponding to spins in each such chain are contracted, resulting in the new graph, having higher connectivity but smaller number of vertices than the original one. With the proper choice of chains this new graph can contain a subgraph isomorphic to the graph of the problem to solve. The minor embedding process is illustrated in figure \ref{fig:chimera}.
+
+Grouping qubits into chains and contracting them is not enough to run the embedded problem. One first has to ensure that all spins in a chain align in the same direction, so that they can indeed represent a single logical variable. This is accomplished by adding a penalty term which prohibitively increases cost of solutions in which value of spins in chains differ. However, due to the probabilitsic nature of quantum annealer, even after adding penalty one might obtain solutions in which values of spins in some chains disagree. Such disagreeing chains are called \emph{broken}. Since solutions containing broken chains cannot be interpreted directly as a solution to the original problem, one has to either discard them, or manually correct them (e.g. by choosing most common value among the spins in chain).
+
+% To define minor embedding more formally, let us first define the notion of vertex contraction. Let $(G, E)$ be a graph defining topology of the device and let $v_{1}, \ldots, v_{{n}} \in E$ be a chain of vertices. Contraction of vertices $v_{1}, \ldots, v_{n}$ is a new graph $G'=(V', E')$ such that
+% \begin{itemize}
+%   \item $V' = V \setminus \{v_{1}, \ldots, v_{{n}}\} \cup \{w\}$, where $w$ is some new vertex.
+%   \item $E' = \{e \in E\colon v_{i} \notin E\} \cup \{\{v, w\}\colon \exists_{i} \{v, v_{i}\} \in E\}$
+% \end{itemize}
+% Intuitively, contracting vertices replaces them with a new one connected with their every neighbour.
 
 \section{Nvidia CUDA}
 History of specialized hardware for manipulating graphics ranges as far as to 1970s. Initially these devices, that later became known as Graphics Processing Units (GPU), offered limited functionalities. Increasing demand for performance in gaming industry and professional graphics processing drove the evolution of GPUs, which quickly became highly sophisticated devices supporting advanced 2D and 3D image manipulation. Performing such arithmetically intensive operations requires enormous computational power, and it was only the matter of time until it was realised that the power of these devices can be harnessed for general purpose computations (so called GPGPU - General Purpose computing on GPU). 
