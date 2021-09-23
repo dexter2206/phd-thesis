@@ -89,7 +89,7 @@ Local memory resides physically on the device, and thus offers the same bandwidt
 
 Constant memory and texture memory are two types of read-only memory \footnote{Read-only here means ``Not writeable from inside the kernel''} residing in global memory. Accesses to constant memory are cached in constant cache and accesses to it are serialized. Therefore, each request is split into as many  transactions as there are different memory addresses in the original request. Texture memory is cached in texture cache, which is optimized for accessing spatial data. Hence, the best performance is achieved if threads in a warp read or write to the addresses that are close in 2D.
 
-Threads can cooperate and share data through the use of on-chip \emph{shared  memory}. The amount of shared memory allocated is directly controlled by the programmer either on the kernel definition level, or during its launch. Shared memory is organized in banks that can be accessed simultanenously, and the best performance is achieved if each thread accesses memory in different bank. Otherwise, a \emph{bank conflict occurs} and the request is split into as little conflict-free requests as possible.
+Threads can cooperate and share data through the use of on-chip \emph{shared  memory}. The amount of allocated shared memory is directly controlled by the programmer either on the kernel definition level, or during its launch. Shared memory is organized in banks that can be accessed simultanenously, and the best performance is achieved if each thread in a warp accesses memory in a different bank. Otherwise, a \emph{bank conflict occurs} and the request is split into as little conflict-free requests as possible.
 
 
 \subsection{Programming environment}
