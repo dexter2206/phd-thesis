@@ -61,7 +61,7 @@ Considering the architectural differences between CPUs and GPUs, it is hardly su
 \begin{figure}[ht]
     \centering
     \includegraphics[width=0.7\textwidth]{figures/CUDA_processing_flow_(En).png}
-    \caption{{\protect\todo[inline]{Important: this figure is only here temporarily, I will prepare my own graph once the text is done.}} Processing flow on CUDA. The CPU sends input data to GPU memory, and launches computational kernel. The kernel's code is executed, in parallel, using GPU. Once the execution is done, results are copied form GPU memory to system's RAM.}
+    \caption{{\protect\todo[inline]{Important: this figure is only here temporarily, I will prepare my own graph once the text is done.}} Processing flow on CUDA. The CPU sends input data to the GPU memory, and launches the computational kernel. The kernel's code is executed, in parallel, using multiple threads on GPU. Once the execution is done, results are copied from the GPU memory to the system's RAM.}
     \label{fig:cuda_flow}
 \end{figure}
 
