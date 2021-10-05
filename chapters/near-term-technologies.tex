@@ -14,6 +14,12 @@ One of the possible alternatives to the standard gate model is adiabatic quantum
 where $a(\tau) = b(0) = 0, \; a(0) = b(\tau) = 1$, and $a$ and $b$ are decreasing and increasing functions respectively.
 By adiabatic quantum theorem, if the evolution described by the equation \eqref{eq:aqc} is slow enough, the system will stay in ground state of ${H}_\text{total}(s)$ for every $s \in [0, \tau]$. In particular, after reaching $s=\tau$, i.e. when $H_\text{total} = H$, the state of the system should encode an optimal solution to target optimization problem.
 
+\subsection{Comparison to classical model of computation}
+It is clearly visible that quantum annealing is different from computing using classical computers. One of the most obvious differences is computational model. On classical computers one essentially writes programs as a series of instructions to be executed by the CPU. On typical machines, CPU is capable of performing arithmetic operations, computing values of some special functions, managing execution flow, controlling I/O and much more. In comparison, quantum annealers are capable of executing a single operation: annealing given optimization problem. Therefore, programming these devices boils down to defining optimization problem and tuning the annealing parameters. There is no processing flow controlled by the programmer.
+
+Another difference between classical computers and quantum annealers is lack of working memory in the former. Classical computers use working memory (typically in the form of RAM) to store machine code and data. However, quantum annealers do not need to store neither code or data, and hence they do not feature analogous component. Similarly, quantum annealers, being purely computational oriented devices, do not have mass storage.
+
+A slightly less obvious difference between classical computers and quantum annealers is their model of parallelism. Classical computers are capable of running several threads of execution at the same time. However, every nontrivial classical algorithm involving parallelism must necessarily also include a serial part, which limits speedup gained for introducing more CPU cores or CPUs. In contrast, quantum annealers are capable of annealing multiple qubits at the same time, which makes their operation inherently parallel.
 
 \subsection{D-Wave quantum annealers}
 
@@ -46,6 +52,10 @@ Grouping qubits into chains and contracting them is not enough to run the embedd
 % Intuitively, contracting vertices replaces them with a new one connected with their every neighbour.
 
 \section{Nvidia CUDA}
+
+Quantum annealing, introduced in the previous section, is an inherently heuristic process. Like many heuristic algorithms, it cannot certify that the solution it found is in fact optimal. One way to assess performance of such algorithms is to compare their results with known low-energy spectrum of some test instances. In this section, we describe the Nvidia CUDA technology, which we use for our implementation of massively parallel brute-force algorithm describe in chapter \ref{chapter:bruteforce}.
+
+\subsection{Brief history of Graphics Processing Units}
 History of specialized hardware for manipulating graphics ranges as far as to 1970s. Initially these devices, that later became known as Graphics Processing Units (GPU), offered limited functionalities. Increasing demand for performance in gaming industry and professional graphics processing drove the evolution of GPUs, which quickly became highly sophisticated devices supporting advanced 2D and 3D image manipulation. Performing such arithmetically intensive operations requires enormous computational power, and it was only the matter of time until it was realised that the power of these devices can be harnessed for general purpose computations (so called GPGPU - General Purpose computing on GPU). 
 
 Early efforts in development of GPGPU required framing of computational problem in terms of operations performed on graphical primitives, as this was the only way for using specialized API of GPUs. This changed with the development of devices and toolkits that supported operations needed for general purpose computations out of the box. Notably, in 2007 Nvidia introduced its massively parallel CUDA architecture.
