@@ -1,19 +1,61 @@
 \chapter*{Introduction}
-The previous century has witnessed what is now called the digital revolution. Introduction of computers dramatically altered multiple aspects of our lives. In particular, almost every area of science benefitted tremendously from the increasingly available computing power \cite{winsberg}. Physics was no exception and numerical simulations assisting experiments are now a commonplace.
+The previous century has witnessed what is now called the digital revolution. The introduction of
+computers dramatically altered multiple aspects of our lives. In particular, almost every area of
+science benefitted hugely from the increasingly available computational power \cite{winsberg}.
+Physics was no exception and numerical simulations now commonly assist experiments.
 
-It is well-known that simulating quantum systems -- a holy grail of modern computational physics -- is an extremely challenging endeavour \cite{feynman.82}. It is only natural to ask whether advances in technology can bring us closer to this goal.  Moore's law \cite{mack}, that so far well predicted rate of growth of computational power of classical computers, is expected to slow down in the years to come \cite{waldrop, kumar}. Even more importantly, it is commonly believed that simulating quantum system using any Turing-machine compatible model of computations is infeasible and must result in an exponential slowdown \cite{feynman.82, poplavskii}. For those two reasons alone one should expect that efficient simulations of many-body quantum systems, if at all possible, can be done only if one reaches beyond classical architectures of computing devices.
+Simulating quantum systems -- a holy grail of modern computational physics -- is a highly
+challenging task for classical computers \cite{feynman.82}. The difficulties can be blamed on the
+enormous sizes of the state spaces of such systems. Direct, naive simulations would require solving
+systems of differential equations with the number of variables exponential in the number of
+particles. But what about using more sophisticated algorithms? Surprisingly, it is commonly believed
+that a sufficiently efficient classical algorithm for simulating quantum systems does not exist
+\cite{feynman.82, poplavskii}. Matters seem even worse when one considers that increase in the
+classical devices' computational power cannot accelerate infinitely. Moore's law \cite{mack}, which
+so far well predicted this growth, is expected to slow down in the years to come \cite{waldrop,
+kumar}.
 
-The 1980s Richard Feynmann and Paul Benioff put forward an idea that quantum devices can be used to carry simulations of quantum systems \cite{feynman.82,benioff.80}. These idea led to development of several quantum computation models. In 1985 David Deutsh described universal, gate--based quantum computer  \cite{deutsch}, a device capable of simulating any other quantum computer with at most polynomial slowdown. The 1990s and early 2000s saw emergence of another model of quantum computation, Adiabatic Quantum Computing (AQC) \cite{kadowaki,farhi}, later proven to be equivalent to the standard gate--based model \cite{aharonov}.
+If classical computers cannot simulate quantum physics efficiently, what device can? In the 1980s
+Richard Feynmann and Paul Benioff put forward the idea that quantum devices can be used to carry
+simulations of quantum systems \cite{feynman.82,benioff.80}. This idea led to the development of
+several quantum computation models. In 1985 David Deutsh described a universal, gate--based quantum
+computer \cite{deutsch}, a device capable of simulating any other quantum computer with at most
+polynomial slowdown. The 1990s and early 2000s saw the emergence of another model of quantum
+computation, Adiabatic Quantum Computing (AQC) \cite{kadowaki,farhi}. Interestingly, AQC was later
+proven to be equivalent to the standard gate--based model \cite{aharonov}.
 
-Even before usable quantum computers were constructed, several notable algorithms that could utilize them were developed. In 1994 Peter Shor published his, now famous, algorithm for integer factorization \cite{shor}, thus demonstrating that quantum computers can (in principle) solve some problems believed to be intractable by their classical counterparts \cite{kleinjung}. Two years later Grover presented quantum algorithm for unstructured database search \cite{grover} offering quadratic speedup over classical algorithms performing the same task. These developments, demonstrating practical usage of quantum computers, further fueled interest in the field.
+Just like a classical computer, a quantum computer needs software to run. And software is based on
+algorithms, describing how the computation should be performed. It is not a surprise that quantum
+computers operate in a very different way than classical ones, and so they require different,
+specialized algorithms. What is surprising is that several notable quantum algorithms were developed
+even before the first quantum computers were constructed. In 1994 Peter Shor published his, now
+famous, algorithm for integer factorization \cite{shor}. Shor's algorithm demonstrated that quantum
+computers are (in principle) capable of solving problems intractable by the classical ones
+\cite{kleinjung}. It was also shown that quantum computers could offer a significant performance
+boost for easier problems. For instance, in 1996 Grover presented a quantum algorithm for
+unstructured database search \cite{grover}, offering quadratic speedup over classical approaches. 
 
-In recent years we observed unprecedented development of hardware that brings us closer to the quantum revolution. In particular, several implementations of gate-based quantum computers \cite{ionq, bohnet}, quantum annealers \cite{johnson, dattani} were developed and made publicly available, allowing scientist to benchmark them and further research their possible applications.
+The invention of specialized quantum algorithms further fueled interest in the field. In recent years we observed an unprecedented development of hardware that brings us closer to the quantum revolution. Several implementations of gate--based quantum computers \cite{ionq, bohnet} and quantum annealers \cite{johnson, dattani} were constructed and made publicly available. This allowed scientists to benchmark them and further research their possible applications.
 
-However promising, near-term quantum computers are far from perfect. One could ask whether already these noisy devices can be used for simulating dynamics of quantum systems. In this thesis, we are aiming to show that this is indeed the case, and present-day quantum annealers can be used in hybrid, parallel-in-time algorithms simulating simple quantum systems. While our algorithm is only a proof of concept, it exemplifies possible directions of future research.
+However promising, near-term quantum computers are far from perfect. One could ask whether already
+these noisy devices can be used for simulating the dynamics of quantum systems. In this thesis, we
+are aiming to show that this is indeed the case, and present-day quantum annealers can be used in a
+hybrid, parallel-in-time algorithm simulating small quantum systems. While our algorithm is only a
+proof of concept, it exemplifies possible directions of future research.
 
-A key component in assessing performance of current quantum annealers is comparing them to the classical algorithms solving the same problems. While there exist plethora of general heuristic methods for finding ground state of Ising spin--glass, one can ask if it is possible to construct better algorithm tailored for problems defined on the same graph as the physical device. As the next point in the thesis, we present recent, heuristic algorithm for finding low-energy spectrum of Ising spin-glass based on tensor-networks specifically suited for problems defined on Chimera-like graphs.
+A key component in assessing the performance of current quantum annealers is comparing them to the
+classical algorithms solving the same problems. While there exist plethora of general heuristic
+methods for finding a ground state of Ising spin--glass, one can ask if it is possible to construct
+a better algorithm tailored for problems defined on the same graph as the physical device. As the
+next point in the thesis, we present a recent, heuristic algorithm for finding the low-energy
+spectrum of an Ising spin--glass based on tensor-networks specifically suited for problems defined
+on Chimera-like graphs.
 
-The last chapter of the thesis describes a fast, parallel approach for exhaustively searching for low energy spectrum of Ising spin--glass problems. Our method is suitable for solving small (less than 50 spins), but otherwise arbitrary instances. The presented approach can be used for benchmarking other algorithms that cannot certify their solution. We exemplify its usage by benchmarking recent MPS--based algorithm on a set of random spin-glass problems.
+The last chapter of the thesis describes a fast, parallel approach for exhaustively searching for
+low--energy spectrum of Ising spin--glass problems. Our method is suitable for solving small (less
+than 50 spins), but otherwise arbitrary instances. The presented approach can be used for
+benchmarking other algorithms that cannot certify their solution. We exemplify its usage by
+benchmarking a recent MPS--based algorithm on a set of random spin-glass problems.
 
 %%% Local Variables:
 %%% mode: latex
