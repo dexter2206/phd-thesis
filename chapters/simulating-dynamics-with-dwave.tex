@@ -1,7 +1,7 @@
 \chapter{Simulating dynamics of quantum system using D-Wave annealer}
 \label{chapter:simulating}
 
-The leading motivation behind the development of quantum computing devices is simulating quantum systems intractable by classical computers. But how far are we from this goal? This chapter presents a possible approach for simulating quantum systems (or any time-dependent dynamical system) that can be used with annealing devices such as D-Wave quantum annealer or Fujitsu digital annealer. To illustrate the working of our algorithm we simulate the simplest single-qubit system and demonstrate that already near-term annealing devices are capable of capturing its dynamics in some regime of parameters.
+The leading motivation behind the development of quantum computing devices is simulating quantum systems intractable by classical computers. But how far are we from this goal? This chapter presents a possible approach for simulating quantum systems (or any time-dependent dynamical system) that can be used with annealing devices such as D-Wave quantum annealer or Fujitsu digital annealer. To illustrate the working of our algorithm, we simulate the simplest single-qubit system and demonstrate that already near-term annealing devices are capable of capturing its dynamics in some regime of parameters.
 
 \section{Parallel in time simulation of quantum systems}
 Problems solved by annealers exhibit no time dependence. Therefore, simulating any time-dependent phenomena using those devices requires reformulating the problem as one that is static in nature. In our case, it is possible by enlarging the Hilbert space of the system under consideration, so that the states of this larger space encode also temporal information.
