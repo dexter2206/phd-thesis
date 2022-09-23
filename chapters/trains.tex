@@ -14,43 +14,43 @@ terminology. We will consider a part of a railway network, which we will simply 
 the single--track railways, and hence there are two possible kinds of sections:
 \begin{itemize}
     \item Single tracks, sections that can be occupied by one train at a time.
-    \item Sidings, or parallel tracks (occuring e.g. at stations). At the sidings, trains passing
-      in the same direction can meet and overtake, and trains passing in the opposite directions
-      can meet and pass. Each siding comprises two or more tracks, each of which can also be
-      occupied by one train at a time.
+    \item Sidings, or parallel tracks (occuring e.g. at stations). At the sidings, trains passing in
+      the same direction can meet and overtake, and trains passing in the opposite directions can
+      meet and pass. Each siding comprises two or more tracks, each of which can also be occupied by
+      one train at a time.
 \end{itemize}
 
-Fig. \ref{fig:railway-network} shows an example network studied in our work. The trains move
-through the network according to a \emph{timetable}. It is assumed that this timetable is conflict
-free. That is, at any time no two trains occupy the same block section, except possibly at sidings
-(where the number of trains does not exceed the number of tracks in the siding).
+Fig. \ref{fig:railway-network} shows an example network studied in our work. The trains move through
+the network according to a \emph{timetable}. It is assumed that this timetable is conflict free.
+That is, at any time no two trains occupy the same block section, except possibly at sidings (where
+the number of trains does not exceed the number of tracks in the siding).
 
 Now, suppose the network is affected by a disturbance, which prevented some trains from running
 according to their original timetable. Put differently, after the disturbance, some trains occupy
 different parts of the networks than they are supposed to occupy. Resuming operation according to
-the original timetable could result in a conflict. Hence, after the disturbance, a new, conflict--free timetable has to be promptly created. Optimally, this new timetable should, in some sense, minimize the resulting delays.
+the original timetable could result in a conflict. Hence, after the disturbance, a new,
+conflict--free timetable has to be promptly created. Optimally, this new timetable should, in some
+sense, minimize the resulting delays.
 
-It is important to distinguish two types of delays. A \emph{primary} delay is the one resulting
-from the original disturbrance. There is some amount of time needed for a train to reach its
-further destinations, e.g. due to speed limits and upper bound on speed achievable by a train.
-Hence, primary delays propagate through the network and cannot be mitigated, even in the absence
-of other trains. The delays resulting from the possible conflicts that need to be resolved are
-called \emph{secondary} delays. The total delay is thus a sum of primary and secondary delays.
-Since the primary delays are unavoidable, the objective is to minimize some function of secondary
-delays, e.g. their maximum or weighted sum.
+It is important to distinguish two types of delays. A \emph{primary} delay is the one resulting from
+the original disturbrance. There is some amount of time needed for a train to reach its further
+destinations, e.g. due to speed limits and upper bound on speed achievable by a train. Hence,
+primary delays propagate through the network and cannot be mitigated, even in the absence of other
+trains. The delays resulting from the possible conflicts that need to be resolved are called
+\emph{secondary} delays. The total delay is thus a sum of primary and secondary delays. Since the
+primary delays are unavoidable, the objective is to minimize some function of secondary delays, e.g.
+their maximum or weighted sum.
 
 \begin{figure}
     \label{fig:railway-network}
     \includegraphics[width=\textwidth]{figures/line_small.pdf}
-    \caption{
-        Nidzica -- Olsztynek segment of line No. 216. Sections 1, 3, and 5 are parallel sidings,
-        while sections 2 and 4 are single tracks.
-    }
+    \caption{ Nidzica -- Olsztynek segment of line No. 216. Sections 1, 3, and 5 are parallel
+        sidings, while sections 2 and 4 are single tracks. }
 \end{figure}
 
 \section{Basic defninition and notations}
-Before we can formulate the optimization problem at hand in a way that it can be run on D-Wave,
-let us introduce the needed notation. The set of all trains will be denoted by $\JJ$. This set is
+Before we can formulate the optimization problem at hand in a way that it can be run on D-Wave, let
+us introduce the needed notation. The set of all trains will be denoted by $\JJ$. This set is
 naturally partitioned into the set $\JJ_0$ of trains going into one direction and set $\JJ_1$ of
 trains going into the opposite direction. This is a proper partition, i.e.
 \begin{equation}
@@ -58,33 +58,130 @@ trains going into the opposite direction. This is a proper partition, i.e.
 \end{equation}
 
 For any train $j \in \JJ$ its route $M_j$ is a sequence of blocks. Our model forbids recirculation,
- i.e. each train passes every block in its route exactly once, Furthermore, we assume that each
- train starts and ends its route at some station, and its route is uniquely identified by a
- sequence of station blocks
- $\left(s_{j,1}, s_{j, 2}, \ldots, s_{j, \mbox{end}_j}\right)$. In other words, there are no
- alternative routes between any two stations. For convenience, we will denote the block preceding
- $s_{j,k}$ in given train's route by $\pi(s_{j,k})$ and the block succeeding it by $\rho(s_{j,k})$,
- i.e.
- \begin{align}
-     \pi(s_{j,k}) &= s_{j,k-1} \quad \mbox{for } 2 \le k \le \mbox{end}_j \\
-     \rho(s_{j,k}) &= s_{j,k+1} \quad \mbox{for } 1 \le k \le \mbox{end}_j - 1.
- \end{align}
-
-According to the original timetable, train $j$ should leave given station $s$ in its route at the time $\ttout(j, s)$. However, due to a disturbance a delay $d(j, s)$ can occur, in which case train
-leaves at time $\tout = \ttout(j, s) + d(j, s)$. As already mentioned, primary delays propagate
-through the network. However, they can be somewhat compensated if there is enough time reserved
-in the passing sequence of blocks. Let us denote a primary delay of train $j$ at station $s$ as
-$d_U(j, s)$. Then, the accumulated primary delay of the same train at the given station is
-given by
+i.e. each train passes every block in its route exactly once. Furthermore, we assume that each train
+starts and ends its route at some station, and its route is uniquely identified by a sequence of
+station blocks $\left(s_{j,1}, s_{j, 2}, \ldots, s_{j, \mbox{end}_j}\right)$. In other words, there
+are no alternative routes between any two stations. For convenience, we will denote the block
+preceding $s_{j,k}$ in given train's route by $\pi(s_{j,k})$ and the block succeeding it by
+$\rho(s_{j,k})$, i.e.
+\begin{align}
+    \pi(s_{j,k}) &= s_{j,k-1} \quad \mbox{for } 2 \le k \le \mbox{end}_j \\
+    \rho(s_{j,k}) &= s_{j,k+1} \quad \mbox{for } 1 \le k \le \mbox{end}_j - 1.
+\end{align}
+We will denote the time at which train $j$ should leave the block $s$ according to the original
+timetable by $\ttout(j, s)$. Similarly, the time at which train $j$ is supposed to leave block $s$
+will be denoted by $\ttin(j, s)$. In our model, we assume that the time at which a train leaves one
+block is precisely the same as the time it enters the next block, i.e.
 \begin{equation}
-    d_U(j, \rho(s)) = \max\{0, d_U(j, s) - \alpha(j, s, \rho(s))\}
+\ttout(j, s) = \ttin(j, \rho_j(s))
 \end{equation}
-where $\alpha(j, s, \rho(s))$ accounts for possible time reserve.
+It is clear that the original timetable determines how long it takes for a train $j$ to travel
+through a given block $s$. We call this time the passage time, denoted by $\pt(j, s)$
+\begin{equation}
+    \pt(j, s) = \ttout(j, s) - \ttin(j, s)
+\end{equation}
+An important observation is that passage times defined by the timetable may not be the minimum physically
+achievable passing times $\pmin(j, s)$. In other words, for each train $j$ and block $s$ there
+exists a time reserve
+\begin{equation}
+\label{eq:pt}
+0 \le \alpha(j, s) = \pt(j, s) - \pmin(j, s)
+\end{equation}
+This time reserve will become important when discussing the propagation of the primary delays.
+
+Suppose the disturbance happened, resulting in some trains not being able to meet the schedule.
+Hence, the actual leaving and arrival times (denoted by $\tout$ and $\tin$) differ from the
+scheduled ones. The delay $d(j, s)$ of train $j$ at block $s$ is defined as the difference
+\begin{equation}
+\label{eq:djs}
+d(j, s) \coloneqq \tout(j, s) - \ttout(j, s) = \tin(j, \rho(s)) - \ttin(j, \rho(s))
+\end{equation}
+and is the quantity we want to minimize. As already mentioned, $d(j, s)$ can be expressed as a sum
+\begin{equation}
+d(j, s) = d_U(j, s) + d_S(j, s)
+\end{equation}
+where $d_U$ denotes the primary (or unavoidable) delay, and $d_S$ denotes the secondary delay. The
+unavoidable delays propagate through the network. In the absence of time reserve, one would simply
+have $d_U(j, s) = d_U(j, s')$ for a given train $j$ and blocks $s$ and $s'$ on its route. However,
+the primary delay can somewhat be mitigated by using the time reserve. Since delays are necessarily
+positive, one has
+\begin{equation}
+    d_U(j, \rho(s)) = \max\{0, d_U(j, s) - \alpha(j, \rho(s))\}
+\end{equation}
+
+The secondary delays can be, in principle, arbitrary large. However, it is convenient to assume that
+all secondary delays for train $j$ are bound from above by some constant $d_{\max}(j)$. One can find
+a reasonable upper bound by running some fast heuristic or determine it manually (e.g. there might
+be an apriori established maximum allowable delay of the train). Henceforth, we will consider
+$d_{\max}(j)$ to be a parameter of the model. With this assumption, we have the following upper and
+lower bound on the overall delay
+\begin{equation}
+d_U(j, s) \le d(j, s) \le d_U(j, s) + d_{\max}(j).
+\end{equation}
+In our model, we will treat $d_{\max}(j)$ as a parameter.
+
+\section{Dispatching conditions}
+Now that we established the necessary notation, let us discuss some constraints that the quantities
+in our model have to fulfill.\\
+\textbf{The minimum passing time condition.} A train cannot travel through a block faster than the corresponding minimum passing time
+\begin{equation}
+    \label{eq:dc1}
+\tout(j, s) \ge \tin(j, s) + \pmin(j, s).
+\end{equation}
+Using \eqref{eq:djs} and \eqref{eq:pt} one can easily verify that \eqref{eq:dc1} is equivalent to
+\begin{equation}
+    d(j, \rho(s)) \ge d(j, s) - \alpha(j, s, \rho(s)).
+\end{equation}\\
+\textbf{The single block occupation condition.} Two trains cannot occupy the same part of a single
+railway track. Consider two trains, $j, j' \in \JJ_0$ leaving the same station $s$ in the direction
+of the next station block $\rho_j(s)$. Suppose further that train $j$ leaves first. i.e.
+$\tout(j's) > \tout(j, s)$. Since two trains cannot occupy the same block, some amount of time has
+to pass after $\tout(j, s)$ before the train $j'$ can leave. This amount of time is dependent on
+both $j$ and a sequence of blocks, and hence we denote it by $\tauu(j, s, \rho_j(s))$. Thus, the
+condition becomes
+\begin{equation}
+\label{eq:single-block}
+\tout(j', s) \ge \tout(j, s) + \tauu(j, s, \rho_j(s)).
+\end{equation}
+Substituting for $\tout$ in \eqref{eq:single-block} yields the following inequality for delays
+\begin{equation}
+\label{eq:single-block-delays}
+d(j', s) \ge d(j, s) + \ttout(j, s) - \ttout(j', s) + \tauu(j, s, \rho_j(s))
+\end{equation}
+or
+\begin{equation}
+d(j', s) \ge d(j, s) + \Delta(j, s, j', s) + \tauu(j, s, \rho_j(s))
+\end{equation}
+where
+\begin{equation}
+\label{eq:delta}
+\Delta(j, s, j', s) = \ttout(j, s) - \ttout(j', s)
+\end{equation}
+The precise form of $\tauu$ depends on the dispatching detail of the problem. In our approach we
+propose the following form
+\todo[inline]{Zapytac Domina skad to sie kurwa wzielo}
+\begin{equation}
+\tauu(j, s) = \max_{i \in \{k+1,\ldots,l-1\}}(\ttin(j, m_{i+1}) - \ttin(j, m_i))
+\end{equation}
+\textbf{The deadlock condition.} No two trains heading in the opposite direction can enter
+a sequence of blocks between the two consecutive station blocks at the same time. Suppose trains $j$
+and $j'$ are heading in the opposite directions on a route determined by two consecutive stations
+$s$ and $\rho_j(s)$. Note that for $j'$ the order is reversed, i.e. it starts at $\rho_j(s)$ and
+travels in the direction of $s$. In this case, $j$ has to arrive at $\rho_j(s)$ before $j'$ can
+leave $\rho_j(s)$. We formalize this similarly as the previous condition
+\begin{equation}
+\label{eq:deadlock}
+\tout(j', \rho_j(s)) \ge \tout(j,s) + \tauuu(j, s, \rho_j(s))
+\end{equation}
+Rewritten in terms of delays, the inequality \eqref{eq:deadlock} reads
+\begin{equation}
+d(j',\rho_j(s)) \ge d(j, s) + \Delta(j,s,j',\rho_j(s)) + \tauuu(j, s, \rho_j(s))
+\end{equation}
 \section{Formulating problem as quadratic binary optimization}
 
 
 \section{Results}
-In our work we considered two single-track railway lines managed by the polish state--owned company
+In our work, we considered two single-track railway lines managed by the polish state--owned company
 PKP Polskie Linie Kolejowe:
 
 \begin{itemize}
