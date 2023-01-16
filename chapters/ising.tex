@@ -191,6 +191,12 @@ tempering \cite{wang}. Other approaches for solving Ising spin--glasses include 
 branch--and--bound framework \cite{rendl}, its chordal extensions \cite{baccari} or methods based on
 simulating dynamical systems \cite{sheldon}.
 
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=\textwidth]{figures/pt_and_sa.pdf}
+    \caption{Schematic representation of simulated annealing \textbf{(a)} and parallel tempering \textbf{(b)} algorithms. In simulated annealing, a single copy of the system is simulated. The temperature of the system is decreasing with each epoch, thus reducing movement through the state space. In parallel tempering, several copies (replicas) of the system are simulated, each with a fixed temperature. Hotter replicas move through the state space rapidly and less predictably, while colder replicas move conservatively. Between epochs, replicas can exchange states, which helps avoiding being stuck at local minima. Exchanging replicas can be also viewed as reseeding of the colder replicas by randomized solutions provided by hotter replicas.}
+    \label{fig:my_label}
+\end{figure}
 %%% Local Variables:
 %%% mode: latex
 %%% TeX-master: "../main"
