@@ -13,13 +13,16 @@
 \usepackage{listings}
 \usepackage{float}
 
+\theoremstyle{definition}
+\newtheorem{example}{Example}[chapter]
+
 \DeclareRobustCommand\tikzdot{\tikz[overlay,yshift=0.5ex] \fill[blue!90] (0.ex,0.ex) circle (0.3ex);}
 \DeclareRobustCommand\tikzcircle{\tikz[overlay,yshift=0.5ex] \draw[red,thick] (0.ex,0.ex) circle (0.4ex);}
 \DeclareRobustCommand\tikzquad{\tikz[overlay,yshift=0.ex,xshift=0.1ex] \draw[green,thick] (0.ex,0.ex) rectangle (1ex,1ex);}
 
 %\title{Simulating quantum systems with near-term technologies}
 \title{
-Validation and benchmarking of quantum annealing technology
+    Validation and benchmarking of quantum annealing technology
 }
 
 \newcommand{\bg}[1]{\textcolor{red}{bg: #1}}
@@ -29,11 +32,11 @@ Validation and benchmarking of quantum annealing technology
 \include{definitions}
 
 % Styles
-\linespread{1.25}
+\linespread{1.15}
 
 
 \author{Konrad Jałowiecki}
-\date{September 2019}
+\date{January 2022}
 
 \begin{document}
 
