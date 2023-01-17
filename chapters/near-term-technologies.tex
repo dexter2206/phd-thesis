@@ -1,8 +1,12 @@
-\chapter{Technologies involved}
+\chapter{Devices and technologies used}
 \label{chapter:near-term}
 
- In this chapter we discuss technologies used for performing research presented in this work.
- First, we discuss quantum annealing, a quantum computation paradigm witnessing rapid development in recent years. The second discussed technology, Nvidia CUDA, is present on the market for well over a decade, yet each and every iteration of GPUs brings to the table new functionalities and performance improvements. 
+After introducing the Ising model, our next task is to present the technologies used in the
+research conducted for this thesis. Since the main point of this thesis is benchmarking quantum
+annealers, it is only natural that we start by introducing the reader to the concepts of adiabatic
+quantum computations and quantum annealing. The second part of the chapter is devoted to NVIDIA
+CUDA, a technology allowing massively parallel computations on general-purpose graphics processing
+units (GPUs).
 
 
 \section{Adiabatic quantum computation and quantum annealing}
@@ -56,12 +60,12 @@ Grouping qubits into chains and contracting them is not enough to run the embedd
 Quantum annealing, introduced in the previous section, is an inherently heuristic process. Like many heuristic algorithms, it cannot certify that the solution it found is in fact optimal. One way to assess performance of such algorithms is to compare their results with known low-energy spectrum of some test instances. In this section, we describe the Nvidia CUDA technology, which we use for our implementation of massively parallel brute-force algorithm describe in chapter \ref{chapter:bruteforce}.
 
 \subsection{Brief history of Graphics Processing Units}
-History of specialized hardware for manipulating graphics ranges as far as to 1970s. Initially these devices, that later became known as Graphics Processing Units (GPU), offered limited functionalities. Increasing demand for performance in gaming industry and professional graphics processing drove the evolution of GPUs, which quickly became highly sophisticated devices supporting advanced 2D and 3D image manipulation. Performing such arithmetically intensive operations requires enormous computational power, and it was only the matter of time until it was realised that the power of these devices can be harnessed for general purpose computations (so called GPGPU - General Purpose computing on GPU). 
+History of specialized hardware for manipulating graphics ranges as far as to 1970s. Initially these devices, that later became known as Graphics Processing Units (GPU), offered limited functionalities. Increasing demand for performance in gaming industry and professional graphics processing drove the evolution of GPUs, which quickly became highly sophisticated devices supporting advanced 2D and 3D image manipulation. Performing such arithmetically intensive operations requires enormous computational power, and it was only the matter of time until it was realised that the power of these devices can be harnessed for general purpose computations (so called GPGPU - General Purpose computing on GPU).
 
 Early efforts in development of GPGPU required framing of computational problem in terms of operations performed on graphical primitives, as this was the only way for using specialized API of GPUs. This changed with the development of devices and toolkits that supported operations needed for general purpose computations out of the box. Notably, in 2007 Nvidia introduced its massively parallel CUDA architecture.
 
 \subsection{Differences between CPU and GPU}
-Principles behind operation of CUDA-enabled devices are fundamentally different than the ones governing execution of program on traditional CPU-only architecture. In current x86 based computers, CPU runs given sequence of instructions (so called thread of execution) using one of its cores. Such processor is the ''brain'' of a computer, and it can perform a wide variety of tasks ranging from arithmetic operations, through accessing system's RAM, to performing IO operations and controlling other components of the system. Typical CPUs are optimized for sequential execution, and as such are usually equipped with moderate (as compared to the GPUs) number of high-performance cores. 
+Principles behind operation of CUDA-enabled devices are fundamentally different than the ones governing execution of program on traditional CPU-only architecture. In current x86 based computers, CPU runs given sequence of instructions (so called thread of execution) using one of its cores. Such processor is the ''brain'' of a computer, and it can perform a wide variety of tasks ranging from arithmetic operations, through accessing system's RAM, to performing IO operations and controlling other components of the system. Typical CPUs are optimized for sequential execution, and as such are usually equipped with moderate (as compared to the GPUs) number of high-performance cores.
 
 On the other hand, GPUs are more specialized. They are well suited for performing a large number of arithmetic operations and accessing memory in parallel. They typically have more cores than a traditional CPU (with even modern commodity GPUs boasting thousands of them). Although those cores are less performant than their CPU counterparts and support much narrower set of operations, their large number combined with fast memory access gives modern GPUs advantage over CPUs in multiple areas.
 
