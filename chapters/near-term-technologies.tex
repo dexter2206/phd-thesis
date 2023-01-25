@@ -10,13 +10,35 @@ units (GPUs).
 
 
 \section{Adiabatic quantum computation and quantum annealing}
-One of the possible alternatives to the standard gate model is adiabatic quantum computation which relies on adiabatic quantum theorem \cite{born}. Informally, the theorem states that if the physical system starting from its instantenous ground state is driven slowly enough, the evolution follows hamiltonian and the system stays in the instantenous ground state. Adiabatic quantum computing might be realized in a form of quantum annealing. In this metaheuristics, a goal is to minimize value of some target function $f$. In order to do so, one first has to find some Ising hamiltonian $H$ whose ground state encodes the optimal solution to the problem. Then, the system is prepared in a ground state of some initial, simpler hamiltonian $H_0$. After that. the system is slowly perturbed in such a way that its hamiltonian changes from $H_0$ to $H$, i.e. the evolution of the system is governed by the following hamiltonian $H_\text{total}$
-\begin{equation}
-    \label{eq:aqc}
-    {H}_\text{total}(s) = a(s) {H}_0 + b(s){H}, \quad s \in [0, \tau]
-\end{equation}
-where $a(\tau) = b(0) = 0, \; a(0) = b(\tau) = 1$, and $a$ and $b$ are decreasing and increasing functions respectively.
-By adiabatic quantum theorem, if the evolution described by the equation \eqref{eq:aqc} is slow enough, the system will stay in ground state of ${H}_\text{total}(s)$ for every $s \in [0, \tau]$. In particular, after reaching $s=\tau$, i.e. when $H_\text{total} = H$, the state of the system should encode an optimal solution to target optimization problem.
+
+\subsection{Adiabatic Quantum Computation}
+One of the possible models of quantum computing is Adiabatic Quantum Computation (AQC)
+\cite{farhi}. AQC ties closely with quantum annealing, and hence we will shortly discuss how it
+works in general. Before we describe how the computations are performed in this model, we will take
+a closer look at the underlying adiabatic theorem, which can be stated as follows \cite{farhi,
+born}:
+
+\begin{theorem}[Adiabatic theorem]
+Suppose we are give a time-dependent Hamiltonian $\tilde{H}(t)$ with eigenenergies $E_1(t) \le E_2(t) \le
+ \ldots \le E_i(t) \le \ldots$ and corresponding eigenstates $\ket{\psi_i(t)}$, Further, suppose we
+ are given a physical system $\mathcal{S}$ evolving according to $H(t) = \tilde{H}(t/T)$ and let
+ $\ket{\psi(t)}$ denote the state of $\mathcal{S}$ at time $t$. If $\ket{\psi(0)} =
+ \ket{\psi_n(0)}$, then also $\ket{\psi(t)} = \ket{\psi_n(t)}$ for all time $t$, provided that $T$ is large
+ enough and for all $t$ there
+ exists a nonzero difference between $E_n(t)$ and the rest of the $H(t)$'s spectrum.
+\end{theorem}
+
+One conclusion to the adiabatic theorem is of particular importance to quantum computation. If the
+system is prepared in a ground state, has a nonzero gap between its ground energy and the energy of
+the first excited state, and is evolved slowly enough, it will stay in the ground state during the
+whole evolution. Knowing that we can finally discuss how AQC works. First, an optimization problem
+to be solved is encoded as a ground state of some Hamiltonian $H_{target}$. Then, a physical system
+is prepared in a ground state of some simpler hamiltonian, $H_{initial}$. After that, the system is
+driven slowly from $H_{initial}$ to $H_{target}$. By adiabatic theorem, the system ends up in a
+ground state of $H_{target}$, and after the measurement is performed the solution to the original
+problem can be decoded.
+
+\todo[inline]{Describe how AQC ties to anealing}
 
 \subsection{Comparison to classical model of computation}
 It is clearly visible that quantum annealing is different from computing using classical computers. One of the most obvious differences is computational model. On classical computers one essentially writes programs as a series of instructions to be executed by the CPU. On typical machines, CPU is capable of performing arithmetic operations, computing values of some special functions, managing execution flow, controlling I/O and much more. In comparison, quantum annealers are capable of executing a single operation: annealing given optimization problem. Therefore, programming these devices boils down to defining optimization problem and tuning the annealing parameters. There is no processing flow controlled by the programmer.
