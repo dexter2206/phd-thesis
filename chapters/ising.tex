@@ -3,7 +3,7 @@
 
 Quantum annealers are essentially different from classical computers. For one, they don't
 execute programs written as a sequence of instructions in their memory. Instead, they are
-single--purpose devices capable (in principle) of solving a specific optimization problem. 
+single--purpose devices capable (in principle) of solving a specific optimization problem.
 Namely, annealers are designed to find a lowest energy configuration (called \emph{ground state})
 of the Ising spin--glass model, which we introduce in this chapter.
 
@@ -63,9 +63,9 @@ This instance has 8 possible states:
     \begin{center}
         \begin{tabular}{|c|c||c|c|}
         \hline
-        $\mathbf{s}=(s_1, s_2, s_3)$ & 
-        $H(\mathbf{s})$ & 
-        $\mathbf{s}=(s_1, s_2, s_3)$ & 
+        $\mathbf{s}=(s_1, s_2, s_3)$ &
+        $H(\mathbf{s})$ &
+        $\mathbf{s}=(s_1, s_2, s_3)$ &
         $H(\mathbf{s})$\\\hline
         (-1, -1, -1) & -1 & (1, -1, -1) & -5\\ \hline
         (-1, -1, 1) & 7 & (1, -1, 1) & 3 \\ \hline
@@ -148,7 +148,7 @@ So far we only discussed classes of decision problems. How do they relate to the
 finding a ground state of the Ising model? Suppose we are given an Ising model instance with
 hamiltonian $H$ and let $x \in \RR$ be some fixed number. Consider the problem of deciding whether
 there exists $\mathbf{s}$ such that $H(\mathbf{s}) \le x$. We will call this problem a
-\emph{decision version of the Ising problem}. 
+\emph{decision version of the Ising problem}.
 
 If we can minimize $H$, we can also solve the decision problem by simply finding a ground state and
 checking if its energy exceeds threshold $x$. On the other hand, the sole capability of solving the
@@ -173,6 +173,14 @@ Travelling Salesman Problem or Hamiltonian Cycles Problem, are reducible to find
 
 \section{Algorithms for solving Ising model}
 
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{figures/pt_and_sa.pdf}
+    \caption{Schematic representation of simulated annealing \textbf{(a)} and parallel tempering \textbf{(b)} algorithms. In simulated annealing, a single copy of the system is simulated. The temperature of the system is decreasing with each epoch, thus reducing movement through the state space. In parallel tempering, several copies (replicas) of the system are simulated, each with a fixed temperature. Hotter replicas move through the state space rapidly and less predictably, while colder replicas move conservatively. Between epochs, replicas can exchange states, which helps avoid being stuck at local minima. Exchanging replicas can be also viewed as reseeding of the colder replicas by randomized solutions provided by hotter replicas.}
+    \label{fig:my_label}
+\end{figure}
+
+
 As is the case with many \textbf{NP--hard} optimization problems, there are many heuristic
 approaches for solving the Ising model. One family of such algorithms relies on Metropolis-Hastings
 \cite{beichl} algorithm for sampling from underlying Boltzmann distribution. In simulated annealing
@@ -190,7 +198,6 @@ annealing is another Monte Carlo method sharing similarities with simulated anne
 tempering \cite{wang}. Other approaches for solving Ising spin--glasses include methods involving
 branch--and--bound framework \cite{rendl}, its chordal extensions \cite{baccari} or methods based on
 simulating dynamical systems \cite{sheldon}.
-
 %%% Local Variables:
 %%% mode: latex
 %%% TeX-master: "../main"
