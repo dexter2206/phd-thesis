@@ -38,21 +38,52 @@ driven slowly from $H_{initial}$ to $H_{target}$. By adiabatic theorem, the syst
 ground state of $H_{target}$, and after the measurement is performed the solution to the original
 problem can be decoded.
 
-In quantum annealing (QA), one follows essentially the same procedure as in Adiabatic Quantum
+In Quantum Annealing (QA), one follows essentially the same procedure as in Adiabatic Quantum
 Computing. What is different, is that the evolution of the system in QA does not have to be
 adiabatic \cite{Vinci2017}. Further, quantum annealing is not necessarily universal, with its
-universality depending on the form of the Hamiltonians used. 
-
-\subsection{Comparison to classical model of computation}
-It is clearly visible that quantum annealing is different from computing using classical computers. One of the most obvious differences is computational model. On classical computers one essentially writes programs as a series of instructions to be executed by the CPU. On typical machines, CPU is capable of performing arithmetic operations, computing values of some special functions, managing execution flow, controlling I/O and much more. In comparison, quantum annealers are capable of executing a single operation: annealing given optimization problem. Therefore, programming these devices boils down to defining optimization problem and tuning the annealing parameters. There is no processing flow controlled by the programmer.
-
-Another difference between classical computers and quantum annealers is lack of working memory in the former. Classical computers use working memory (typically in the form of RAM) to store machine code and data. However, quantum annealers do not need to store neither code or data, and hence they do not feature analogous component. Similarly, quantum annealers, being purely computational oriented devices, do not have mass storage.
-
-A slightly less obvious difference between classical computers and quantum annealers is their model of parallelism. Classical computers are capable of running several threads of execution at the same time. However, every nontrivial classical algorithm involving parallelism must necessarily also include a serial part, which limits speedup gained for introducing more CPU cores or CPUs. In contrast, quantum annealers are capable of annealing multiple qubits at the same time, which makes their operation inherently parallel.
+universality depending on the form of the Hamiltonians used and available ranges for the annealing
+time. We will describe in more detail how Quantum Annealing works on a concrete example later in
+this chapter when we discuss D-Wave annealers.
 
 \subsection{D-Wave quantum annealers}
 
-The first commercially available quantum annealer was introduced by D-Wave company in 2011. At the time of writing, the newest series of D-Wave annealers is The Advantage System utilizing chip with at least 5000 qubits. These novel devices deomnstrate a significant improvement over previous 2000Q generation, which used at most 2048 qubit chip with sparser connectivity. Since most research utilizing quantum annealers in this work was conducted using 2000Q devices, in what follows we mostly limit our attention to this specific devices.
+The first commercially available quantum annealer was D-Wave One introduced by D-Wave company in
+2011 \cite{johnson}. Later generations of D-Wave annealers improved on this prototypical device in
+terms of numbers of qubits, couplers and connectivity (described later in this chapter). Table
+\ref{tab:dwave} summarizes the release history of D-Wave annealers and highlights the differences
+between the generations. At the time of writing, the newest series of D-Wave annealers is the
+Advantage system utilizing a chip with at least 5000 qubits. These novel devices demonstrate a
+significant improvement over the previous 2000Q generation, which used at most 2048-qubit chip with
+sparser connectivity. 
+
+\begin{table}
+    \label{tab:dwave}
+\begin{tabular}[pos]{|l|c|c|c|c|}
+\hline
+\textbf{Series} & 
+\textbf{Release date} &
+\textbf{Topology} & 
+\textbf{Num.\newline qubits} & 
+\textbf{Num. couplers}\\ 
+\hline    
+D-Wave One & May 2011 & Chimera & 128 & 352 \\
+\hline
+D-Wave Two & May 2013 & Chimera & 512 & 1472 \\
+\hline
+D-Wave 2X & August 2015 & Chimera & 1152 & 3360 \\
+\hline
+D-Wave 2000Q & January 2017 & Chimera & 2048 & 6016\\
+\hline
+Advantage & 2020 & Pegasus & 5000+ & 35000+ \\
+\hline
+Advantage 2 & 2023-2024 & Zephyr & 7440 & \\ 
+\hline
+\end{tabular}
+\caption{Comparison of different generations of D-Wave annealers. The numbers of qubits and couplers
+are given for a perfectly manufactured chip with full yield. Actual devices from any series may
+have a slightly lower number of qubits and/or couplers. \todo[inline]{Fill actual number of qubits
+instead of estimates}}.
+\end{table}
 
 \begin{figure}[h]
     \centering
@@ -66,9 +97,24 @@ The first commercially available quantum annealer was introduced by D-Wave compa
 
 The Ising model described in previous chapter allows arbitrary interactions between spins. However, this is often not the case with physical devices like quantum annealers. For instance, in D-Wave devices spins are arranged into a specific \emph{topology} with limited connectivity. Thus, the possible graph on which the optimization problems can be defined is much sparser than the complete $K_{N}$ graph. Spins in 2000Q devices are arranged in the so called \emph{Chimera} topology depicted in figure \ref{fig:chimera}. The Chimera graph can be thought of as a $n \times m$ lattice of unit cells, where each cell is a complete bipartite $K_{4,4}$. Qubits are also connected to two qubits in neighbouring cells via external couplers (unless they reside on the border or a corner of the lattice), resulting in at most total 6 connections per qubit. Straightforward calculation shows that Chimera graph has total of $16mn + 4(m-1)n + 4(n-1)m$ edges.
 
-The new Advantage system uses \emph{Pegasus} topology, which increases maximum degree of vertex in the graph to 15. For the details of this topology we refer interested reader to \cite{boothby}.
+The new Advantage system uses \emph{Pegasus} topology (see Fig \ref{fig:pegasus}), which increases
+maximum degree of vertex in the graph to 15. For the details of this topology we refer interested
+reader to \cite{boothby}.
+\todo[inline]{instead of only citing, describe pegasus}
 
+
+\begin{figure}
+    \includegraphics[width=\textwidth]{figures/pegasus}
+    \caption{
+        The $P_3$ graph, an example of the Pegasus topology. Different types of couplers are
+        color--coded. The magnified portion of the image shows a part of the graph containing a
+        Chimera unit cell. Observe the inner couplers, marked in red, connecting qubits that are not
+        connected in Chimera topology. The addition of these couplers allows for running problems
+        that are not necessarily defined on a bipartite graph.
+    }
+\end{figure}
 \subsection{Minor embeddings}
+
 Not every Ising problem one might wish to solve is compatible with topology of physical quantum annealer. This issue can sometimes be circumvented using procedure called \emph{minor embedding}. In this approach one considers groups of several physical spins connected in a chain as a single logical one. Vertices corresponding to spins in each such chain are contracted, resulting in the new graph, having higher connectivity but smaller number of vertices than the original one. With the proper choice of chains this new graph can contain a subgraph isomorphic to the graph of the problem to solve. The minor embedding process is illustrated in figure \ref{fig:chimera}.
 
 Grouping qubits into chains and contracting them is not enough to run the embedded problem. One first has to ensure that all spins in a chain align in the same direction, so that they can indeed represent a single logical variable. This is accomplished by adding a penalty term which prohibitively increases cost of solutions in which value of spins in chains differ. However, due to the probabilitsic nature of quantum annealer, even after adding penalty one might obtain solutions in which values of spins in some chains disagree. Such disagreeing chains are called \emph{broken}. Since solutions containing broken chains cannot be interpreted directly as a solution to the original problem, one has to either discard them, or manually correct them (e.g. by choosing most common value among the spins in chain).
@@ -79,6 +125,13 @@ Grouping qubits into chains and contracting them is not enough to run the embedd
 %   \item $E' = \{e \in E\colon v_{i} \notin E\} \cup \{\{v, w\}\colon \exists_{i} \{v, v_{i}\} \in E\}$
 % \end{itemize}
 % Intuitively, contracting vertices replaces them with a new one connected with their every neighbour.
+
+\subsection{Comparison to classical model of computation}
+It is clearly visible that quantum annealing is different from computing using classical computers. One of the most obvious differences is computational model. On classical computers one essentially writes programs as a series of instructions to be executed by the CPU. On typical machines, CPU is capable of performing arithmetic operations, computing values of some special functions, managing execution flow, controlling I/O and much more. In comparison, quantum annealers are capable of executing a single operation: annealing given optimization problem. Therefore, programming these devices boils down to defining optimization problem and tuning the annealing parameters. There is no processing flow controlled by the programmer.
+
+Another difference between classical computers and quantum annealers is lack of working memory in the former. Classical computers use working memory (typically in the form of RAM) to store machine code and data. However, quantum annealers do not need to store neither code or data, and hence they do not feature analogous component. Similarly, quantum annealers, being purely computational oriented devices, do not have mass storage.
+
+A slightly less obvious difference between classical computers and quantum annealers is their model of parallelism. Classical computers are capable of running several threads of execution at the same time. However, every nontrivial classical algorithm involving parallelism must necessarily also include a serial part, which limits speedup gained for introducing more CPU cores or CPUs. In contrast, quantum annealers are capable of annealing multiple qubits at the same time, which makes their operation inherently parallel.
 
 \section{Nvidia CUDA}
 
