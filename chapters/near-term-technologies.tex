@@ -38,7 +38,11 @@ driven slowly from $H_{initial}$ to $H_{target}$. By adiabatic theorem, the syst
 ground state of $H_{target}$, and after the measurement is performed the solution to the original
 problem can be decoded.
 
-\todo[inline]{Describe how AQC ties to anealing}
+In quantum annealing (QA), one follows essentially the same procedure as in Adiabatic Quantum
+Computing. What is different, is that the evolution of the system in QA does not have to be
+adiabatic \cite{Vinci2017}. Further, quantum annealing is not necessarily universal, with its
+universality depending on the form of the Hamiltonians used. 
+
 
 \subsection{Comparison to classical model of computation}
 It is clearly visible that quantum annealing is different from computing using classical computers. One of the most obvious differences is computational model. On classical computers one essentially writes programs as a series of instructions to be executed by the CPU. On typical machines, CPU is capable of performing arithmetic operations, computing values of some special functions, managing execution flow, controlling I/O and much more. In comparison, quantum annealers are capable of executing a single operation: annealing given optimization problem. Therefore, programming these devices boils down to defining optimization problem and tuning the annealing parameters. There is no processing flow controlled by the programmer.
