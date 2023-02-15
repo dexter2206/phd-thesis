@@ -1,5 +1,6 @@
 \documentclass[12pt,dvipsnames]{memoir}
 \usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
 \usepackage{amsmath, amssymb, amsthm}
 \usepackage{todonotes}
 \usepackage{graphicx}
@@ -12,6 +13,12 @@
 \usepackage[linesnumbered,ruled]{algorithm2e}
 \usepackage{listings}
 \usepackage{float}
+\usepackage[bibstyle=nature,maxbibnames=10,backend=bibtex]{biblatex}
+
+
+\addbibresource{my_papers_others.bib}
+\addbibresource{my_papers_phd.bib}
+\addbibresource{ref.bib}
 
 \theoremstyle{definition}
 \newtheorem{example}{Example}[chapter]
@@ -43,6 +50,8 @@
 
 \maketitle
 
+\input{published_work.tex}
+
 \input{chapters/introduction.tex}
 \input{chapters/ising.tex}
 \input{chapters/near-term-technologies.tex}
@@ -53,6 +62,5 @@
 \input{chapters/appendix.tex}
 
 
-\bibliographystyle{plain}
-\bibliography{ref.bib}
+\printbibliography
 \end{document}
