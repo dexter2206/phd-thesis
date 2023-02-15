@@ -4,7 +4,7 @@
 Quantum annealers are essentially different from classical computers. For one, they don't
 execute programs written as a sequence of instructions in their memory. Instead, they are
 single--purpose devices capable (in principle) of solving a specific optimization problem.
-Namely, annealers are designed to find a lowest energy configuration (called \emph{ground state})
+Namely, annealers are designed to find the lowest energy configuration (called \emph{ground state})
 of the Ising spin--glass model, which we introduce in this chapter.
 
 The potential usefulness of quantum annealers stems from the fact that the optimization problem they
@@ -23,13 +23,13 @@ tensor network--based approach discussed later in the thesis.
 The Ising spin--glass model was introduced in 1920 by Wilhelm Lenz \cite{lenz} as a description of
 ferromagnetism in solids but is named after his student Ernst Ising, who studied and solved it in
 the one-dimensional case \cite{ising}. For purposes of this thesis, however, we will forget about
-the physical interpretation of the model, treating it as merely as a description of particular
+the physical interpretation of the model, treating it as merely as a description of a particular
 optimization problem.
 
 Consider a simple\footnote{That is, one that does not contain duplicate edges or loops.}, undirected
-graph $G = (V, E)$ with $N$ nodes labeled by consecutive natural numbers.  With each node $i \in V$
+graph $G = (V, E)$ with $N$ nodes labeled by consecutive natural numbers.  With each node, $i \in V$
 we associate a dichotomous spin variable $s_i \in \{-1, 1\}$. To each edge $\{i, j\} \in E$, we
-assign an interaction strength $J_{ij}$ and to each node $i \in V$ we assign local magnetic field
+assign an interaction strength $J_{ij}$ and to each node $i \in V$ we assign a local magnetic field
 $h_i$. Here, all $J_{ij}$ and $h_i$ are real numbers. For such a system, one can define the
 following energy function (Hamiltonian)
 \begin{equation}
@@ -75,7 +75,7 @@ This instance has 8 possible states:
     \end{center}
 \end{table}
 Observe that the lowest attainable energy is -5 and there are 3 states with this energy (we call
-this situation a \emph{degeneracy}). Hence, all of the configurations $(-1, 1, -1), (-1, 1, 1), (1,
+this situation a \emph{degeneracy}). Hence, all the configurations $(-1, 1, -1), (-1, 1, 1), (1,
 -1, -1)$ are ground states. For this instance, a low energy spectrum of size $k=5$ comprises all
 ground states, the $(-1, -1, -1)$ state with $H(-1, -1, -1) = -1$ and any of the states with
 $H(\mathbf{s})=3$.
@@ -88,7 +88,7 @@ hierarchy of complexity classes.
 \section{Algorithms and complexity}
 
 
-Solving the computational problem requires suitable \emph{algorithm}, a description of steps to be
+Solving the computational problem requires a suitable \emph{algorithm}, a description of steps to be
 performed by a computer to obtain a solution. It is hardly surprising that some problems might be
 solved in more than one way, i.e. there might exist different algorithms performing essentially the
 same task. Different algorithms solving the same problems might vastly differ in their demand on
@@ -103,7 +103,7 @@ problem instances large enough, it will perform better than the one with executi
 to $N^{2}$. This characteristic, known as computational complexity\footnote{Note that here we focus
 only on \emph{time complexity}, but other notions like memory complexity can be defined similarly},
 can be formalized by a big-$O$ notation (see appendix for more detailed description). Using this
-notation, the algorithms from the above example would be classified as $O(N)$ and $O(N^{2})$
+notation, the algorithms from the above example would be classified as $O(N)$ and, $O(N^{2})$
 respectively.
 
 \section{Complexity classes}
@@ -115,13 +115,13 @@ also be restricted to specific types of problems. For instance, one might consid
 problems \cite{arora}, i.e. problems to which the answer is yes or no.
 
 One of the fundamental complexity classes is \textbf{P}, a class of decision problems solvable in polynomial time on a deterministic Turing Machine  \cite{arora}. Another class, \textbf{NP}, comprises all decision problems whose solution can be verified in polynomial time using a deterministic Turing Machine \cite{arora}.
-One can immediately see that \textbf{P} $\subset$ \textbf{NP}. Indeed, if a problem is solvable in polynomial time, then it is also trivially verifiable in polynomial time. However, it is not immediately obvious if the inclusion is strict, and the question whether \textbf{P} $\ne$ \textbf{NP} is one of the most important, yet unsolved problems in theoretical computer science \cite{fortnow}.
+One can immediately see that \textbf{P} $\subset$ \textbf{NP}. Indeed, if a problem is solvable in polynomial time, then it is also trivially verifiable in polynomial time. However, it is not immediately obvious if the inclusion is strict, and whether \textbf{P} $\ne$ \textbf{NP} is one of the most important, yet unsolved problems in theoretical computer science \cite{fortnow}.
 The class of \textbf{NP--hard} problems comprises all the problems that are at least as hard as
 every problem in \textbf{NP}. More formally, given decision problem P is \textbf{NP--hard} if and
-only if solving every problem in \textbf{NP} can be reduced to solving P polynomial number of times
+only if solving every problem in \textbf{NP} can be reduced to solving P a polynomial number of times
 \cite{arora}. A particular subclass of \textbf{NP--hard} problems, \textbf{NP--complete}, is an
 intersection of \textbf{NP} and \textbf{NP--hard} \cite{arora}. Figure \ref{fig:complexity} shows
-relationship between the discussed complexity classes both under assumptions \textbf{P} =
+the relationship between the discussed complexity classes, both under assumptions \textbf{P} =
 \textbf{NP} and \textbf{P} $\ne$ \textbf{NP}.
 
 Problems in the complexity class \textbf{P} are often considered tractable, or efficiently solvable,
@@ -144,7 +144,7 @@ the original one is discovered \cite{arora}.
 
 \section{Ising model and complexity}
 
-So far we only discussed classes of decision problems. How do they relate to the problem of
+Thus far, we only discussed classes of decision problems. How do they relate to the problem of
 finding a ground state of the Ising model? Suppose we are given an Ising model instance with
 hamiltonian $H$ and let $x \in \RR$ be some fixed number. Consider the problem of deciding whether
 there exists $\mathbf{s}$ such that $H(\mathbf{s}) \le x$. We will call this problem a
@@ -176,25 +176,25 @@ Travelling Salesman Problem or Hamiltonian Cycles Problem, are reducible to find
 \begin{figure}
     \centering
     \includegraphics[width=\textwidth]{figures/pt_and_sa.pdf}
-    \caption{Schematic representation of simulated annealing \textbf{(a)} and parallel tempering \textbf{(b)} algorithms. In simulated annealing, a single copy of the system is simulated. The temperature of the system is decreasing with each epoch, thus reducing movement through the state space. In parallel tempering, several copies (replicas) of the system are simulated, each with a fixed temperature. Hotter replicas move through the state space rapidly and less predictably, while colder replicas move conservatively. Between epochs, replicas can exchange states, which helps avoid being stuck at local minima. Exchanging replicas can be also viewed as reseeding of the colder replicas by randomized solutions provided by hotter replicas.}
+    \caption{Schematic representation of simulated annealing \textbf{(a)} and parallel tempering \textbf{(b)} algorithms. In simulated annealing, a single copy of the system is simulated. The temperature of the system is decreasing with each epoch, thus reducing movement through the state space. In parallel tempering, several copies (replicas) of the system are simulated, each with a fixed temperature. Hotter replicas move through the state space rapidly and less predictably, while colder replicas move conservatively. Between epochs, replicas can exchange states, which helps avoid being stuck at local minima. Exchanging replicas can also be viewed as reseeding of the colder replicas by randomized solutions provided by hotter replicas.}
     \label{fig:my_label}
 \end{figure}
 
 
 As is the case with many \textbf{NP--hard} optimization problems, there are many heuristic
-approaches for solving the Ising model. One family of such algorithms relies on Metropolis-Hastings
-\cite{beichl} algorithm for sampling from underlying Boltzmann distribution. In simulated annealing
+approaches for solving the Ising model. One family of such algorithms relies on the Metropolis-Hastings
+\cite{beichl} algorithm for sampling from the underlying Boltzmann distribution. In simulated annealing
 \cite{cook, isakov}, one lowers the temperature over time. Thus, the chance of accepting a locally
 worse solution is greater at the start of the algorithm and decreases with each iteration, which
 helps avoid getting stuck in a local minimum. In another approach from the same family,
 \emph{parallel tempering}, one simulates several replicas of the system, each of them in a different
-temperature. Neighboring replicas are allowed to exchange states, with exchange probability
+temperature. Neighbouring replicas are allowed to exchange states, with exchange probability
 depending on their energy and temperature difference \cite{swendsen}. Replicas with higher
 temperatures explore state space rapidly (thus reseeding the algorithm), while ones with lower
 temperatures refine the best solutions found so far. Various modifications of the aforementioned
 algorithms exist. For instance, one could employ isoenergetic cluster moves \cite{zhu} or adaptive
 choosing the number of sweeps performed between replica exchanges \cite{bittner}. Population
-annealing is another Monte Carlo method sharing similarities with simulated annealing and parallel
+annealing is another Monte Carlo method, sharing similarities with simulated annealing and parallel
 tempering \cite{wang}. Other approaches for solving Ising spin--glasses include methods involving
 branch--and--bound framework \cite{rendl}, its chordal extensions \cite{baccari} or methods based on
 simulating dynamical systems \cite{sheldon}.

@@ -14,7 +14,7 @@ terminology. We will consider a part of a railway network, which we will simply 
 the single--track railways, and hence there are two possible kinds of sections:
 \begin{itemize}
     \item Single tracks, sections that can be occupied by one train at a time.
-    \item Sidings, or parallel tracks (occuring e.g. at stations). At the sidings, trains passing in
+    \item Sidings, or parallel tracks (occurring e.g. at stations). At the sidings, trains passing in
       the same direction can meet and overtake, and trains passing in the opposite directions can
       meet and pass. Each siding comprises two or more tracks, each of which can also be occupied by
       one train at a time.
@@ -33,7 +33,7 @@ conflict--free timetable has to be promptly created. Optimally, this new timetab
 sense, minimize the resulting delays.
 
 It is important to distinguish two types of delays. A \emph{primary} delay is the one resulting from
-the original disturbrance. There is some amount of time needed for a train to reach its further
+the original disturbance. There is some amount of time needed for a train to reach its further
 destinations, e.g. due to speed limits and upper bound on speed achievable by a train. Hence,
 primary delays propagate through the network and cannot be mitigated, even in the absence of other
 trains. The delays resulting from the possible conflicts that need to be resolved are called
@@ -48,7 +48,7 @@ their maximum or weighted sum.
         sidings, while sections 2 and 4 are single tracks. }
 \end{figure}
 
-\section{Basic defninition and notations}
+\section{Basic definition and notations}
 Before we can formulate the optimization problem at hand in a way that it can be run on D-Wave, let
 us introduce the needed notation. The set of all trains will be denoted by $\JJ$. This set is
 naturally partitioned into the set $\JJ_0$ of trains going into one direction and set $\JJ_1$ of
@@ -57,19 +57,19 @@ trains going into the opposite direction. This is a proper partition, i.e.
     \JJ_0 \cup \JJ_1 = \JJ \quad \JJ_0 \cap \JJ_1 = \emptyset
 \end{equation}
 
-For any train $j \in \JJ$ its route $M_j$ is a sequence of blocks. Our model forbids recirculation,
+For any train, $j \in \JJ$ its route $M_j$ is a sequence of blocks. Our model forbids recirculation,
 i.e. each train passes every block in its route exactly once. Furthermore, we assume that each train
 starts and ends its route at some station, and its route is uniquely identified by a sequence of
 station blocks $\left(s_{j,1}, s_{j, 2}, \ldots, s_{j, \mbox{end}_j}\right)$. In other words, there
 are no alternative routes between any two stations. For convenience, we will denote the block
-preceding $s_{j,k}$ in given train's route by $\pi(s_{j,k})$ and the block succeeding it by
+preceding $s_{j,k}$ in a given train's route by $\pi(s_{j,k})$ and the block succeeding it by
 $\rho(s_{j,k})$, i.e.
 \begin{align}
     \pi(s_{j,k}) &= s_{j,k-1} \quad \mbox{for } 2 \le k \le \mbox{end}_j \\
     \rho(s_{j,k}) &= s_{j,k+1} \quad \mbox{for } 1 \le k \le \mbox{end}_j - 1.
 \end{align}
-We will denote the time at which train $j$ should leave the block $s$ according to the original
-timetable by $\ttout(j, s)$. Similarly, the time at which train $j$ is supposed to leave block $s$
+We will denote the time at which the train $j$ should leave the block $s$ according to the original
+timetable by $\ttout(j, s)$. Similarly, the time at which the train $j$ is supposed to leave block $s$
 will be denoted by $\ttin(j, s)$. In our model, we assume that the time at which a train leaves one
 block is precisely the same as the time it enters the next block, i.e.
 \begin{equation}
@@ -91,7 +91,7 @@ This time reserve will become important when discussing the propagation of the p
 
 Suppose the disturbance happened, resulting in some trains not being able to meet the schedule.
 Hence, the actual leaving and arrival times (denoted by $\tout$ and $\tin$) differ from the
-scheduled ones. The delay $d(j, s)$ of train $j$ at block $s$ is defined as the difference
+scheduled ones. The delay $d(j, s)$ of the train $j$ at block $s$ is defined as the difference
 \begin{equation}
 \label{eq:djs}
 d(j, s) \coloneqq \tout(j, s) - \ttout(j, s) = \tin(j, \rho(s)) - \ttin(j, \rho(s))
@@ -110,9 +110,9 @@ positive, one has
 \end{equation}
 
 The secondary delays can be, in principle, arbitrary large. However, it is convenient to assume that
-all secondary delays for train $j$ are bound from above by some constant $d_{\max}(j)$. One can find
+all secondary delays for the train $j$ are bound from above by some constant $d_{\max}(j)$. One can find
 a reasonable upper bound by running some fast heuristic or determine it manually (e.g. there might
-be an apriori established maximum allowable delay of the train). Henceforth, we will consider
+be an \emph{a priori} established maximum allowable delay of the train). Henceforth, we will consider
 $d_{\max}(j)$ to be a parameter of the model. With this assumption, we have the following upper and
 lower bound on the overall delay
 \begin{equation}
@@ -122,7 +122,7 @@ In our model, we will treat $d_{\max}(j)$ as a parameter.
 
 \section{Dispatching conditions}
 Now that we established the necessary notation, let us discuss some constraints that the quantities
-in our model have to fulfill.\\
+in our model have to fulfil.\\
 \textbf{The minimum passing time condition.} A train cannot travel through a block faster than the corresponding minimum passing time
 \begin{equation}
     \label{eq:dc1}
@@ -134,7 +134,7 @@ Using \eqref{eq:djs} and \eqref{eq:pt} one can easily verify that \eqref{eq:dc1}
 \end{equation}\\
 \textbf{The single block occupation condition.} Two trains cannot occupy the same part of a single
 railway track. Consider two trains, $j, j' \in \JJ_0$ leaving the same station $s$ in the direction
-of the next station block $\rho_j(s)$. Suppose further that train $j$ leaves first. i.e.
+of the next station block $\rho_j(s)$. Suppose further that the train $j$ leaves first. i.e.
 $\tout(j's) > \tout(j, s)$. Since two trains cannot occupy the same block, some amount of time has
 to pass after $\tout(j, s)$ before the train $j'$ can leave. This amount of time is dependent on
 both $j$ and a sequence of blocks, and hence we denote it by $\tauu(j, s, \rho_j(s))$. Thus, the
@@ -148,7 +148,7 @@ Substituting for $\tout$ in \eqref{eq:single-block} yields the following inequal
 \label{eq:single-block-delays}
 d(j', s) \ge d(j, s) + \ttout(j, s) - \ttout(j', s) + \tauu(j, s, \rho_j(s))
 \end{equation}
-or
+or,
 \begin{equation}
 d(j', s) \ge d(j, s) + \Delta(j, s, j', s) + \tauu(j, s, \rho_j(s))
 \end{equation}
@@ -157,8 +157,8 @@ where
 \label{eq:delta}
 \Delta(j, s, j', s) = \ttout(j, s) - \ttout(j', s)
 \end{equation}
-The precise form of $\tauu$ depends on the dispatching detail of the problem. In our approach we
-propose the following form
+The precise form of $\tauu$ depends on the dispatching detail of the problem. In our approach, we
+propose the following from
 \todo[inline]{Zapytac Domina skad to sie kurwa wzielo}
 \begin{equation}
 \tauu(j, s) = \max_{i \in \{k+1,\ldots,l-1\}}(\ttin(j, m_{i+1}) - \ttin(j, m_i))

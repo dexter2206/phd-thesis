@@ -2,7 +2,7 @@
 The previous century has witnessed what is now called the digital revolution. The introduction of
 computers dramatically altered multiple aspects of our lives. In particular, almost every area of
 science benefitted hugely from the increasingly available computational power \cite{winsberg}.
-Physics was no exception and numerical simulations now commonly assist experiments.
+Physics was no exception, and numerical simulations now commonly assist experiments.
 
 Simulating quantum systems -- a holy grail of modern computational physics -- is a highly
 challenging task for classical computers \cite{feynman.82}. The difficulties can be blamed on the
@@ -10,15 +10,15 @@ enormous sizes of the state spaces of such systems. Direct, naive simulations wo
 systems of differential equations with the number of variables exponential in the number of
 particles. But what about using more sophisticated algorithms? Surprisingly, it is commonly believed
 that a sufficiently efficient classical algorithm for simulating quantum systems does not exist
-\cite{feynman.82, poplavskii}. Matters seem even worse when one considers that increase in the
+\cite{feynman.82, poplavskii}. Matters seem even worse when one considers that the increase in the
 classical devices' computational power cannot accelerate infinitely. Moore's law \cite{mack}, which
 so far well predicted this growth, is expected to slow down in the years to come \cite{waldrop,
 kumar}.
 
-If classical computers cannot simulate quantum physics efficiently, what device can? In the 1980s
-Richard Feynmann and Paul Benioff put forward the idea that quantum devices can be used to carry
+If classical computers cannot simulate quantum physics efficiently, what device can? In the 1980s,
+Richard Feynman and Paul Benioff put forward the idea that quantum devices can be used to carry
 simulations of quantum systems \cite{feynman.82,benioff.80}. This idea led to the development of
-several quantum computation models. In 1985 David Deutsh described a universal, gate--based quantum
+several quantum computation models. In 1985 David Deutsch described a universal, gate--based quantum
 computer \cite{deutsch}, a device capable of simulating any other quantum computer with at most
 polynomial slowdown. The 1990s and early 2000s saw the emergence of another model of quantum
 computation, Adiabatic Quantum Computing (AQC) \cite{kadowaki,farhi}. Interestingly, AQC was later
@@ -33,9 +33,9 @@ famous, algorithm for integer factorization \cite{shor}. Shor's algorithm demons
 computers are (in principle) capable of solving problems intractable by the classical ones
 \cite{kleinjung}. It was also shown that quantum computers could offer a significant performance
 boost for easier problems. For instance, in 1996 Grover presented a quantum algorithm for
-unstructured database search \cite{grover}, offering quadratic speedup over classical approaches. 
+unstructured database search \cite{grover}, offering quadratic speed-up over classical approaches. 
 
-The invention of specialized quantum algorithms further fueled interest in the field. In recent years we observed an unprecedented development of hardware that brings us closer to the quantum revolution. Several implementations of gate--based quantum computers \cite{ionq, bohnet} and quantum annealers \cite{johnson, dattani} were constructed and made publicly available. This allowed scientists to benchmark them and further research their possible applications.
+The invention of specialized quantum algorithms further fuelled interest in the field. In recent years, we observed an unprecedented development of hardware that brings us closer to the quantum revolution. Several implementations of gate--based quantum computers \cite{ionq, bohnet} and quantum annealers \cite{johnson, dattani} were constructed and made publicly available. This allowed scientists to benchmark them and further research their possible applications.
 
 However promising, near-term quantum computers are far from perfect. One could ask whether already
 these noisy devices can be used for simulating the dynamics of quantum systems. In this thesis, we
@@ -44,7 +44,7 @@ hybrid, parallel-in-time algorithm simulating small quantum systems. While our a
 proof of concept, it exemplifies possible directions of future research.
 
 A key component in assessing the performance of current quantum annealers is comparing them to the
-classical algorithms solving the same problems. While there exist plethora of general heuristic
+classical algorithms solving the same problems. While there exist a plethora of general heuristic
 methods for finding a ground state of Ising spin--glass, one can ask if it is possible to construct
 a better algorithm tailored for problems defined on the same graph as the physical device. As the
 next point in the thesis, we present a recent, heuristic algorithm for finding the low-energy
