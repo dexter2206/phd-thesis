@@ -47,44 +47,56 @@ this chapter when we discuss D-Wave annealers.
 \subsection{D-Wave quantum annealers}
 
 The first commercially available quantum annealer was D-Wave One, introduced by D-Wave company in
-$2011$ \cite{johnson}. Later generations of D-Wave annealers improved on this prototypical device in
-terms of numbers of qubits, couplers and connectivity (described later in this chapter). Table
-\ref{tab:dwave} summarizes the release history of D-Wave annealers and highlights the differences
-between the generations. At the time of writing, the newest series of D-Wave annealers is the
-Advantage system utilizing a chip with at least $5000$ qubits. These novel devices demonstrate a
-significant improvement over the previous $2000$Q generation, which used at most $2048$-qubit chip with
-sparser connectivity. 
+$2011$ \cite{johnson}. featuring 128 qubits. Since then, multiple improved generations of D-Wave
+annealers have been released. At the time of writing, the newest series of D-Wave annealers is
+called the Advantage system. Devices in this typically utilize a chip with at least
+$5000$ qubits. Table \ref{tab:dwave} summarizes the release history of D-Wave annealers and
+highlights the differences between their generations.
+
+Number of qubits on chip is not the only factor restricting problems that can be submitted to the
+annealer. To implement quadratic terms in the Ising hamiltonian, the qubits have to physically
+interact. In all of the D-Wave devices manufactured so far, however, the connectivity is limited.
+For instance, in devices from D-Wave 2000Q series, each qubit could interact with maximum of 6 other
+qubits, whereas in Advantage systems qubit can havve up to 15 interacting neighbours. The
+connectivity of qubits is determined by the device's \emph{topology}. We discuss topologies of
+currently available D-Wave annealers, as well as the topology of the upcoming Advantage 2 system, in
+deitals in the next section.
+
+Topology describes an idealized graph, in which nodes correspond to the annealer's qubits and edges
+map to couplers connecting them. In practice, however, some qubits or couplers might be unavailable
+due to manufactiring errors or calibration problems. The actuall graph available on the device is
+called its \emph{working graph}. Note that the working graph might change over time.
 
 \begin{table}
+    \footnotesize
     \label{tab:dwave}
 \begin{tabular}[pos]{|l|c|c|c|c|}
 \hline
 \textbf{Series} & 
-\textbf{Release date} &
+\textbf{Release year} &
 \textbf{Topology} & 
 \textbf{Num.\newline qubits} & 
 \textbf{Num. couplers}\\ 
 \hline    
-D-Wave One & May 2011 & Chimera & 128 & 352 \\
+D-Wave One & 2011 & Chimera $C_{4}$ & 128 & 352 \\
 \hline
-D-Wave Two & May 2013 & Chimera & 512 & 1472 \\
+D-Wave Two & 2013 & Chimera $C_{8}$ & 512 & 1472 \\
 \hline
-D-Wave 2X & August 2015 & Chimera & 1152 & 3360 \\
+D-Wave 2X & 2015 & Chimera $C_{12}$ & 1152 & 3360 \\
 \hline
-D-Wave 2000Q & January 2017 & Chimera & 2048 & 6016\\
+D-Wave 2000Q & 2017 & Chimera $C_{16}$ & 2048 & 6016\\
 \hline
-Advantage & 2020 & Pegasus & 5000+ & 35000+ \\
+Advantage & 2020 & Pegasus $P_{16}$ & 5640 & 40484 \\
 \hline
-Advantage 2 & 2023-2024 & Zephyr & 7440 & \\ 
+Advantage 2 & 2023-2024 & Zephyr $Z_{15}$ & 7440 & 71736 \\ 
 \hline
 \end{tabular}
 \caption{Comparison of different generations of D-Wave annealers. The numbers of qubits and couplers
-are given for a perfectly manufactured chip with full yield. Actual devices from any series may
-have a slightly lower number of qubits and/or couplers. \todo[inline]{Fill actual number of qubits
-instead of estimates}}.
+are given for a perfectly manufactured chip with full yield. Actual devices from any series
+typically have a lower number of qubits and/or couplers.}.
 \end{table}
 
-\begin{figure}[h]
+\begin{figure}
     \centering
     \includegraphics[width=\textwidth]{figures/chimera.pdf}
     \caption{\textbf{a.} Example of Chimera topology. Graph presented here consists of a $2 \times 2$ grid of unit cells (hence $C_2$ the name). Note the sparse connectivity of the presented graph as compared to the full graph with the same number of nodes. \textbf{b.} Full $K_9$ graph embedded in Chimera graph from \textbf{a.}. The nodes are labelled with numbers corresponding to groups of logical qubits they were constructed from.}
@@ -93,6 +105,9 @@ instead of estimates}}.
 
 
 \subsection{Annealer topologies}
+
+The first D-Wave devices, up to Dwave 2000Q series (see Fig. \ref{fig:chimera}), used a to pology
+called Chimera. 
 
 The Ising model described in the previous chapter allows arbitrary interactions between spins. However, this is often not the case with physical devices like quantum annealers. For instance, in D-Wave devices, spins are arranged into a specific \emph{topology} with limited connectivity. Thus, the possible graph on which the optimization problems can be defined is much sparser than the complete $K_{N}$ graph. Spins in 2000Q devices are arranged in the so-called \emph{Chimera} topology depicted in figure \ref{fig:chimera}. The Chimera graph can be thought of as a $n \times m$ lattice of unit cells, where each cell is a complete bipartite $K_{4,4}$. Qubits are also connected to two qubits in neighbouring cells via external couplers (unless they reside on the border or a corner of the lattice), resulting in at most total 6 connections per qubit. Straightforward calculation shows that the Chimera graph has a total of $16mn + 4(m-1)n + 4(n-1)m$ edges.
 
