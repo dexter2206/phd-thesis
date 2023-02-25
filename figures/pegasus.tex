@@ -24,7 +24,9 @@
                cap=round
            }
         },
-        coupler legend/.style={minimum height=0.5mm, minimum width=2mm, inner sep=0, fill, rectangle}
+        coupler legend/.style={minimum height=0.5mm, minimum width=2mm, inner sep=0, fill,
+        rectangle},
+        unitcell/.style={thick, dashed}
     ]
 
     \matrix [] at (0.4, -0.9) {
@@ -867,6 +869,11 @@
         \path[coupler,odd] (137) -- (139);
         \path[coupler,external] (138) -- (139);
         %\end{pgfonlayer}
+
+        \draw[unitcell] (0.37, -0.87) -- (0.37, 0.0);
+        \draw[unitcell] (0.71, -0.87) -- (0.71, 0.0);
+        \draw[unitcell] (0.0, -0.6) -- (1.0, -0.6);
+        \draw[unitcell] (0.0, -0.26) -- (1.0, -0.26);
 
         \coordinate (target) at (0.54, -0.43);
         \coordinate (view) at (0.8, -0.75);
