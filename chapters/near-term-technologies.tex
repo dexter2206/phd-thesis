@@ -116,36 +116,114 @@ Advantage 2 & 2023-2024 & $Z_{15}$ & 7440 & 71736 \\
     series typically have a lower number of qubits and/or couplers.}.
 \end{table}
 
-\begin{figure}
-    \centering
-    \includegraphics[width=\textwidth]{figures/chimera.pdf}
-    \caption{\textbf{a.} Example of Chimera topology. Graph presented here consists of a $2 \times 2$ grid of unit cells (hence $C_2$ the name). Note the sparse connectivity of the presented graph as compared to the full graph with the same number of nodes. \textbf{b.} Full $K_9$ graph embedded in Chimera graph from \textbf{a.}. The nodes are labelled with numbers corresponding to groups of logical qubits they were constructed from.}
-    \label{fig:chimera}
-\end{figure}
+% \begin{figure}
+%     \centering
+%     \includegraphics[width=\textwidth]{figures/chimera.pdf}
+%     \caption{\textbf{a.} Example of Chimera topology. Graph presented here consists of a $2 \times 2$ grid of unit cells (hence $C_2$ the name). Note the sparse connectivity of the presented graph as compared to the full graph with the same number of nodes. \textbf{b.} Full $K_9$ graph embedded in Chimera graph from \textbf{a.}. The nodes are labelled with numbers corresponding to groups of logical qubits they were constructed from.}
+%     \label{fig:chimera}
+% \end{figure}
 
 \subsection{Annealer topologies}
 
-The first D-Wave devices, up to Dwave 2000Q series (see Fig. \ref{fig:chimera}), used a topology
-called Chimera.
+The first topology that we will discuss in this chapter is the \emph{Chimera} topology, used for all
+generations of D-Wave devices up to D-Wave 2000Q series. We decided to describe the Chimera before
+moving towards newer topologies because it serves as a building block for its successors.
 
-The Ising model described in the previous chapter allows arbitrary interactions between spins. However, this is often not the case with physical devices like quantum annealers. For instance, in D-Wave devices, spins are arranged into a specific \emph{topology} with limited connectivity. Thus, the possible graph on which the optimization problems can be defined is much sparser than the complete $K_{N}$ graph. Spins in 2000Q devices are arranged in the so-called \emph{Chimera} topology depicted in figure \ref{fig:chimera}. The Chimera graph can be thought of as a $n \times m$ lattice of unit cells, where each cell is a complete bipartite $K_{4,4}$. Qubits are also connected to two qubits in neighboring cells via external couplers (unless they reside on the border or a corner of the lattice), resulting in at most total 6 connections per qubit. Straightforward calculation shows that the Chimera graph has a total of $16mn + 4(m-1)n + 4(n-1)m$ edges.
+While discussing the topologies of the D-Wave annealers, we will not discuss the physical structure
+of the chip. We decided to do so because, for this thesis, the \emph{logical} structure of the chip
+is far more important than the underlying physical one. However, one consequence of this
+choice is that the distinction between two types of couplers (external and internal) will become
+less intuitive once we reach beyond the Chimera topology. Nevertheless, we believe that this will
+not impair the reader's ability to understand the layout of qubits in the newer devices. For the
+description of the physical chip layouts, we refer the reader to \cite{}.
 
-The new Advantage system uses \emph{Pegasus} topology (see Fig \ref{fig:pegasus}), which increases
-the maximum degree of vertex in the graph to 15. For the details of this topology, we refer the interested
-reader to \cite{boothby}.
-\todo[inline]{instead of only citing, describe pegasus}
+\subsubsection{The Chimera topology}
+
+In Chimera topology, depicted in Fig. \ref{fig:chimera}, the qubits are placed on a rectangular grid
+of \emph{unit cells}. Every unit cell is a complete bipartite graph $K_{t,t}$. Each group in the
+bipartition is called \emph{shore}, and hence the parameter $t$ is called the \emph{shore size}.
+Each qubit in the unit cell (except the ones in the cells on the border) connects to two qubits on
+the same shore in the neighboring cells. Hence, the whole Chimera graph is also bipartite, and
+the maximum degree of a node is $t+2$. The couplers connecting qubits in the same unit cell are
+called \emph{internal} and the couplers connecting qubits belonging to different cells are called \emph{external}.
+
+Typically, the devices using Chimera topology utilize a square grid with a shore size of $4$. Such
+layouts are denoted by $C_n$, where $n$ is the width (and the height) of the grid. In such devices,
+each qubit is connected to a maximum of 6 qubits, the total number of qubits is $8n^2$ and the total
+number of couplers is $16n^2 + 8(n-1)n$.
+
+The Chimera topology is often visualized using two distinct layouts, both of which are exemplified
+in Fig. \ref{fig:chimera}. In the cross layout, the shores of the unit cell form a cross, with one
+shore being placed vertically and the second shore being placed horizontally. In the grid layout,
+each unit cell is depicted as two columns of qubits, corresponding to both shores of the cell. While
+the grid layout might be more intuitive in some applications, cross layouts are in turn convenient
+when presenting the Pegasus topology, which we will discuss next.
+
+\subsubsection{The Pegasus topology}
+The current generation of D-Wave devices, dubbed the Advantage System, uses the topology called
+Pegasus \cite{boothby}. An example of this topology is presented in Fig. \ref{fig:pegasus}. The unit
+cell of Pegasus comprises 24 qubits grouped into the 3 Chimera unit cells. The topology features
+several improvements regarding the qubit connectivity. Firstly, the internal couplers connect not
+only the qubits in the same Chimera unit cell, but also connect some neighboring Chimera unit cells.
+Secondly, inside the Chimera unit cells new type of connection, called \emph{the odd} couplers, is
+introduced. Interestingly, those modifications mean that the Pegasus graph is no longer bipartite.
+The Pegasus topology having $n$ rows and $n$ columns of unit cells is denoted by $P_n$ and contains
+$24n(n-1)$ qubits.
+
+Observe that a graph in Pegasus topology features subgraphs isomorphic to Chimera graphs. This
+fact is important for the annealer users, as all problems compatible with a device using the Chimera
+topology are automatically compatible with devices using a sufficiently large Pegasus topology.
+
+\begin{figure}
+    \begin{subfigure}[b]{0.5\textwidth}
+        \centering
+        \includegraphics[width=0.8\textwidth]{figures/chimera-cross.pdf}
+        \caption{Chimera cross layout}
+        \label{fig:chimera-cross}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=0.8\textwidth]{figures/chimera-shore-column.pdf}
+        \caption{Chimera grid layout}
+        \label{fig:chimera-shore-column}
+    \end{subfigure}
+    \caption{
+        Chimera $C_3$ topology drawn using the cross layout and the grid layout. The different type
+        of couplers are color coded.
+    }
+    \label{fig:chimera}
+\end{figure}
 
 
 \begin{figure}
     \includegraphics[width=\textwidth]{figures/pegasus}
     \caption{
         The $P_3$ graph, an example of the Pegasus topology. Different types of couplers are
-        color--coded. The magnified portion of the image shows a part of the graph containing a
-        Chimera unit cell. Observe the inner couplers, marked in red, connecting qubits that are not
-        connected in Chimera topology. The addition of these couplers allows for running problems
-        that are not necessarily defined on a bipartite graph.
+        color--coded. The Pegasus unit cells are separated with a dashed line. The magnified portion
+        of the image shows a part of the graph containing a Chimera unit cell. Observe the odd
+        couplers, marked in red, connecting qubits that are not connected in a unit cell of Chimera topology.
     }
+    \label{fig:pegasus}
 \end{figure}
+
+\subsection{The Zephyr topology}
+The upcoming generation of D-Wave annealers, called Advantage 2 System, will use the Zephyr topology
+\cite{}. This topology utilizes Chimera unit cells with the shore size of 8 and, compared to the
+Pegasus topology, contains more odd couplers. Overall, a maximum degree of a qubit in Zephyr
+topology is 20. The Zephyr topology containing $n$ unit cells is denoted $Z_n$ and contains
+$16n(2n+1)$ qubits.
+
+\begin{figure}
+    \includegraphics[width=\textwidth]{figures/zephyr}
+    \caption{
+        The $Z_3$ graph, an example of the Zephyr topology. Different types of couplers are
+        color--coded. Observe that, similarly to Pegasus, the Zephyr topology contains Chimera
+        subgraphs. However, the shore size of the Chimera unit cells in Zephyr is 8 instead of 4.
+    }
+    \label{fig:zephyr}
+\end{figure}
+
+
 \subsection{Minor embeddings}
 
 Not every Ising problem one might wish to solve is compatible with the topology of physical quantum annealer. This issue can sometimes be circumvented using a procedure called \emph{minor embedding}. In this approach, one considers groups of several physical spins connected in a chain as a single logical one. Vertices corresponding to spins in each such chain are contracted, resulting in the new graph, having higher connectivity but smaller number of vertices than the original one. With the proper choice of chains, this new graph can contain a subgraph isomorphic to the graph of the problem to solve. The minor embedding process is illustrated in figure \ref{fig:chimera}.
