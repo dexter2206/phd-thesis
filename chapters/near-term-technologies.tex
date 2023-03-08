@@ -226,49 +226,203 @@ $16n(2n+1)$ qubits.
 
 \subsection{Minor embeddings}
 
-Not every Ising problem one might wish to solve is compatible with the topology of physical quantum annealer. This issue can sometimes be circumvented using a procedure called \emph{minor embedding}. In this approach, one considers groups of several physical spins connected in a chain as a single logical one. Vertices corresponding to spins in each such chain are contracted, resulting in the new graph, having higher connectivity but smaller number of vertices than the original one. With the proper choice of chains, this new graph can contain a subgraph isomorphic to the graph of the problem to solve. The minor embedding process is illustrated in figure \ref{fig:chimera}.
+Oftentimes, even small (relatively to the available number of qubits) instances are not compatible
+with the annealer because of its restricted connectivity. This issue can sometimes be mitigated
+using a procedure called \emph{minor embedding}, in which the number of qubits is sacrificed for an
+improvement in connectivity. Informally, the minor embedding relies on constructing a new
+\emph{logical} graph with which the Ising instance to be solved is compatible.
+This, in turn, is achieved by introducing \emph{logical} qubits built from several physical qubits
+(a process called \emph{contraction}). For the reasons explained later in this section, we will
+require all qubits forming the logical qubit to be connected in a chain. The logical qubit
+constructed this way inherits all the neighbors of its physical qubits, and thus one ends up with a
+more densely connected graph, albeit with a lower number of qubits. Before formalizing this idea, let us first present an example of minor embedding.
 
-Grouping qubits into chains and contracting them is not enough to run the embedded problem. One first has to ensure that all spins in a chain align in the same direction, so that they can indeed represent a single logical variable. This is accomplished by adding a penalty term which prohibitively increases the cost of solutions in which the value of spins in chains differ. However, due to the probabilistic nature of quantum annealer, even after adding penalty one might obtain solutions in which values of spins in some chains disagree. Such disagreeing chains are called \emph{broken}. Since solutions containing broken chains cannot be interpreted directly as a solution to the original problem, one has to either discard them, or manually correct them (e.g. by choosing the most common value among the spins in the chain).
+\begin{example}[Minor embedding]
+\label{ex:minor-embedding}
+\begin{figure}[b]
+    \includegraphics[width=\textwidth]{figures/minor-embedding}
+    \caption{
+        Example of minor embedding. Spin--glasses defined on the graph $G$ (\textbf{c.}) cannot
+        be directly solved on an annealer with $C_1$ topology (\textbf{a.}). By contracting vertices
+        4 and 0 one obtains a new logical graph $C_1'$ (\textbf{b.}), which contains $G$ as a
+        subgraph.
+    }
+    \label{fig:minor-embedding}
+\end{figure}
 
-% To define minor embedding more formally, let us first define the notion of vertex contraction. Let $(G, E)$ be a graph defining topology of the device and let $v_{1}, \ldots, v_{{n}} \in E$ be a chain of vertices. Contraction of vertices $v_{1}, \ldots, v_{n}$ is a new graph $G'=(V', E')$ such that
-% \begin{itemize}
-%   \item $V' = V \setminus \{v_{1}, \ldots, v_{{n}}\} \cup \{w\}$, where $w$ is some new vertex.
-%   \item $E' = \{e \in E\colon v_{i} \notin E\} \cup \{\{v, w\}\colon \exists_{i} \{v, v_{i}\} \in E\}$
-% \end{itemize}
-% Intuitively, contracting vertices replaces them with a new one connected with their every neighbour.
+Consider an annealer with $C_1$ topology and an (arbitrary) Ising spin--glass instance
+defined on a triangular graph $G$ as depicted in Fig. \ref{fig:minor-embedding}. No
+such instance is compatible with $C_1$, because graph $G$ is not bipartite. Combining qubits $0$
+and $4$ into a single logical qubit yields a graph depicted in Fig.
+\ref{fig:minor-embedding}\textbf{b.}, with which $G$ is compatible. If one could use an annealer
+with this logical graph, then instances defined on $G$ could be solved directly. Note that vertices
+0 and 4 are not the only valid choice in this case. Indeed, every contraction of two vertices in
+$C_1$ would be sufficient to embed $G$.
+\end{example}
 
-\subsection{Comparison to classical model of computation}
-It is clearly visible that quantum annealing is different from computing using classical computers. One of the most obvious differences is computational model. On classical computers, one essentially writes programs as a series of instructions to be executed by the CPU. On typical machines, CPU is capable of performing arithmetic operations, computing values of some special functions, managing execution flow, controlling I/O and much more. In comparison, quantum annealers are capable of executing a single operation: annealing given optimization problem. Therefore, programming these devices boils down to defining an optimization problem and tuning the annealing parameters. There is no processing flow controlled by the programmer.
+As demonstrated in the example, contracting vertices in the annealer's working graph can make it
+compatible with an Ising instance otherwise unsolvable by the annealer. It only remains to
+explain how this new logical graph can be used with the actual device.
 
-Another difference between classical computers and quantum annealers is lack of working memory in the former. Classical computers use working memory (typically in the form of RAM) to store machine code and data. However, quantum annealers do not need to store neither code nor data, and hence they do not feature an analogous component. Similarly, quantum annealers, being purely computational oriented devices, do not have mass storage.
+The idea is to make all the physical qubits in the chain behave like a single qubit. Since the
+qubits are connected, one can couple them, including a penalty large enough that violating qubits'
+alignment would prohibitively increase the energy of the solution. The example presents this idea.
 
-A slightly less obvious difference between classical computers and quantum annealers is their model of parallelism. Classical computers are capable of running several threads of execution at the same time. However, every non-trivial classical algorithm involving parallelism must necessarily also include a serial part, which limits speed-up gained for introducing more CPU cores or CPUs. In contrast, quantum annealers are capable of annealing multiple qubits at the same time, which makes their operation inherently parallel.
+\begin{example}[Minor embedding, continued]
+Consider an Ising spin--glass instance with Hamiltonian:
+
+\begin{equation}
+H(s_1, s_2, s_3) = s_1 + s_2 + s_3 - s_1s_2 - s_2s_3
+\end{equation}
+with an unique optimal solution $\mathbf{s} = (-1, -1, -1)$. Suppose we want to solve it on annealer
+with $C_1$ topology, using the minor embedding presented in Example \ref{ex:minor-embedding}. The
+problem submitted to the annealer will have the following Hamiltonian:
+\begin{equation}
+H'(z_0, z_3, z_4, z_5) = \underbrace{z_3 + z_5}_{s_1 + s_3} + \underbrace{0.5(z_0 + z_4)}_{s_2} - \underbrace{z_3z_4}_{s_2s_1} - \underbrace{z_0z_5}_{s_2s_3} + \underbrace{P(z_0, z_4)}_{\text{penalty}},
+\end{equation}
+where $z_i$ is a spin variable associated to $i$-th qubit and $P(z_0, z_4)$ is a \emph{penalty term}
+for chain comprising qubits 0 and 4. The penalty is of the form $P(z_0, z_4) = -\alpha z_0z_4$ where
+$alpha$ is a large positive constant. Let us examine all possible configurations of $(z_0, z_3, z_4,
+z_5)$ and observe how the penalty term influences their energy:
+
+\begin{center}
+\begin{tabular}{|c|c|c|c|}
+\hline
+\multicolumn{2}{|c|}{feasible solutions} & \multicolumn{2}{c|}{infeasible solutions} \\
+\hline
+$z_0, z_3, z_4, z_5$ & energy & $z_0, z_3, z_4, z_5$ & energy\\
+\hline
+-1, -1,-1, -1 & $-5.0 -\alpha$ & 1, 1,1, -1 & $1.0 + \alpha$\\
+-1, 1,1, -1 & $-2.0 -\alpha$ & 1, -1,1, -1 & $1.0 + \alpha$\\
+-1, -1,1, -1 & $-2.0 -\alpha$ &-1, -1,-1, 1 & $-1.0 + \alpha$ \\
+1, 1,-1, 1 & $2.0 -\alpha$ & 1, 1,-1, -1 & $2.0 + \alpha$ \\
+1, -1,-1, 1 & $-2.0 -\alpha$ & 1, -1,-1, -1 & $-2.0 + \alpha$ \\
+-1, 1,-1, -1 & $-1.0 -\alpha$ & -1, -1,1, 1 & $2.0 + \alpha$ \\
+1, -1,1, 1 & $1.0 -\alpha$ & -1, 1,1, 1 & $2.0 + \alpha$\\
+1, 1,1, 1 & $1.0  -\alpha$ & -1, 1,-1, 1 & $3.0 + \alpha$\\
+\hline
+\end{tabular}
+\end{center}
+
+If $\alpha$ is large enough, e.g. $\alpha=2$, all feasible solutions (left part of the table) have
+energy lower than any solution in which qubits $z_0$ and $z_4$ are misaligned (right part of the
+table), which increases a change of sampling them on a physical device.On the other hand, if
+$\alpha=1$, the feasible solution $(1,1,1,1)$ has higher energy than the infeasible solution $(1,
+-1, -1, -1)$.
+\end{example}
+
+As demonstrated in the example above, when performing minor embedding it is important to correctly
+choose the chain strengths. Typically, it is not possible to choose a correct $\alpha$ with
+certainty. One choice is to test multiples of the largest coupling term
+$J_{ij}$ in the problem being solved, i.e. take:
+\begin{equation}
+\alpha = k \cdot max_{i, j} |J_{ij}|.
+\end{equation}
+This is the strategy we use in this thesis for all experiemnts run on D-Wave.
+
+Since the annealers are inherently heuristic devices, even with carefully chosen chain strength one
+might obtain solutions that cannot be decoded into feasible solutions to the original problem,
+because the qubits forming chains are misaligned. This situation is known as a \emph{chain break},
+and there are two most commonly used strategies for dealing with it:
+
+\begin{itemize}
+\item discarding the incorrect samples. This is the simplest method, but it reduces the total number
+of samples. Hence, the experiments needing some fixed number of samples have to adapt and e.g.
+sample from the annealer multiple times until the desired number of feasible samples is collected.
+\item \emph{majority voting}: whenever the chain of qubits is misaligned, choose the most common value
+among the chain and use it as a value of the logical qubit. In case of a tie, choose
+-1 or 1 both with equal probabilities.
+\end{itemize}
+
+Having presented all the necessary aspects of using quantum annealers, we can conclude this section
+with a discussion on how quantum annealing differs from the classical model of computation.
+
+\subsection{Comparison to the classical model of computation}
+It is clear that quantum annealing is different from classical computations. One of the
+most obvious differences is the computational model. On classical computers, one essentially writes
+programs as a series of instructions to be executed by the CPU. On typical machines, the CPU is
+capable of performing arithmetic operations, computing values of some special functions, managing
+execution flow, controlling I/O and much more. In comparison, chips in quantum annealers are capable
+of executing a single operation: annealing a given optimization problem. Therefore, programming
+these devices boils down to defining an optimization problem and tuning the annealing parameters.
+
+Another difference between classical computers and quantum annealers is the lack of working memory in the former. Classical computers use working memory (typically in the form of RAM) to store machine code and data. However, quantum annealers do not need to store neither code nor data, and hence they do not feature an analogous component. Similarly, quantum annealers, being purely computationally oriented devices, do not have mass storage.
+
+A slightly less obvious difference between classical computers and quantum annealers is their model
+of parallelism. Classical computers are capable of running several threads of execution at the same
+time. However, every non-trivial classical algorithm involving parallelism must necessarily also
+include a serial part which limits speedup gained for introducing more execution units (CPU cores or
+CPUs). In contrast, quantum annealers are capable of annealing multiple qubits at the same time,
+which makes their operation inherently parallel.
 
 \section{Nvidia CUDA}
 
-Quantum annealing, introduced in the previous section, is an inherently heuristic process. Like many heuristic algorithms, it cannot certify that the solution it found is in fact optimal. One way to assess performance of such algorithms is to compare their results with known low-energy spectrum of some test instances. In this section, we describe the Nvidia CUDA technology, which we use for our implementation of massively parallel brute-force algorithm describe in chapter \ref{chapter:bruteforce}.
+Quantum annealing, introduced in the previous section, is an inherently heuristic process. Like many
+heuristic algorithms, it cannot certify that the solution it found is optimal. One way to assess the
+performance of such algorithms is to compare their results with known low-energy spectra of some
+test instances. Another viable approach is to compute the exact low energy spectra of some test
+instances, which in turn requires an exact solver. In particular, one might perform an exhaustive
+search over all possible states and extract only the selected number of the ones with the lowest
+energy, the approach also known as brute--force approach. In chapter \ref{chapter:bruteforce} we
+demonstrate a massively parallel implementation of the brute-force algorithm using Nvidia CUDa, but
+before we do this, in this section we will introduce the basic principles of using CUDA--enabled
+graphic processing units.
 
 \subsection{Brief history of Graphics Processing Units}
-The history of specialized hardware for manipulating graphics ranges as far as the 1970s. Initially these devices, that later became known as Graphics Processing Units (GPU), offered limited functionalities. Increasing demand for performance in gaming industry and professional graphics processing drove the evolution of GPUs, which quickly became highly sophisticated devices supporting advanced 2D and 3D image manipulation. Performing such arithmetically intensive operations requires enormous computational power, and it was only the matter of time until it was realised that the power of these devices can be harnessed for general purpose computations (so called GPGPU - General Purpose computing on GPU).
+The history of specialized hardware for manipulating graphics ranges as far as the 1970s. Initially,
+these devices, which later became known as Graphics Processing Units (GPUs), offered limited
+functionalities. Increasing demand for performance in the gaming industry and professional graphics
+processing drove the evolution of GPUs, which quickly became highly sophisticated devices supporting
+advanced 2D and 3D image manipulation. Performing such arithmetically intensive operations requires
+enormous computational power, and it was only a matter of time until it was realised that the
+power of these devices can be harnessed for the general purpose computations (so called GPGPU -
+General Purpose computing on GPU).
 
-Early efforts in development of GPGPU required framing of computational problem in terms of operations performed on graphical primitives, as this was the only way for using specialized API of GPUs. This changed with the development of devices and toolkits that supported operations needed for general purpose computations out of the box. Notably, in 2007 Nvidia introduced its massively parallel CUDA architecture.
+Early efforts in the development of GPGPU required framing of computational problems in terms of
+operations performed on graphical primitives, as this was the only way for using specialized API of
+GPUs. This changed with the development of devices and toolkits that supported operations needed for
+the general--purpose computations out of the box. Notably, in 2007 Nvidia introduced its massively
+parallel CUDA architecture.
 
 \subsection{Differences between CPU and GPU}
-Principles behind operation of CUDA-enabled devices are fundamentally different from the ones governing execution of program on traditional CPU-only architecture. In current x86 based computers, the CPU runs a given sequence of instructions (so-called thread of execution) using one of its cores. Such a processor is the ''brain'' of a computer, and it can perform a wide variety of tasks ranging from arithmetic operations, through accessing the system's RAM, to performing IO operations and controlling other components of the system. Typical CPUs are optimized for sequential execution, and as such are usually equipped with moderate (as compared to the GPUs) number of high-performance cores.
+The principles behind the operation of CUDA--enabled devices are fundamentally different from the
+ones governing the execution of a program on traditional CPU--only architecture. In current
+x86--based computers, the CPU runs a given sequence of instructions (so-called thread of execution)
+using one of its cores. Such a processor is the ''brain'' of a computer, and it can perform a wide
+variety of tasks ranging from arithmetic operations, through accessing the system's RAM, to
+performing IO operations and controlling other components of the system. Typical CPUs are optimized
+for sequential execution, and as such are usually equipped with moderate (as compared to the GPUs)
+number of high-performance cores.
 
-On the other hand, GPUs are more specialized. They are well suited for performing numerous arithmetic operations and accessing memory in parallel. They typically have more cores than a traditional CPU (with even modern commodity GPUs boasting thousands of them). Although those cores are less performant than their CPU counterparts and support a much narrower set of operations, their large number combined with fast memory access gives modern GPUs advantage over CPUs in multiple areas.
+On the other hand, GPUs are more specialized. They are well suited for performing numerous
+arithmetic operations and accessing memory in parallel. They typically have more cores than a
+traditional CPU (with even modern commodity GPUs boasting thousands of them). Although those cores
+are less performant than their CPU counterparts and support a much narrower set of operations, their
+large number combined with fast memory access gives modern GPUs an advantage over CPUs in multiple
+areas.
 
 \subsection{Processing flow on CUDA}
-Considering the architectural differences between CPUs and GPUs, it is hardly surprising that both of these types of devices are programmed quite differently. The first major difference is that GPUs cannot operate on their own and are themselves controlled by CPU. This is why CUDA is a type of \emph{heterogenous} architectures (as opposed to CPU-only \emph{homogenous} architectures). The processing flow on CUDA is summarized in Figure \ref{fig:cuda_flow}.
+Considering the architectural differences between CPUs and GPUs, it is hardly surprising that both
+of these types of devices are programmed quite differently. The first major difference is that GPUs
+cannot operate on their own and are themselves controlled by the CPU. This is why CUDA is a type of
+\emph{heterogenous} architecture (as opposed to CPU-only \emph{homogenous} architecture). The
+processing flow on CUDA is summarized in Figure \ref{fig:cuda_flow}.
 
 \begin{figure}[ht]
     \centering
     \includegraphics[width=\textwidth]{figures/cuda_workflow}
-    \caption{Processing flow on CUDA. The CPU sends input data to the GPU memory, and launches the computational kernel. The kernel's code is executed, in parallel, using multiple threads on GPU. Once the execution is done, results are copied from the GPU memory to the system's RAM.}
+    \caption{Processing flow on CUDA. The CPU sends input data to the GPU memory and launches the computational kernel. The kernel's code is executed, in parallel, using multiple threads on GPU. Once the execution is done, results are copied from the GPU memory to the system's RAM.}
     \label{fig:cuda_flow}
 \end{figure}
 
-Programs run on GPU are organized in \emph{kernels}. For the most part, kernels might be viewed as functions or subroutines (which is indeed how they are implemented) that don't have a return value. On a CPU, such function would be executed by some core as a part of a thread. In CUDA however, the very same kernel is executed by multiple threads. Executing a kernel requires specifying a \emph{grid} that will be used for running it. A grid can be 1, 2- or 3-dimensional and is itself divided into blocks. Each block is in turn also organized in 1, 2, or 3-dimensional structure of threads (the same for every block in the grid). A schematic view of a two-dimensional grid is presented on Figure \ref{fig:cuda_grid}.
+Programs run on GPU are organized in \emph{kernels}. For the most part, kernels might be viewed as
+functions or subroutines (which is indeed how they are implemented) that don't have a return value.
+On a CPU, such a function would be executed by some core as a part of a thread. In CUDA however, the
+very same kernel is executed by multiple threads. Executing a kernel requires specifying a
+\emph{grid} that will be used for running it. A grid can be 1, 2-- or 3--dimensional and is itself
+divided into blocks. Each block is in turn also organized in 1, 2--, or 3-dimensional structure of
+threads (the same for every block in the grid). A schematic view of a two-dimensional grid is
+presented in Fig. \ref{fig:cuda_grid}.
 
 \begin{figure}[ht]
     \centering
@@ -277,63 +431,131 @@ Programs run on GPU are organized in \emph{kernels}. For the most part, kernels 
     \label{fig:cuda_grid}
 \end{figure}
 
-As already mentioned, each thread in the grid executes \emph{precisely the same} kernel. It might therefore seem surprising that, nevertheless, they are able to access different parts of memory. This is possible, because each thread is identified by its indices in both the grid and the block. Those indices can be used e.g. for computing offsets in arrays that are being processed. A more sophisticated use of thread and block indices will be exemplified in chapter \ref{chapter:bruteforce}.
+As already mentioned, each thread in the grid executes \emph{precisely the same} kernel with
+\emph{precisely the same} parameters. It might therefore seem surprising that, nevertheless, they
+can access different parts of memory or otherwise handle a different part of the omputational task.
+This is possible because each thread is identified by its indices in both the grid and the block.
+Those indices can be used e.g. for computing offsets in arrays that are being processed. A more
+sophisticated use of thread and block indices will be exemplified in chapter \ref{chapter:bruteforce}.
 
 \subsection{SIMT architecture}
-CUDA-enabled GPUs employ an architecture called SIMT (Single Instruction, Multiple Threads)\footnote{One can contrast SIMT architecture used by CUDA with SIMD instructions (Single Instruction, Multiple  Data) available on mother CPUs.}. As implied by the name, in SIMT architecture, multiple threads execute the same instruction. Threads are executed in blocks  by computational units called Streaming Multiprocessors (SMs), and blocks distributed to multiprocessors on kernel launch. When a block is distributed to SM, it is further partitioned into \emph{warps}, groups of 32 threads each. All threads in a warp are scheduled for execution together. Nevertheless, they have separate program counter and thus their execution flow can diverge. At any given time, a  thread in a warp can be either active (executing \emph{the same} instruction as the rest of the active threads in a warp) or inactive (not executing any instruction at all). A thread may be inactive because its execution diverged from the rest of the warp or because it terminated earlier. It is interesting to note that starting from the Volta architecture, threads can be scheduled on finer level of granularity, allowing them to diverge and reconverge on the sub-warp level. Each multiprocessor manages a set of 32-bit registers and parallel data cache, called \emph{shared memory}, distributed among the thread blocks. Since those resources are limited, the number of warps that can run in parallel on any SM is heavily dependent on resource usage of the kernel being executed.
+CUDA-enabled GPUs employ an architecture called SIMT (Single Instruction, Multiple
+Threads)\footnote{One can contrast SIMT architecture used by CUDA with SIMD instructions (Single
+Instruction, Multiple  Data) available on modern CPUs.}. As implied by the name, in SIMT
+architecture, multiple threads execute the same instruction. Threads are executed in blocks by
+computational units called Streaming Multiprocessors (SMs), and blocks are distributed to
+multiprocessors on kernel launch. When a block is distributed to SM, it is further partitioned into
+\emph{warps}, groups of 32 threads each. All threads in a warp are scheduled for execution together.
+Nevertheless, each of them has a separate program counter and thus their execution flow can diverge.
+At any given time, a thread in a warp can be either active (executing \emph{the same} instruction
+as the rest of the active threads in a warp) or inactive (not executing any instruction at all). A
+thread may be inactive because its execution diverged from the rest of the warp or because it
+terminated earlier. It is interesting to note that starting from the Volta architecture, threads can
+be scheduled on a finer level of granularity, allowing them to diverge and reconverge on the
+sub-warp level. Each multiprocessor manages a set of 32-bit registers and a parallel data cache,
+called \emph{shared memory}, distributed among the thread blocks. Since those resources are limited,
+the number of warps that can run in parallel on any SM is heavily dependent on the resource usage of
+the kernel being executed.
 
 \subsection{Memory hierarchy}
 
-Threads can access several memory types during kernel execution, including global memory, local memory, constant and texture memory and shared memory. Physically, those different memory types can be divided into device memory (global memory, local memory, constant memory) and on-chip memory (shared memory). SM's on-chip memory also serves as L1 cache.
+On CUDA--enabled devices, threads can access several memory types during kernel execution, including
+global memory, local memory, constant and texture memory and shared memory. Physically, those
+different memory types can be divided into device memory (global memory, local memory, constant
+memory) and on-chip memory (shared memory). SM's on-chip memory also serves as the L1 cache.
 
-Global memory is a device memory available to each thread. All accesses to global memory are serviced in 32-, 64-, or 128- bytes memory transactions. Accesses made from a single warp are coalesced into as many of such transactions as necessary, depending on device's compute capability and access pattern. Reads and writes targeting global memory are always cached in L2 and (depending on configuration, compute capability and access pattern) may also be cached in L1 cache.
+Global memory is a device memory available to all threads. All accesses to global memory are
+serviced in 32-, 64-, or 128- bytes memory transactions. Accesses made from a single warp are
+coalesced into as many such transactions as necessary, depending on the device's
+architecture and access pattern. Reads and writes targeting global memory are always cached in L2
+and (depending on configuration, compute capability and access pattern) may also be cached in L1
+cache.
 
-Local memory resides physically on the device, and thus offers the same bandwidth and latency. Just like global memory, it is always cached in L2 cache. This type of memory is never used directly by the programmer. Instead, the compiler might decide to use it for local variables of a thread in case there is not enough register (so-called \emph{register spilling}) or for dynamically indexed local arrays. Local memory is arranged in such a way, that accesses are always fully coalesced as long as all threads access the same relative address (e.g. the same local variable, the same index of local array etc.).
+Local memory in CUDA is only a logical concept. Physically, it resides in the off-chip memory just
+like global memory and thus offers the same bandwidth and latency. Just like
+global memory, it is always cached in L2 cache. This type of memory is never used directly by the
+programmer. Instead, the compiler might decide to use it for local variables of a thread in case
+there is not enough register (so-called \emph{register spilling}) or for dynamically indexed local
+arrays. Local memory is arranged in such a way, that accesses are always fully coalesced as long as
+all threads access the same relative address (e.g. the same local variable, the same position of a
+local array etc.).
 
-Constant memory and texture memory are two types of read-only memory \footnote{Read-only here means ``Not writeable from inside the kernel''} residing in global memory. Accesses to constant memory are cached in constant cache and accesses to it are serialized. Therefore, each request is split into as many  transactions as there are different memory addresses in the original request. Texture memory is cached in texture cache, which is optimized for accessing spatial data. Hence, the best performance is achieved if threads in a warp read or write to the addresses that are close in 2D.
+Constant memory and texture memory are two types of read-only memory \footnote{Read-only here means
+``Not writeable from inside the kernel''} residing in global memory. Accesses to constant memory are
+cached in constant cache and serialized. Therefore, each request is split into as many transactions
+as there are different memory addresses in the original request. Texture memory is cached in the
+texture cache, which is optimized for accessing spatial data. Hence, the best performance is
+achieved if threads in a warp read or write to the addresses that are placed closely on 2D tiles.
 
-Threads can cooperate and share data through the use of on-chip \emph{shared  memory}. The amount of allocated shared memory is directly controlled by the programmer either on the kernel definition level, or during its launch. Shared memory is organized in banks that can be accessed simultaneously, and the best performance is achieved if each thread in a warp accesses memory in a different bank. Otherwise, a \emph{bank conflict occurs}, and the request is split into as little conflict-free requests as possible.
+Threads can cooperate and share data through the use of the on--chip \emph{shared memory}. The amount of allocated shared memory is directly controlled by the programmer either on the kernel definition level or during its launch. Shared memory is organized in banks that can be accessed simultaneously, and the best performance is achieved if each thread in a warp accesses memory in a different bank. Otherwise, a \emph{bank conflict occurs}, and the request is split into as few conflict--free requests as possible.
 
 
 \subsection{Programming environment}
-CUDA devices can be programmed directly using either C/C++ or Fortran. The C/C++ code can be compiled using Nvidia's nvcc compiler, shipped out of the box with CUDA toolkit, while using Fortran requires installing its third-party distribution (e.g. PG Fortran developed by Portland Group). Giving a comprehensive walkthrough of using either C/C++ or Fortran with CUDA is well beyond the scope of this thesis, but for the sake of completeness we present a short example of CUDA Fortran code in listing \ref{lst:cuda_fortran} \todo{Note to self: remember to either replace it with my own example or cite the source (CUDA Fortran documentatoin)}.
+CUDA devices can be programmed directly using either C/C++ or Fortran. For both those languages a
+Nvidia compiler is required to compile the CUDA program, as CUDA extends C/C++ and Fortran languages
+with a syntax for defining and launching kernels. The C/C++ CUDA code can be compiled using Nvidia's
+\texttt{nvcc} compiler, shipped out of the box with CUDA toolkit. For CUDA Fortran code, the Nvidia
+High Performance Computing (HPC) suite containing \texttt{nvfortran} compiler\footnote{The
+\texttt{nvfortran} compiler was previously a third--party program called \texttt{pgfortran},
+developed by the Portland Computing group}. Giving a comprehensive walkthrough of using either
+C/C++ or Fortran with CUDA is well beyond the scope of this thesis, but for the sake of
+completeness, below we present a short example of the CUDA C/C++ and CUDA Fortran code.
 
-\begin{lstlisting}[
-    language=Fortran,
-    label=lst:cuda_fortran,
-    captionpos=b,
-    caption={Example code in CUDA Fortran. Presented here are an example kernel performing saxpy operation together with a host subroutine that uses it.},
+\begin{example}[Implementing parallel vector addition with CUDA]
+Listings \ref{lst:cuda_c} and \ref{lst:cuda_fortran} below present an example implementation of a
+parallel vector addition using CUDA. The \texttt{addVec} defined with \texttt{global} attribute is a
+kernel and accepts two input vectors \texttt{x}, \texttt{y} (in the form of arrays) and their length
+\texttt{n}. Since CUDA kernels cannot return a value, both versions of the code accept an additional
+argument \texttt{res} designating where the result will be stored. The \texttt{addVec} kernel can be
+launched on any one--dimensional grid of one--dimensional blocks. Hence, some threads may need to
+handle more than one position in the input arrays. The pattern presented here, where $i$--th thread
+handles positions $i$, $i+N$, $i+2N$, $\ldots$ with $N$ equal total number of blocks is called a
+\emph{strided loop}.
+
+There are several differences between the two code examples stemming from the languages used. In
+CUDA Fortran we can copy data from the host to the GPU using array assignment. On
+the other hand, the equivalent code in C++ requires manually calling \texttt{cudaMemcpy} function.
+Similarly, the GPU arrays in C++ are declared as pointers, for which the memory has to be manually
+allocated and later deallocated using the combination of \texttt{cudaMalloc} and \texttt{cudaFree}.
+Lastly, C/C++ indexes arrays starting from zero, whereas Fortran indexes tables starting from 1.
+This affects how the thread id, stored in \texttt{tid} variable is computed.
+
+
+\lstinputlisting[
     frame=tlrb,
-    aboveskip=2em,
-    belowskip=2em
-]{fortran}
-! Kernel definition
-attributes(global) subroutine ksaxpy( n, a, x, y )
-   real, dimension(*) :: x,y
-   real, value :: a
-   integer, value :: n, i
-   i = (blockidx%x-1) * blockdim%x + threadidx%x
-   if( i <= n ) y(i) = a * x(i) + y(i)
-end subroutine
+    basicstyle=\footnotesize,
+    language=fortran,
+    label=lst:cuda_fortran,
+    caption={Example code in CUDA Fortran implementing parallel addition of vectors on GPU.},
+    captionpos=b
+]{code/cuda_fortran.cuf}
 
-! Host subroutine
-subroutine solve( n, a, x, y )
-   real, device, dimension(*) :: x, y
-   real :: a
-   integer :: n
-   ! call the kernel
-   call ksaxpy<<<n/64, 64>>>( n, a, x, y )
-end subroutine
-\end{lstlisting}
+\lstinputlisting[
+    frame=tlrb,
+    basicstyle=\footnotesize,
+    language=C++,
+    label=lst:cuda_c,
+    caption={Example code in CUDA C/C++ implementing parallel addition of vectors on GPU.},
+    captionpos=b
+]{code/cuda_c.cu}
 
-Along to the nvcc compiler, the CUDA toolkit contains several, more specialized libraries. Among others, those include:
+\end{example}
+
+\subsection{Software ecosystem}
+Along with the \texttt{nvcc} compiler, the CUDA toolkit contains several, more specialized libraries. Among others, those include:
 \begin{itemize}
     \item cuBLAS -- CUDA Basic Linear Algebra Subroutines library,
     \item cuFFT -- CUDA Fast Fourier Transform library,
     \item cuRAND -- CUDA Random Number Generation library,
-    \item cuSPARSE -- CUDA library for manipulating sparse matrices.
+    \item cuSPARSE -- CUDA library for manipulating sparse matrices,
+    \item thrust -- parallel algorithms library. Interestingly, Thrust also provides parallel
+    implementations of its algorithms that can be run on traditional CPU, making it usable even
+    without CUDA.
 \end{itemize}
-For many high-level languages, there exist third-party wrappers enabling use of CUDA (e.g. PyCuda for Python).
+
+For some high-level languages, there exist third-party libraries enabling the usage of CUDA. For
+Python, one could mention e.g. \texttt{PyCUDA}, \texttt{CuPy} or recently introduced
+\texttt{setuptools\_cuda}. In Julia, integration with CUDA can be achieved with \texttt{CUDA.jl} package.
 
 
 

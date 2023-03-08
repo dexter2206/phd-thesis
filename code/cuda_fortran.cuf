@@ -1,0 +1,38 @@
+module addVec
+contains
+   attributes(global) subroutine addVec(x, y, res, n)
+      real, dimension(*) :: x, y, res
+      integer, value :: n, i, tid, gridsize
+
+      tid = (blockidx%x - 1) * blockdim%x + threadidx%x
+      gridsize = blockdim%x * griddim%x
+
+      do i = tid, n, gridsize
+         res(i) = x(i) + y(i)
+      end do
+   end subroutine
+end module
+
+
+program testAddVec
+   use addVec
+   use cudafor
+   implicit none
+   integer, parameter :: N = 100000
+   real :: x(N), y(N), res(N)
+   integer :: i, nBlocks=256, nThreads=128
+   real, device :: x_d(N), y_d(N), res_d(N)
+
+   do i = 1,N
+      call random_number(x(i))
+      call random_number(y(i))
+   end do
+
+   x_d = x
+   y_d = y
+
+   call addVec<<<nBlocks, nThreads>>>(x_d, y_d, res_d, N)
+   res = res_d
+
+   write(*,*) 'Max error: ', maxval(abs(res - (x + y)))
+end program testAddVec
