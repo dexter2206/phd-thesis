@@ -1,19 +1,25 @@
-\chapter{Simulating dynamics of quantum system using D-Wave annealer}
+\chapter{Simulating dynamics of quantum systems using quantum annealing}
+\chaptermark{Simulating dynamics}
 \label{chapter:simulating}
 
 The leading motivation behind the development of quantum computing devices is simulating quantum systems intractable by classical computers. But how far are we from this goal? This chapter presents a possible approach for simulating quantum systems (or any time-dependent dynamical system) that can be used with annealing devices such as D-Wave quantum annealer or Fujitsu digital annealer. To illustrate the working of our algorithm, we simulate the simplest single-qubit system and demonstrate that already near-term annealing devices are capable of capturing its dynamics in some regime of parameters.
 
-\section{Parallel in time simulation of quantum systems}
+\section{Parallel in time simulation of dynamical systems}
 Problems solved by annealers exhibit no time dependence. Therefore, simulating any time-dependent phenomena using those devices requires reformulating the problem as one that is static in nature. In our case, it is possible by enlarging the Hilbert space of the system under consideration, so that the states of this larger space encode also temporal information.
 
 Let us first start by precisely defining the problem we want to address.
-Consider a $L$ dimensional real or complex dynamical system whose behaviour is determined by the following partial differential equation
+Consider an $L$--dimensional real or complex system, whose state at time $t$
+is described by the vector $\ket{\psi(t)}$  evolving according to a differential equation of
+the form
 \begin{equation}
 \label{eq:dynamical-system}
-    \frac{\partial \ket{\psi(t)}}{\partial t} = K(t) \ket{\psi(t)}
+    \frac{\partial \ket{\psi(t)}}{\partial t} = K(t) \ket{\psi(t)}.
 \end{equation}
 
-Here, $\ket{\psi(t)}$ denotes the system's state at time $t$ and operator $K$ is the so--called Hamiltonian. It is clearly visible that an isolated quantum systems can be described by equation \eqref{eq:dynamical-system}, as putting $K=-\frac{i}{\hbar}H$ transforms it into Schr\"{o}dinger equation.
+Here, $K$ is the so--called Hamiltonian and can be any linear operator acting on $\mathbb{R}^L$ or
+resp. $\mathbb{C}^L$. Observe that any isolated quantum system can be described by equation
+\eqref{eq:dynamical-system}, as putting $K=-\frac{i}{\hbar}H$, where $H$ is its Hamiltonian,
+transforms the equation \eqref{eq:dynamical-system} into Schr\"{o}dinger equation.
 
 Given an initial state, $\ket{\psi(t_0)}$ the equation \eqref{eq:dynamical-system}
 admits a unique solution. Namely,
@@ -26,7 +32,7 @@ the system into its state at time $t$ and is given by
     \label{eq:propagator}
     U(t, t_0) = \mathcal{T} \exp \left( \int_{t_0}^t K(\tau)d\tau \right).
 \end{equation}
-Here, $\mathcal{T}$ denotes the well-known time-ordering operation.
+Here, $\mathcal{T}$ denotes the time-ordering operation.
 Note that in the case when $K(t)$ commutes with $K(t')$ for every $t' \ne t$, the
 time-ordering can be omitted. In particular, this is the case if $K$ is time
 independent.
@@ -34,52 +40,57 @@ independent.
 Given the initial state, we are interested in finding the state of the
 system at some time $t > t_0$. Numerical methods for solving this problem
 usually start by partitioning the interval $[t_0, t]$ into $N$ distinct time
-points $t_0 < t_1 < \ldots < t_{N-1}$. Then, the desired state $\ket{\psi(t)}$
+points $t_0 < t_1 < \ldots < t_{N-1} = t$. Then, the desired state $\ket{\psi(t)}$
 can be computed as
 %
 \begin{equation}
-\ket{\psi(t)} = U(t_{N-1}, t_{N-2}) \cdots U_{n+1}U_n \cdots U_0 \ket{\psi(t_0)}.
+\ket{\psi(t)} = U_{N-1} \cdots U_1 \ket{\psi(t_0)},
 \end{equation}
 %
-This is purely a rearrangement of computations, which by itself gives no benefit
-over applying $U(t, t_0)$ directly. However, shortening the interval allows for a more efficient approximation of propagators, which can be done using a variety of methods (e.g. via Suzuki-Trotter approximation).
+where $U_i$ is a shorthand notation for $U(t_i, t_{i-1})$. This is purely a rearrangement of
+computations, which by itself gives no benefit over applying $U(t, t_0)$ directly. However,
+shortening the interval allows for a more efficient approximation of propagators, which can be done
+using a variety of methods (e.g. via Suzuki-Trotter approximation).
 
 This procedure, common to many sequential methods, gives a starting point for a class of the so--called parallel in--time methods based on the Feynman clock operator. In these approaches, one starts by suitably enlarging state space so that it can encode the state of the system at all times $t_0, t_1, \ldots, t_{N-1}$. This can be done by considering a tensor product of a state space with the new Hilbert space spanned by the orthonormal basis $\{\ket{0}, \ket{1}, \ldots, \ket{N-1}\}$. Then, the following superposition encodes states of the system in all $N$ moments of time
 %
 \begin{equation}
     \ket{\Psi} = \sum_{n=0}^{N-1} \ket{n} \otimes \ket{\psi(t_n)}.
 \end{equation}
-The solution to the original problem can be then obtained using so--called \emph{clock operator}
+Consider now the following \emph{clock operator} $\clockop$
 \begin{equation}
 \label{eq:clock2}
  \clockop
    =
 \sum_{n=0}^{N-2}
 \big(
-\ket{t_{n+1}}\bra{t_{n+1}} \otimes I - \ket{t_{n+1}}\bra{t_n} \otimes U_n
+\ket{n+1}\bra{n+1} \otimes I - \ket{n+1}\bra{n} \otimes U_n
 + \text{h.c.}
 \big).
 \end{equation}
-Indeed, one can see that $\ket{\Psi}$ becomes a solution to eigenequation
+One can see that $\ket{\Psi}$ is a solution (although not unique) to the eigenequation
 \begin{equation}
 \label{eq:clock-eigenequation}
-\clockop \ket{\Psi} = 0.
+\clockop \ket{\mathbf{x}} = 0.
 \end{equation}
-Note, however, that equation \eqref{eq:clock-eigenequation} does not take into account in any way an initial state of the system at $t_0$. Therefore, $\ket{\Psi}$ is not its unique eigenvector. It is possible to fix this problem by adding a \emph{penalty} term $\clockop_0 = \ket{t_0}\bra{t_0}\otimes(I-\ket{\psi_0}\bra{\psi_0})$ to the left-hand side. The equation to solve becomes then $(\clockop + \clockop_0) \ket{\Psi} = 0$.
+The non--uniqueness of the solution of \ref{eq:clock-eigenequation} follows from the fact that the
+definition of the clock operator $\clockop$ does not depend on the initial state.
+We can fix this problem by adding a \emph{penalty} term $\clockop_0 = \ketbra{0}{0}\otimes(I-\ketbra{\psi_0}{\psi_0})$ to the
+left-hand side. The equation to solve becomes then $(\clockop + \clockop_0) \ket{\mathbf{x}} = 0$.
 This equation can be reformulated as
 \begin{equation}
 \label{eq:gsys}
 \coefmatrix \ket{\Psi}
 =
-\ket{t_0}\otimes \ket{\psi_0} = \ket{\Phi},
+\ket{0}\otimes \ket{\psi_0} = \ket{\Phi},
 \quad
-\coefmatrix=\clockop + \ket{t_0}\bra{t_0} \otimes I.
+\coefmatrix=\clockop + \ketbra{0}{0} \otimes I.
 \end{equation}
 Thus, using an approximation of evolution operators, we constructed a system of linear equations encoding the solution to the equation \eqref{eq:dynamical-system} under the given initial condition. At this point, however, it is not possible to solve it using a quantum annealer yet. To do so, one first needs to convert this system into an optimization problem
 with binary variables, which is what we will deal with next.
 \section{Solving systems of linear equations as an optimization problem}
 There is a straightforward way of converting equation \eqref{eq:gsys} into
-an optimization problem. One can observe that if the solution minimizes the norm $\left\Vert \coefmatrix\ket{\mathbf{x}} - \ket{\Phi}\right\Vert$.
+an optimization problem. One can observe that the solution minimizes the norm $\left\Vert \coefmatrix\ket{\mathbf{x}} - \ket{\Phi}\right\Vert$.
 Since the norm is non-negative, it follows that solving equation \eqref{eq:gsys} is equivalent to the following optimization problem
 \begin{equation}
     \label{eq:optimize_1}
