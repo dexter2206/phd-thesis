@@ -44,16 +44,7 @@ avoiding conflicts). Differentiating between those two components of delays is c
 allows us to neglect the primary delays and focus only on secondary details when constructing the
 objective function.
 
-\begin{figure}
-    \includegraphics[width=\textwidth]{figures/line_small.pdf}
-    \caption{ Nidzica -- Olsztynek segment of line No. 216. Sections 1, 3, and 5 are parallel
-      sidings, while sections 2 and 4 are single tracks. Observe that sidings in the same network
-      can have different capacities.
-    }
-    \label{fig:railway-network}
-\end{figure}
-
-\section{Basic definition and notations}
+\section{Railway model and basic notation}
 Let us now expand on the informal description from the previous section. We will start by introducing
 notation and the definitions necessary to formulate a problem in such a way that it can be run on D-Wave.
 
@@ -129,8 +120,7 @@ lower bound on the overall delay
 In our model, we will treat $d_{\max}(j)$ as a parameter.
 
 \section{Dispatching conditions}
-Now that we established the necessary notation, let us discuss some constraints that the quantities
-in our model have to fulfil.\\
+Now that we established the necessary notation, let us discuss some constraints that our model has to obey.\\
 \textbf{The minimum passing time condition.} A train cannot travel through a block faster than the corresponding minimum passing time
 \begin{equation}
 	\label{eq:dc1}
@@ -138,6 +128,7 @@ in our model have to fulfil.\\
 \end{equation}
 Using \eqref{eq:djs} and \eqref{eq:pt} one can easily verify that \eqref{eq:dc1} is equivalent to
 \begin{equation}
+  \label{eq:passingtime}
 	d(j, \rho(s)) \ge d(j, s) - \alpha(j, s, \rho(s)).
 \end{equation}\\
 \textbf{The single block occupation condition.} Two trains cannot occupy the same part of a single
@@ -167,7 +158,7 @@ where
 \end{equation}
 The precise form of $\tauu$ depends on the dispatching detail of the problem. In our approach, we
 propose the following from
-\todo[inline]{Zapytac Domina skad to sie kurwa wzielo}
+
 \begin{equation}
 	\tauu(j, s) = \max_{i \in \{k+1,\ldots,l-1\}}(\ttin(j, m_{i+1}) - \ttin(j, m_i))
 \end{equation}
@@ -181,21 +172,163 @@ leave $\rho_j(s)$. We formalize this similarly as the previous condition
 	\label{eq:deadlock}
 	\tout(j', \rho_j(s)) \ge \tout(j,s) + \tauuu(j, s, \rho_j(s))
 \end{equation}
-Rewritten in terms of delays, the inequality \eqref{eq:deadlock} reads
+Rewritten in terms of delays, the inequality \eqref{eq:deadlock} reads:
 \begin{equation}
+  \label{eq:deadlock2}
 	d(j',\rho_j(s)) \ge d(j, s) + \Delta(j,s,j',\rho_j(s)) + \tauuu(j, s, \rho_j(s))
 \end{equation}
-\section{Formulating problem as quadratic binary optimization}
+\textbf{The rolling stock circulation condition.} Our model assumes that some trains are
+assigned the same train set. Naturally, there exists some necessary \emph{turnover time},
+before a train set can be used. Formally, if trains $j$ and $j'$ going in opposite
+directions are assigned the same train set, then the following inequality has to hold:
+\begin{equation}
+\tout(j', s_{j',1}) > \tout(j, s_{j,end}) + \Delta(j, j')
+\end{equation}
+where $\Delta(j, j')$ is the minimum turnover time. In the delay representation, the
+inequality becomes:
+\begin{equation}
+\label{eq:rolling}
+\begin{split}
+  d(j',1) + \ttout(j',1) > & \; d(j, s_{j,end-1}) + \ttout(j, s_{j,end-1}) + \\
+                           & \; \tauuu(j, s_{j,end-1}) + \Delta(j,j').
+\end{split}
+\end{equation}
+Inequality \eqref{eq:rolling} can be simplified to
+\begin{equation}
+  d(j',1) > d(j, s_{j,end-1}) - R(j,j'),
+\end{equation}
+by setting
+\begin{equation}
+  \label{eq:rolling2}
+  R(j, j') = \ttout(j',1) - \ttout(j, s_{j,end-1}) - \tauuu(j,s_{j,end-1})
+\end{equation}
+\section{Constructing the QUBO}
+The delays occurring in our model are real numbers, and hence they cannot be used
+to formulate QUBO to be solved on the annealer. We can get around this problem by limiting
+the possible delays to a discrete set. Naturally, the set of possible delay values is
+model--dependent. Furthermore, the allowable range of delays might vary between trains and blocks,
+which we also have to take into account.
+
+Let $S^{*}_{j}=  S_{j} \setminus \{s_{j,end}\}$. For each $j \in \mathcal{J}$ and $s \in S^{*}_{j}$
+we will denote the set of possible values of $d(j, s)$ by $A_{j, s}$. Now, we can define a set of binary variables $x_{s,j,m}$  of the form:
+\begin{equation}
+  x_{s,j,m} = \begin{cases}
+                1, & d(j, s) = m\\
+                0, & \mbox{otherwise}
+\end{cases},
+\end{equation}
+i.e. for fixed $s$ and $j$ the tuple $(x_{s,j,m}\colon m \in A_{j,s})$  is a one-hot encoding of
+the  delay $d(j,s)$. Naturally, each delay can assume only one value. Mathematically, this
+can be expressed as the following constraint:
+\begin{equation}
+  \forall_{j \in \mathcal{J}}\forall_{s \in S^{*}_{j}} \sum_{m \in A_{j, s}} x_{s,j,m} = 1
+\end{equation}
+
+For the objective function, we opt for one of the form:
+\begin{equation}
+  \label{eq:onehot}
+f(\mathbf{x}) = \sum_{j \in \mathcal{J}}\sum_{s \in S^{*}_{j}}\sum_{m \in A_{j,s}} w(s,j,m) \cdot x_{j,s,m},
+\end{equation}
+where $w(s,j,m)$ are some predefined weights constituting part of the model. In particular, they
+can be chosen so that they depend only on the secondary delays.
+
+To proceed further in our construction, we need to rephrase the constraints discussed in the
+previous section in terms of our binary variables. Preferably, we want them to be a quadratic
+polynomial such that they are zero if a given constraint is satisfied, and positive otherwise.
+\todo[inline]{Need to rewrite it, for now those are just copy-pasted from the paper}
+They read as follows:\\
+\subsubsection{The minimum passing time condition (c.f. \eqref{eq:passingtime})}
+\begin{equation}
+  \label{eq:passingtime-binary}
+\forall_{j} \forall_{s \in S_j^{**}}
+\sum_{d \in A_{j,s}}
+\left(
+\sum_{ d' \in D(d) \cap A_{j, \rho_j(s)}} x_{j, s, d}
+x_{j, \rho_j(s), d'} \right) = 0,
+\end{equation}
+where $D(d) = \{0, 1, \ldots, d - \alpha(j, s, \rho_j(s)) -1\}$, and
+$S_j^{**} = S_j \setminus \{s_{j, \text{end}}, s_{j, \text{end}-1}\}$.
+
+\subsubsection{The single--block occupation condition (c.f. \eqref{eq:single-block} and \eqref{eq:single-block-delays})}
+\begin{equation}
+  \label{eq:singleblock-binary}
+\forall_{(j,j') \in \mathcal{J}^0 (\mathcal{J}^1)}
+\forall_{s \in S^*_{j,j'}}
+\sum_{d \in A_{j,s}}\left(\sum_{d' \in B(d) \cap A_{j', s}}
+x_{j, s, d} x_{j', s, d'}\right) = 0,
+\end{equation}
+where $B(d) = \{d + \Delta(j, s, j', s), d + \Delta(j, s, j', s)+ 1,\ldots, d +
+\Delta(j,
+s, j', s) + \\ \tau_{(1)}(j,s, \rho_j(s))-1
+\}$ is a set of delays that violates the block occupation condition.
+\subsubsection{The deadlock condition (c.f. \eqref{eq:deadlock} and \eqref{eq:deadlock2})}
+\begin{equation}
+  \label{eq:deadlock-binary}
+  \forall_{j \in \mathcal{J}^0(\mathcal{J}^1),  j' \in
+\mathcal{J}^1(\mathcal{J}^0) }
+\forall_{s \in S^*_{j,j'}}
+\sum_{d \in A_{j,s}}\left(\sum_{d' \in C(d) \cap A_{j', \rho_j(s)}}
+x_{j, s, d}
+x_{j', \rho_j(s), d'}\right) = 0
+\end{equation}
+\subsubsection{The rolling stock circulation condition (c.f. \eqref{eq:rolling}--\eqref{eq:rolling2})}
+\begin{equation}
+  \label{eq:rollingstock}
+    \forall_{j,j' \in \text{terminal pairs}}
+  \sum_{d \in A_{j,s_{(j, end-1)}}}
+  \sum_{ d' \in E(d) \cap A_{j', 1}} x_{j, s_{(j, end-1)}, d}
+  \cdot x_{j', s_{(j,' 1)}, d'}  = 0,
+\end{equation}
 
 
 \section{Results}
-In our work, we considered two single-track railway lines managed by the polish state--owned company
-PKP Polskie Linie Kolejowe:
+In our work, we considered two single-track railway lines managed by the polish state--owned
+company PKP Polskie Linie Kolejowe:
 
 \begin{itemize}
 	\item Railway line No. 216 (Nidzica -- Olsztynek section)
-	\item Railway line No. 191 (Goleszów -- Wisła -- Uzdrowisko section)
+	\item Railway line No. 191 (Goleszów -- Wisła Uzdrowisko section)
 \end{itemize}
+
+
+\begin{figure}
+  \begin{subfigure}[a]{\textwidth}
+    \includegraphics[width=\textwidth]{figures/line_small.pdf}
+    \caption{ Nidzica -- Olsztynek segment of line No. 216.}
+  \end{subfigure}
+  \begin{subfigure}[b]{\textwidth}
+    \includegraphics[width=\textwidth]{figures/line.pdf}
+    \caption{Goleszów -- Wisła Uzdrowisko segment of railway line No. 191}
+  \end{subfigure}
+  \caption{
+    Network segments studied in our work. The rectangles represent the passenger platforms,
+    and the circles represent boundaries between line block and a station (white) or between
+    two line blocks (blue).
+  }
+  \label{fig:railway-network}
+\end{figure}
+
+Both segments are depicted in Fig. \ref{fig:railway-network}
+For the railway line No. 216, we considered its official train schedule (as of April 2020). The
+line No. 191 was undergoing a renovation as of the time of writing, and hence it had no
+available timetable. Based on the planned parameters of the line, as described in the official
+documents \cite{}, we constructed a cyclic timetable. Both timetables are depicted in Fig.
+\ref{fig:timetables}.
+
+\begin{figure}
+  \begin{subfigure}[t]{\textwidth}
+	\includegraphics[width=\textwidth]{figures/train_diagram_small}
+	\subcaption{Train diagram for the timetable of the line in Fig.~\ref{fig::small_line}}\label{fig::small_diagram}
+  \end{subfigure}
+  \begin{subfigure}[t]{\textwidth}
+    \includegraphics[width=\textwidth]{figures/train_diagram}
+    \subcaption{Train diagram for the timetable of the line in
+      Fig.~\ref{fig::line}}\label{fig::diagram}
+  \end{subfigure}
+  \caption{Train diagrams for the studies network segments.}
+  \label{fig:timetables}
+\end{figure}
+
 
 %%% Local Variables:
 %%% mode: latex
