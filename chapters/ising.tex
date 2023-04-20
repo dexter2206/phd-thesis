@@ -1,7 +1,7 @@
 \chapter{Ising model and complexity theory}
 
 
-Quantum annealers are essentially different from classical computers. For one, they don't
+Quantum annealers are fundamentally different from classical computers. For one, they don't
 execute programs written as a sequence of instructions in their memory. Instead, they are
 single--purpose devices capable (in principle) of solving a specific optimization problem.
 Namely, annealers are designed to find the lowest energy configuration (called \emph{ground state})
@@ -14,7 +14,7 @@ second point of this chapter.
 
 Finding a ground state of the Ising spin--glass model may be hard for classical computers, but
 there exists a plethora of heuristic, classical algorithms capable of finding solutions that are at
-least ``good enough''. We conclude this chapter by listing and describing some of them.
+least ``good enough''. We conclude this chapter by providing a brief overview of the most popular ones.
 These algorithms will serve as a baseline for comparison with quantum annealing and a recent
 tensor network--based approach discussed later in the thesis.
 
@@ -23,15 +23,15 @@ tensor network--based approach discussed later in the thesis.
 The Ising spin--glass model was introduced in 1920 by Wilhelm Lenz \cite{lenz} as a description of
 ferromagnetism in solids but is named after his student Ernst Ising, who studied and solved it in
 the one-dimensional case \cite{ising}. For purposes of this thesis, however, we will forget about
-the physical interpretation of the model, treating it as merely as a description of a particular
+the physical interpretation of the model, treating it merely as a description of a particular
 optimization problem.
 
 Consider a simple\footnote{That is, one that does not contain duplicate edges or loops.}, undirected
 graph $G = (V, E)$ with $N$ nodes labeled by consecutive natural numbers.  With each node, $i \in V$
-we associate a dichotomous spin variable $s_i \in \{-1, 1\}$. To each edge $\{i, j\} \in E$, we
+we associate a spin variable $s_i \in \{-1, 1\}$. To each edge $\{i, j\} \in E$, we
 assign an interaction strength $J_{ij}$ and to each node $i \in V$ we assign a local magnetic field
 $h_i$. Here, all $J_{ij}$ and $h_i$ are real numbers. For such a system, one can define the
-following energy function (Hamiltonian)
+following energy function (Hamiltonian):
 \begin{equation}
 \label{eq:ising-hamiltonian}
 H(\mathbf{s}) = \sum_{\langle i, j \rangle} J_{ij} s_i s_j +  \sum_{i=1}^N h_i s_i,
@@ -43,7 +43,7 @@ in this thesis}.
 
 For fixed model coefficients, one is typically interested in finding its \emph{ground state}, a
 configuration $\mathbf{s}$ that minimizes $H$. More generally, it might be desirable to search for
-$k \ll 2^N$ configurations with the lowest energy, a so-called \emph{low--energy spectrum}.
+$k \ll 2^N$ configurations with the lowest energy, a so-called \emph{low--energy spectrum of size $k$}.
 
 \begin{figure}[H]
     \centering
@@ -74,9 +74,8 @@ This instance has 8 possible states:
         \end{tabular}
     \end{center}
 \end{table}
-Observe that the lowest attainable energy is -5 and there are 3 states with this energy (we call
-this situation a \emph{degeneracy}). Hence, all the configurations $(-1, 1, -1), (-1, 1, 1), (1,
--1, -1)$ are ground states. For this instance, a low energy spectrum of size $k=5$ comprises all
+Observe that the lowest attainable energy is -5 and there are 3 states with exactly this energy. Hence, all the configurations $(-1, 1, -1)$, $(-1, 1, 1)$, $(1,
+-1, -1)$ are ground states. This situation, i.e. when two or more states share the same energy, is called \emph{degeneracy} and the states in question are called \emph{degenerate}. For this instance, a low energy spectrum of size $k=5$ comprises all
 ground states, the $(-1, -1, -1)$ state with $H(-1, -1, -1) = -1$ and any of the states with
 $H(\mathbf{s})=3$.
 \end{example}
@@ -94,15 +93,13 @@ solved in more than one way, i.e. there might exist different algorithms perform
 same task. Different algorithms solving the same problems might vastly differ in their demand on
 various resources, like memory or time needed to execute them. In practice, execution time (and
 usage of other resources) of a given algorithm might also vary between its implementations,
-depending on factors like programming language or libraries used and the hardware it is executed on.
-Therefore, measuring execution time is not that useful in characterizing the algorithm's
-performance.  Instead, it is more useful to characterize algorithms based on how their execution
-time scales (asymptotically) with increasing problem size\cite{arora}. For instance, given an
+depending on factors like programming language or libraries used and the hardware it is executed on. Moreover, measuring execution time can only tell us how the given algorithm's implementation performs on a specific problem. But if we increase the problem size tenfold, will the execution time be 10 times slower? Or maybe 100 times slower? Or maybe it will remain unchanged? Clearly, measuring execution times is useful, but cannot be used for comparing algorithms (instead of their implementations). Instead, it is more useful to characterize algorithms based on how their execution
+time scales (asymptotically) with increasing problem size \cite{arora}. For instance, given an
 algorithm with execution time roughly proportional to the input size $N$, one might suspect that for
 problem instances large enough, it will perform better than the one with execution time proportional
 to $N^{2}$. This characteristic, known as computational complexity\footnote{Note that here we focus
 only on \emph{time complexity}, but other notions like memory complexity can be defined similarly},
-can be formalized by a big-$O$ notation (see appendix for more detailed description). Using this
+can be formalized by a big-$O$ notation (see appendix for a more detailed description). Using this
 notation, the algorithms from the above example would be classified as $O(N)$ and, $O(N^{2})$
 respectively.
 
@@ -112,13 +109,13 @@ consider the minimal time complexity required to do so. More generally, one migh
 computational problems based on their demand on resources. In this view, sets of similar problems
 are called \emph{complexity classes} \cite{arora}. The definition of some complexity classes might
 also be restricted to specific types of problems. For instance, one might consider only decision
-problems \cite{arora}, i.e. problems to which the answer is yes or no.
+problems, i.e. problems to which the answer is yes or no \cite{arora}.
 
 One of the fundamental complexity classes is \textbf{P}, a class of decision problems solvable in polynomial time on a deterministic Turing Machine  \cite{arora}. Another class, \textbf{NP}, comprises all decision problems whose solution can be verified in polynomial time using a deterministic Turing Machine \cite{arora}.
 One can immediately see that \textbf{P} $\subset$ \textbf{NP}. Indeed, if a problem is solvable in polynomial time, then it is also trivially verifiable in polynomial time. However, it is not immediately obvious if the inclusion is strict, and whether \textbf{P} $\ne$ \textbf{NP} is one of the most important, yet unsolved problems in theoretical computer science \cite{fortnow}.
 The class of \textbf{NP--hard} problems comprises all the problems that are at least as hard as
-every problem in \textbf{NP}. More formally, given decision problem P is \textbf{NP--hard} if and
-only if solving every problem in \textbf{NP} can be reduced to solving P a polynomial number of times
+every problem in \textbf{NP}. More formally, given decision problem $S$ is \textbf{NP--hard} if and
+only if solving every problem in \textbf{NP} can be reduced to solving $S$ a polynomial number of times
 \cite{arora}. A particular subclass of \textbf{NP--hard} problems, \textbf{NP--complete}, is an
 intersection of \textbf{NP} and \textbf{NP--hard} \cite{arora}. Figure \ref{fig:complexity} shows
 the relationship between the discussed complexity classes, both under assumptions \textbf{P} =
@@ -158,7 +155,7 @@ corresponding decision problem. Of course, the same reasoning applies for other 
 problems. Hence, if the decision version of an optimization problem is \textbf{NP--hard},
 the optimization problem is sometimes also called \textbf{NP--hard}, even if it slightly abuses the
 notation. For simplifying the vocabulary, in what follows we will use this slightly
-incorrect but more concise convention.
+imprecise but more concise convention.
 
 One can immediately see, that the state space of the Ising model with $N$ spins comprises $2^{N}$
 different configurations. It might be tempting to reason that a problem with such an enormous number
