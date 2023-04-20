@@ -8,61 +8,100 @@ search as a baseline for comparison.
 
 
 \section{Overview of the problem}
-Before formulating the problem to be solved, let us first introduce the necessary railway--related
-terminology. We will consider a part of a railway network, which we will simply refer to as a
-\emph{network}. The network is divided into \emph{block sections}. In our work, we focused only on
-the single--track railways, which means that the network can only comprise the following types of
-sections:
+We will consider a part of a railway network, which we will simply refer to as a
+\emph{network}. The network is divided into \emph{block sections} or simply \emph{blocks}.
+In our approach, we focused only on the single--track railways, which means that the network
+can only comprise the following types of blocks:
 \begin{itemize}
-    \item Single tracks, sections that can be occupied by one train at a time.
-    \item Sidings, or parallel tracks (occurring e.g. at stations). At the sidings, trains passing in
-        the same direction can meet and overtake, and trains passing in the opposite directions can
-        meet and pass. Each siding comprises two or more tracks, each of which can also be occupied by
-        one train at a time.
+  \item \emph{Line blocks}, or \emph{single tracks}, sections that can be occupied by one train
+        at a time.
+  \item \emph{Sidings}, or \emph{parallel tracks} (occurring e.g. at stations). At the sidings,
+        trains passing in the same direction can meet--and--overtake (M--O), and trains passing
+        in the opposite directions can meet--and--pass (M--P). Each siding comprises two or more
+        tracks, each of which can also be occupied by one train at a time. When appropriate, the
+        sidings occurring at the stations will be called \emph{station blocks}.
 \end{itemize}
+Fig. \ref{fig:railway-network} shows an example network.
 
-Fig. \ref{fig:railway-network} shows an example network studied in our work. The trains move through
-the network according to a \emph{timetable}. It is assumed that this timetable is conflict-free.
-That is, at any time no two trains occupy the same block section, except possibly at sidings (where
-the number of trains does not exceed the number of tracks in the siding).
+\begin{figure}[ht]
+  \includegraphics[width=\textwidth]{figures/example_line}
+  \caption{
+    An example network. Sections $2, 3, 4$ and $6$ are \emph{line blocks}, while sections $1$ and
+    $5$ are \emph{sidings} with respectively $4$ and $2$ tracks. Rectangles represent platforms.
+    Circles represent points where a line block and a siding join (white) or where two line blocks
+    join (blue). Superscripts denote tracks within a siding.
+  }
+  \label{fig:railway-network}
+\end{figure}
+
+The trains move through the network according to a \emph{timetable}. It is assumed that this
+timetable is conflict-free. That is, at any time no two trains occupy the same block section, except
+possibly at sidings, where the number of trains cannot exceed the number of tracks in the siding.
 
 Now, suppose the network is affected by a disturbance, which prevented some trains from running
-according to their original timetable. Examples of possible disturbances include (but are not
-limited to) a malfunction of one or more trains or a malfunction of railway tracks.
-After the disturbance, some trains occupy different parts of the networks than they are supposed to
-occupy. Resuming operations according to the original timetable could result in a conflict. Hence,
-after the disturbance, a new, conflict--free timetable has to be promptly created. Optimally, this
-new timetable should, in some sense, minimize the resulting delays.
+according to their original timetable. Examples of possible disturbances include, but are not
+limited to, a malfunction of one or more trains or a malfunction of railway tracks. After the
+disturbance, some trains occupy different parts of the networks than they are supposed to.
+Resuming operations according to the original timetable might not be
+possible. First of all, some trains might already be delayed too much to be physically able to
+follow the timetable. Secondly, trying to closely follow the timetable after the disturbance
+might generate conflicts. Hence, a new, conflict--free timetable has to be promptly created.
+Preferably, this new timetable should, in some sense, minimize the resulting delays.
+
 
 Let us observe that even with the best possible algorithm for constructing a new timetable, some
 delays after the disturbance might be inevitable, e.g. due to engineering or even physical limits.
-For instance, if a train was unable to move for a few hours, it is obvious that it will not reach
-its destination on schedule. These unavoidable, or \emph{primary}, delays propagate through the
-network and cannot be mitigated. There are also \emph{secondary} delays, i.e. delays that are
-introduced in the network because of the restrictions on the new timetable (e.g. necessity of
-avoiding conflicts). Differentiating between those two components of delays is crucial because it
-allows us to neglect the primary delays and focus only on secondary details when constructing the
-objective function.
+For instance, if a train has been broken for some time, it can only follow the timetable if it
+is not already late and it can make up for the time it already lost -- and this can only happen
+if it can reach a sufficiently large speed. If this is not the case, the train will be necessarily
+delayed. Moreover, by taking into account the maximum speed with which the trains can move
+through each section, one can calculate the lower bounds on how much the train will be delayed
+at each station. These lower bounds are known as unavoidable, or \emph{primary}, delays.
 
-\section{Railway model and basic notation}
-Let us now expand on the informal description from the previous section. We will start by introducing
-notation and the definitions necessary to formulate a problem in such a way that it can be run on D-Wave.
+In the ideal case, if all the trains could travel at their maximum speed, the overall delay
+would be equal to the sum of all primary delays and there would be nothing to optimize. However,
+it might not always be possible. Suppose for instance, that two trains going in the same
+direction are already delayed at a station neighboring a line block. From each train's perspective,
+the optimal solution is to start its route immediately when possible. However, only one of them
+can do this because a line block can only be occupied by one train at a time. Hence, at least
+one of these two trains will have a delay larger than the primary one. What is important is that
+this additional delay is not a consequence of some physical or engineering limitations, but rather
+a consequence of the dispatcher's decision. All such delays are called the \emph{secondary} delays
+and, unlike the primary ones, they are subject to optimization.
 
-Before we can formulate the optimization problem at hand in a way that it can be run on D-Wave, let
-us introduce the needed notation. The set of all trains will be denoted by $\JJ$. This set is
-naturally partitioned into the set $\JJ_0$ of trains going into one direction and set $\JJ_1$ of
-trains going into the opposite direction. This is a proper partition, i.e.
+The distinction between primary and secondary delays might seem
+artificial at first, but it has profound consequences. Namely, when constructing a function to
+be minimized we only need to take into account the secondary delays. For instance, we might
+want to minimize their total sum or their weighted sum, with weights corresponding to the trains'
+priorities.
+
+Our high--level description of the problem needs now a mathematical formulation. We start by
+describing the details of the network model in the next section.
+
+\section{The delay representation}
+Before we can formulate the optimization problem to be run on D-Wave, we need first to
+formally describe the railway model. The first idea that comes to mind is to define
+quantities corresponding to departure and arrival times of each train and relevant
+station blocks, and express all other quantities in the model in terms of their
+difference with respect to the times found in the original timetable. However, as we
+will soon see, one can almost completely forget about arrival and departure times,
+and instead express all qunatities in the model using delays. Moreover, we will
+further simplify our model by assuming all secondary delays are integers falling into
+some finite range.
+
+The set of all trains will be denoted by $\JJ$. This set is naturally partitioned into
+the set $\JJ_0$ of trains going into one direction and the set $\JJ_1$ of trains going
+into the opposite direction. This is a proper partition, i.e.:
 \begin{equation}
 	\JJ_0 \cup \JJ_1 = \JJ \quad \JJ_0 \cap \JJ_1 = \emptyset
 \end{equation}
-
-For any train, $j \in \JJ$ its route $M_j$ is a sequence of blocks. Our model forbids recirculation,
+For any train $j \in \JJ$ its route is a sequence of blocks. Our model forbids recirculation,
 i.e. each train passes every block in its route exactly once. Furthermore, we assume that each train
 starts and ends its route at some station, and its route is uniquely identified by a sequence of
-station blocks $\left(s_{j,1}, s_{j, 2}, \ldots, s_{j, \mbox{end}_j}\right)$. In other words, there
-are no alternative routes between any two stations. For convenience, we will denote the block
-preceding $s_{j,k}$ in a given train's route by $\pi(s_{j,k})$ and the block succeeding it by
-$\rho(s_{j,k})$, i.e.
+station blocks $\left(s_{j,1}, s_{j, 2}, \ldots, s_{j, \text{end}_j}\right)$, i.e., there
+are no alternative routes between any two stations. For convenience, we will denote the station
+block preceding $s_{j,k}$ in a given train's route by $\pi(s_{j,k})$ and the station block succeeding
+it by $\rho(s_{j,k})$:
 \begin{align}
 	\pi(s_{j,k})  & = s_{j,k-1} \quad \mbox{for } 2 \le k \le \mbox{end}_j      \\
 	\rho(s_{j,k}) & = s_{j,k+1} \quad \mbox{for } 1 \le k \le \mbox{end}_j - 1.
@@ -88,22 +127,21 @@ exists a time reserve
 \end{equation}
 This time reserve will become important when discussing the propagation of the primary delays.
 
+\subssection{Delay representation}
 Suppose the disturbance happened, resulting in some trains not being able to meet the schedule.
 Hence, the actual leaving and arrival times (denoted by $\tout$ and $\tin$) differ from the
 scheduled ones. The delay $d(j, s)$ of the train $j$ at block $s$ is defined as the difference
 \begin{equation}
 	\label{eq:djs}
-	d(j, s) \coloneqq \tout(j, s) - \ttout(j, s) = \tin(j, \rho(s)) - \ttin(j, \rho(s))
+	d(j, s) \coloneqq \tout(j, s) - \ttout(j, s) = \tin(j, \rho(s)) - \ttin(j, \rho(s)).
 \end{equation}
-and is the quantity we want to minimize. As already mentioned, $d(j, s)$ can be expressed as a sum
+As already mentioned, $d(j, s)$ can be expressed as a sum
 \begin{equation}
 	d(j, s) = d_U(j, s) + d_S(j, s)
 \end{equation}
-where $d_U$ denotes the primary (or unavoidable) delay, and $d_S$ denotes the secondary delay. The
-unavoidable delays propagate through the network. In the absence of time reserve, one would simply
-have $d_U(j, s) = d_U(j, s')$ for a given train $j$ and blocks $s$ and $s'$ on its route. However,
-the primary delay can somewhat be mitigated by using the time reserve. Since delays are necessarily
-positive, one has
+where $d_U$ denotes the primary (or unavoidable) delay, and $d_S$ denotes the secondary delay.  In
+the absence of time reserve, one would simply have $d_U(j, s) = d_U(j, s')$ for a given train $j$
+and blocks $s$ and $s'$ on its route. However, the time reserve allows
 \begin{equation}
 	d_U(j, \rho(s)) = \max\{0, d_U(j, s) - \alpha(j, \rho(s))\}
 \end{equation}
@@ -305,7 +343,7 @@ company PKP Polskie Linie Kolejowe:
     and the circles represent boundaries between line block and a station (white) or between
     two line blocks (blue).
   }
-  \label{fig:railway-network}
+  \label{fig:railway-network2}
 \end{figure}
 
 Both segments are depicted in Fig. \ref{fig:railway-network}
@@ -331,6 +369,6 @@ documents \cite{}, we constructed a cyclic timetable. Both timetables are depict
 
 
 %%% Local Variables:
-%%% mode: latex
+%%% mode: pdflatex
 %%% TeX-master: "../main"
 %%% End:
