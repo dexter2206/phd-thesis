@@ -127,7 +127,7 @@ exists a time reserve
 \end{equation}
 This time reserve will become important when discussing the propagation of the primary delays.
 
-\subssection{Delay representation}
+\subsection{Delay representation}
 Suppose the disturbance happened, resulting in some trains not being able to meet the schedule.
 Hence, the actual leaving and arrival times (denoted by $\tout$ and $\tin$) differ from the
 scheduled ones. The delay $d(j, s)$ of the train $j$ at block $s$ is defined as the difference
@@ -320,6 +320,8 @@ x_{j', \rho_j(s), d'}\right) = 0
 
 
 \section{Results}
+
+\subsection{Studies railway segments}
 In our work, we considered two single-track railway lines managed by the polish state--owned
 company PKP Polskie Linie Kolejowe:
 
@@ -329,44 +331,151 @@ company PKP Polskie Linie Kolejowe:
 \end{itemize}
 
 
-\begin{figure}
-  \begin{subfigure}[a]{\textwidth}
-    \includegraphics[width=\textwidth]{figures/line_small.pdf}
-    \caption{ Nidzica -- Olsztynek segment of line No. 216.}
-  \end{subfigure}
-  \begin{subfigure}[b]{\textwidth}
-    \includegraphics[width=\textwidth]{figures/line.pdf}
-    \caption{Goleszów -- Wisła Uzdrowisko segment of railway line No. 191}
-  \end{subfigure}
-  \caption{
-    Network segments studied in our work. The rectangles represent the passenger platforms,
-    and the circles represent boundaries between line block and a station (white) or between
-    two line blocks (blue).
-  }
-  \label{fig:railway-network2}
-\end{figure}
-
-Both segments are depicted in Fig. \ref{fig:railway-network}
+Both segments are depicted in Fig. \ref{fig:line} and Fig. \ref{fig:linesmall}.
 For the railway line No. 216, we considered its official train schedule (as of April 2020). The
-line No. 191 was undergoing a renovation as of the time of writing, and hence it had no
+line No. 191 was undergoing a renovation at the time of writing, and hence it had no
 available timetable. Based on the planned parameters of the line, as described in the official
-documents \cite{}, we constructed a cyclic timetable. Both timetables are depicted in Fig.
-\ref{fig:timetables}.
+documents \cite{PKPPLK}, we constructed a cyclic timetable. Initial, undisturbed timetables are
+depicted in Fig. \ref{fig:diagram} and Fig. \ref{fig:diaramsmall}.
+
 
 \begin{figure}
-  \begin{subfigure}[t]{\textwidth}
-	\includegraphics[width=\textwidth]{figures/train_diagram_small}
-	\subcaption{Train diagram for the timetable of the line in Fig.~\ref{fig::small_line}}\label{fig::small_diagram}
+  \begin{subfigure}{\textwidth}
+    \includegraphics[width=\textwidth]{figures/line_small.pdf}
+    \caption{Nidzica -- Olsztynek segment of line No. 216. The segment comprises
+      three station blocks (1 -- Nidzica, 3 -- Waplewo, 5 -- Olsztynek), and two line blocks (2, 4).
+      We assume that passing through the station block takes the same amount of time independently of
+      which track is used.
+    }
+    \label{fig:linesmall}
   \end{subfigure}
-  \begin{subfigure}[t]{\textwidth}
-    \includegraphics[width=\textwidth]{figures/train_diagram}
-    \subcaption{Train diagram for the timetable of the line in
-      Fig.~\ref{fig::line}}\label{fig::diagram}
+  \begin{subfigure}{\textwidth}
+    \includegraphics[width=\textwidth]{figures/train_diagram_small}
+    \subcaption{
+    Train diagram for the undisturbed timetable of the line in \textbf{(a)}. The timetable features two
+    \emph{Inter--City} trains IC3521 and IC3520 and one \emph{Regio} train R90602. The paths for the
+    \emph{Inter-City} trains are marked with red and path of the \emph{Regio} train is marked with black.
+  }\label{fig:diagramsmall}
   \end{subfigure}
-  \caption{Train diagrams for the studies network segments.}
-  \label{fig:timetables}
+  \caption{Nidzica-Olsztynek segment of line No. 216 and a train diagram for its initial (undisturbed) timetable}
 \end{figure}
 
+\begin{figure}
+  \begin{subfigure}{\textwidth}
+    \includegraphics[width=\textwidth]{figures/line.pdf}
+    \caption{Goleszów -- Wisła Uzdrowisko segment of line No. 191. The segment comprises 4 station blocks (1 -- Goleszów, 3 -- Ustroń, 7 -- Ustroń Polana, 10 -- Wisła Uzdrowisko) and 6 line blocks (2, 4, 5, 6, 8, 9). Between line blocks there are additional passenger platforms at Ustroń Zdrój, Ustroń Poniwiec and Wisła Jawornik.
+    }
+    \label{fig:line}
+  \end{subfigure}
+  \begin{subfigure}{\textwidth}
+    \includegraphics[width=\textwidth]{figures/train_diagram}
+    \subcaption{
+    Train diagram for the timetable of the line in \textbf{(a)}.
+      The timetable features two \emph{Inter--City} trains (IC1 and IC2) and four regional trains (Ks1--Ks4).
+      The paths of the \emph{Inter--City} trains are marked with red and paths of the regional trains are
+      marked with black.
+  }\label{fig:diagram}
+  \end{subfigure}
+  \caption{Goleszów -- Olsztynek segment of line No. 216 and a train diagram for its initial (undisturbed) timetable}
+\end{figure}
+
+For both network segments, we assume that the minimum waiting times at all considered stations
+are 1 minute. Also, we assume that the passing times through all the line blocks were initially
+scheduled according to the maximum permissible speeds.
+
+For the Nidzica--Olsztynek railway segment, we considered two delays. The first one is a 15 minutes delay
+of IC5320 from station block 5. The second one is that of the IC3521 leaving station block 1 5 minutes late.
+Considering this and our assumptions, this creates conflicts, where two \emph{Inter--City} trains, as well
+as an \emph{Inter--City} train and the regio train, have conflicts at block 4. The conflicted, infeasible
+train diagram for this situation is depicted in Fig. \ref{fig:conflictsmall}.
+
+For the Goleszów -- Wisła Uzdrowisko line, we considered several scenarios allowing us to analyze the
+behavior of our algorithm under different circumstances. Those scenarios are:
+
+\begin{enumerate}
+  \item A moderate delay of the \emph{Inter--City} train starting from the station block 1.
+  \item A moderate delay of all the trains starting from station block 1.
+  \item A significant delay of some trains starting from station block 1.
+  \item A significant delay of the \emph{Inter--City} train starting from the station block 1.
+\end{enumerate}
+
+The delays in all the aforementioned scenarios were chosen so that they indeed result in a delay.
+The conflicted timetables are presented in Fig. \ref{fig:conflictlarge}.
+
+\begin{figure}
+  \begin{subfigure}[b]{0.4\columnwidth}
+    \includegraphics[width=0.8\linewidth]{figures/case1_conflict}
+    \caption{
+      Case $1$ -- single conflict, observe that the additinal delay of Ks$2$ will propagate to the delay of Ks$3$.
+    }
+    \label{fig::c1_conflict}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.4\columnwidth}
+    \includegraphics[width=0.8\linewidth]{figures/case2_conflict}
+    \caption{Case $2$ -- two conflicts, with no impact of Ks$2$ on Ks$3$.}
+    \label{fig::c2_conflict}
+  \end{subfigure}
+
+  \begin{subfigure}[b]{0.4\columnwidth}
+    \includegraphics[width=0.8\linewidth]{figures/case3_conflict}
+    \caption{Case $3$ -- multiple conflicts.}
+    \label{fig::c3_conflict}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.4\columnwidth}
+    \includegraphics[width=0.8\textwidth]{figures/case4_conflict}
+    \caption{Case $4$ -- conflict that is straightforward to resolve.}
+    \label{fig::c4_conflict}
+  \end{subfigure}
+  \caption{The conflicted timetables, various types of conflicts.}
+  \label{fig:conflictlarge}
+\end{figure}
+
+
+\subsection{Solution using simple heuristics}
+To establish baseline for Quantum Annealing, we solved the problems described in the previous chapter
+using simple heuristics common to the railways practice. Those heuristics are:
+
+\begin{itemize}
+  \item FCFS (First Come First Served),
+  \item FLFS (First Leave First Served),
+  \item AMCC (Avoid Maximum Current $C_{\max}$.
+\end{itemize}
+
+In FCFS (resp. FLFS) the way is given to the train that first arrives (resp. first leaves) the
+considered station block at which the conflict occurs. AMCC is slightly more complex. In this
+heuristic, one tries to minimize the maximum secondary delays of the trains. We want to stress
+that those heuristics facilitate different objective functions, it is not possible to directly
+compare them -- nevertheless, it might be useful to discuss qualitative differences between
+the solutions they produce.
+
+For the case of Nidzica--Olsztynek line, all heuristics returned the same solution, depicted in
+Fig. \ref{fig:smallheurresolution}. The conflict is avoided by delaying IC3521 by another
+3-minutes, and allowing R9062 to enter the block not earlier than 14:25, i.e. 4 minutes later
+than in the conflicted timetable. In this case, the additional 4 minutes constitute the maximum
+secondary delay of the solution.
+
+We also applied the aforementioned heuristics to all the considered distrubances in the
+Goleszów -- Wisła Uzdrowisko segment. For brevity, we refrain from presenting the detailed
+discussion of the solutions for all the cases and limit ourselves to the summary of the maximum
+secondary delay, which is presented in Table \ref{tab:simple}
+
+\begin{table}
+\centering
+\begin{tabular}{ccccc}
+Heuristics & case $1$ & case $2$ & case $3$ & case $4$  \\
+\hline
+FLFS & 6 & 13 & 4 & 2 \\
+\hline
+FCFS & 5 & 5 & 5 & 2 \\
+\hline
+AMCC & 5 & 5 & 4 & 2 \\
+\hline
+\end{tabular}
+\caption{The maximum secondary delays, in minutes, resulting from simple heuristics.
+  Observe that for each case, there are solutions far below $d_{\text{max}}
+= 10$.}
+\label{tab:simple}
+\end{table}
 
 %%% Local Variables:
 %%% mode: pdflatex
