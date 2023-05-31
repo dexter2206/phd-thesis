@@ -170,19 +170,72 @@ Results depicted in figures \ref{fig:energy-hist} and \ref{fig:cplex_tn_dwave} s
 \begin{figure}
 	\centering
 	\includegraphics[width=\textwidth]{figures/fig34_merge.pdf}
-	\caption{Caption}
+	\caption{ (a)--(b) Performance of the two state of the art heuristic
+	  algorithms: the CPLEX optimizer (CP) and a recent solver based on tensor
+	  networks (TN) in comparison to the D-Wave $2000$Q quantum annealer (DW),
+	  cf. Fig~\ref{fig:energy-hist}. The corresponding QUBO instances (encoded
+	  using double numerical precision) had total of $|V|=360$ and $|V|=624$
+	  spin variables for (a), and (b) respectively. The annealing time was set
+	  to $\tau=200$\textmu{}s. The numerical precision of the solution vector is
+	  denoted as $R$.%\\
+	  (c)--(h) Degradation of the solution quality resulting from the truncation
+	  of the problem coefficients, cf. Eq.~(\ref{eq:coeff}), to a given
+	  numerical precision denoted as $r$. The numerical results were obtained by
+	  finding the ground state with tensor networks (TN). As a reference point,
+	  we included experimental data from the D-Wave $2000$Q quantum annealer
+	  (DW). This effect is expected to be predominant for the current quantum
+	  annealing technology. It is already visible on
+	  Fig.~\ref{fig:energy-hist}(c)--(f), Fig.~\ref{fig:cplex_tn_dwave}(a)--(b)
+	  and it further increases with the increasing graph size $V$. }
 	\label{fig:cplex_tn_dwave}
 \end{figure}
 
-To put these results into context, we also compare them to the ones obtained using two purely
-classical methods: CPLEX optimizer and recently developed tensor--network based algorithm (which we
-describe later in chapter \ref{chapter:tn}. In our experiment, both of those solvers outperformed
-D-Wave annealers in terms of the quality of solutions. The differences were especially noticeable
-for problem instances with larger graph sizes, i.e. ones with higher precision ($R \ge 3, N=6)$), or
-with extra time points ($N > 6, R = 2$). The observed degradation of the solution quality is
-consistent with the results obtained in other works, especially for the problems requiring
-complete graphs.
+To put these results into context, we also compare them to the ones obtained
+using two purely classical methods: CPLEX optimizer and recently developed
+tensor--network based algorithm (which we describe later in chapter
+\ref{chapter:tn}. In our experiment, both of those solvers outperformed D-Wave
+annealers in terms of the quality of solutions. The differences were especially
+noticeable for problem instances with larger graph sizes, i.e. ones with higher
+precision ($R \ge 3, N=6)$), or with extra time points ($N > 6, R = 2$). The
+observed degradation of the solution quality is consistent with the results
+obtained in other works, especially for the problems requiring complete graphs,
+see e.g. \cite{Hamerly2019}.
 
+\subsection{Discussion of error sources}
+
+The poor performance of D-Wave annealer is something certainly to be expected
+from such early--stage device. Annealers are prone to errors stemming from
+multiple sources, and it is hard to judge which of those sources contributed
+most to the lackluster performance for a particular problem or its instance.
+One of the possible sources of errors is DAC quantization, which essentially
+limits the precision of both the quadratic and linear coefficients passed
+to the annealer. As a result, the problem that the annealer physically
+solves is slightly different than the problem the programmer intended to
+solve.
+
+One can see that such quantization errors would mostly affect problems with
+coefficients laying in close proximity to one another. Indeed, suppose that DAC
+quantization errors limit the precision of the linear coefficients to $d$
+decimal digits. Then any two coefficients, say $h_{i}, h_{{j}}$ lying closer to
+each other than $d$, i.e. $|h_{i} - h {j}| < 10^{-d}$, become physically
+undistinguishable to the annealer. The issue also affects coefficients that are
+further apart, by possibly diminishing their relative differences.
+
+While it is hard to pinpoint which source contributed the most to the errors in
+case of the optimization problems discussed in this chapter, we argue that in
+our case the poor performance of the annealer can be largely explained by DAC
+quantization. Indeed, looking at the \eqref{eq:coeff} one can immediately see
+that the optimization problem can contain coefficients arbitrarily close to each
+other as long as a large enough $R$ is chosen. To justify this reasoning, we
+studied how the tensor network solver performs when the coefficients of the
+problem are perturbed by truncating their coefficients to some predefined number
+of digits $r$. The results of this experiment are presented in Fig
+\ref{fig:cplex_tn_dwave}\textbf{(c)--(h)}. One can immediately observe that the
+error patterns resemble the ones obtained from D-Wave, which might suggest
+that DAC quantization might indeed be a significant source of errors in our case.
+However, we would like to point out, that our analysis is by no means
+conclusive, and further analysis of error patterns is still needed
+.
 
 %%% Local Variables:
 %%% mode: latex
