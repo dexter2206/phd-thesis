@@ -1,0 +1,43 @@
+\chapter*{Summary}
+
+In this thesis, we focused on benchmarking quantum annealers and validating their
+usefulness in practical settings. One of the most anticipated uses of quantum computers
+is simulating physics, or, more precisely, simulating the dynamics of quantum systems.
+Therefore, it seems there is no better benchmark for a quantum computer than to test
+how far it is from achieving this long--awaited goal. To this end, we described in detail a
+proof-of-concept algorithm for simulating the dynamics of a quantum (or in fact, any
+dynamical) system using quantum annealers. Although the applicability of the algorithm
+to current devices is limited by their small number of qubits and sparse connectivity,
+our experiments indicated that already the present-day D-Wave annealers can capture
+the dynamics of a very simple two-level system. We also contrasted the obtained results
+with the ones produced by several classical solvers, concluding that they perform better
+than the tested quantum devices. We also provided a possible explanation why the
+particular optimization problems solved in our experiments are particularly hard for
+D-Wave devices and checked our predictions with numerical experiments.
+
+To assist in the process of benchmarking the annealers, we developed two distinctive
+algorithms. The recent, tensor network--based algorithm allows one to solve Ising
+spin--glass instances defined on Chimera graph and other similar layouts. The algorithm
+is useful in itself as an optimization approach, but for other research conducted for
+this thesis, provided a classical baseline for the results obtained by the D-Wave
+annealer. The second of our algorithms, a massively parallelizable distributed bruteforce
+algorithm, allows for the exact computation of the low--energy spectrum of small,
+but otherwise arbitrary, spin--glass instances. Importantly, this simple yet
+efficient algorithm is exact and deterministic. We used the brute-force algorithm
+to obtain low--energy spectra for some of the smaller instances uses throughout
+our experiments. This provided us not only with a means of assessing the quality of
+solutions obtained from other solvers or annealers, but also with valuable
+insights about the structure of the solution space.
+
+To benchmark another anticipated use of quantum annealers, i.e. solving hard
+optimization problems stemming from real--life problems, we described an approach
+for solving railway-dispatching problems by converting them to QUBO. We then
+conducted experiments testing our approach on two generations of D-Wave quantum
+annealers. Remarkably, for our tests, we used real railway timetables from a Polish
+railway segments.
+\todo{Write more about trains}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "../main"
+%%% End:
