@@ -23,7 +23,7 @@ To illustrate, if $S=1$ one could iterate over all possible states one-by-one, k
 By performing a linear change of variables $s_i \mapsto 2q_i-1$ in spinglass problem, one obtains so called Quadratic Unconstrained Binary Optimization (QUBO) problem. Then, the function to be minimized takes a form
 \begin{equation}
 \label{eq:qubo}
-    F(q_1, \ldots, q_N) = -\sum_{i=1}^N b_iq_i - \sum_{i \ne j} a_{ij} q_i q_j,
+    F(q_1, \ldots, q_N) = \sum_{i=1}^N b_iq_i + \sum_{i \ne j} a_{ij} q_i q_j,
 \end{equation}
 where coefficients $b_i$ and $a_{ij}$ are given by
 \begin{equation}
@@ -58,7 +58,71 @@ Where $(n)_2$ denotes binary representation of integer $n$. In the case when alg
 \begin{equation}
 \mathbf{q} = ((\mbox{GPU thread index} + \mbox{chunk offset})_2
 \end{equation}
-where chunk offset for $i$-th chunk of size $2^l$ is simply $i2^l$. 
+where chunk offset for $i$-th chunk of size $2^l$ is simply $i2^l$.
+
+\section{Improving the algorithm using Gray Code}
+
+The algorithm presented in the previous chapter and its GPU--enabled implementation are already highly performant. However, we can still improve upon it by altering the order in which we enumerate the integral representation of states used by our algorithm.
+
+\subsection{Single bit--energy difference}
+Suppose we are given a QUBO with $F(q_{1},\ldots,q_{N})$ as in the equation \ref{eq:qubo}. Consider two states, say $\bq{1} = (\q{1}_{1},\ldots,\q{1}_{N})$ and $\bq{2}=(\q{2}_{1},\ldots,\q{2}_{N})$ such that they only differ in the $k$-th bit, i.e. $\q{2}_{k}=1-\q{1}_{k}$ and $\q{2}_{i}=\q{1}_{i}$ for $i \ne k$.
+The energy difference $F(\bq{2})-F(\bq{1})$ can be easily computed and reads
+\begin{align}
+\begin{split}
+  \label{eq:energydiff1}
+  F(\bq{2})-F(\bq{1}) &= b_{k}(\q{2}_{k}-\q{1}_{k}) + \sum_{i\ne k}a_{ik}\q{1}_{i}(\q{2}_{k} - \q{1}_{k}) \\
+                      &= (\q{2}_{k}-\q{1}_{k}) \left(b_{1} + \sum_{i \ne k}a_{ik}\q{1}_{i}\right) \\
+  & = (1-2\q{1}_{k}) \left(b_{k} + \sum_{i \ne k}a_{ik}\q{1}_{i}\right).
+\end{split}
+\end{align}
+Interestingly, computing the difference in equation \eqref{eq:energydiff1} requires only $N$ multiplications.   But how can this be used to improve the performance of the exhaustive search through QUBO state space?
+
+Moving $F(\bq{1})$ to the right-hand side, we obtain a formula for $F(\bq{2})$ which requires only $N$ instead of maximum of $N(N+1)/2$ multiplications. Remember that this is only possible because $\bq{1}$ and $\bq{2}$ differ only by a single bit. If we could enumerate states in such a fashion that every consecutive two states differ only by a single bit, we could leverage the above formula instead of recomputing energy for each state from scratch. Before describing the algorithm, let us first introduce a notation that we will use later in this section. Given a state $\mathbf{q} = (q_{1},\ldots,q_{N})$, by $\flip{\mathbf{q}}{k}$ we will denote  a state resulting from flipping $k$-th bit of $\mathbf{q}$, i.e.
+\begin{equation}
+  \flip{\mathbf{q}}{k} \coloneq (q_{1}, \ldots, q_{k-1}, 1-q_{k}, q_{k+1}, \ldots, q_{N})
+\end{equation}
+and by $\diff_{F}(\mathbf{q},k)$ we will denote the difference between the energies of $\flip{\mathbf{q}}{k}$ and $\mathbf{q}$. Using the equation \eqref{eq:energydiff1}, we see that the expression for $\diff_{F}(\mathbf{q},k)$ is
+\begin{align}
+  \begin{split}
+    \diff_{F}(\mathbf{q},k) = F(\flip{\mathbf{q}}{k}) - F(\mathbf{q}).
+  \end{split}
+\end{align}
+The pseudocode for a serial algorithm for solving QUBO problem using our observations is outlined in listing \ref{lst:grayserial}. Before we can implement it on GPU though, we need two additional things:
+\begin{enumerate}
+  \item Producing sequence of bit flips that results in visiting all states.
+  \item Strategy for dividing work among CUDA threads.
+  \item Suitable modifications enabling us to use the algorithm to find the low energy-spectrum.
+\end{enumerate}
+We will first tackle the bit flipping problem. To compute the needed sequence of bit flips, we will use \emph{Gray code}, which we will describe now.
+\begin{lstlisting}[
+  language=Python,
+  caption={Pseudocode for algorithm solving the QUBO problem using energy differences and bit flips.},
+  captionpos=b,
+  label=lst:grayserial,
+  float,
+  floatplacement=H
+]
+def solve_qubo(F, q):
+    q = [0] * N # Start with all bits set to 0
+    best_state = current_state = q
+    best_energy = current_energy = F(q)
+
+    for i in range(2 ** N - 1):
+        k = find_next_bit_to_flip(q, i)
+        current_energy = current_energy + diff(q, k)
+        current_state = flip(q, k)
+        if current_energy < best_energy:
+            best_energy = current_energy
+            best_state = current_state
+    return best_state, best_energy
+\end{lstlisting}
+\subsection{Gray code}
+When one talks about a binary encoding of integers, the first thing that comes to mind is a usual positional base-2 system. This encoding certainly does not fit our purpose.
+Indeed, suppose $N=3$ and we are currently processing state corresponding to number $3$, whose representation in binary is $(011)_{2}$. The next state, corresponding to $4$ is encoded by the string $(100)_{2}$, which differs in all three bits.
+
+Instead of using the positional system, we might utilize an encoding called Gray Code, or Reflected Binary Code (RBC), which is primarily used to improve the robustness of electromechanical switches and in error correction protocols. In this code, encoding of two successive integers always differs by at most one bit, which makes it suitable for application in our algorithm.
+
+The conceptual construction of Gray Code is straightforwrd. For Gray Code of length 1 we have two binary strings: $0$ and $1$. To obtain all Gray Codes for a given length $N > 1$, we first construct an ordered list of codes of length $N-1$ and call it $L$. Then, we reverse the list of codes, and call it $H$. Finally, we prepend $0$ to all elements of $L$ and prepend $1$ to all elements of $H$. The concatenation of $L$ and $H$ forms the $N$--bit Gray Code.
 \section{Numerical results}
 In order to test the performance of our algorithm, we run extensive benchmarks using the following hardware:
 %
@@ -82,3 +146,7 @@ As already mentioned, larger instances $(N > 32)$ were solved only using Titan V
     \caption{Results of benchmarks of our algorithm. {\textbf{a.}} Time to solution vs. system size $N$. {\textbf{b.}} Speedup of multi-core/GPU implementation with respect to a single core one vs. system size $N$. The solid lines represent the numerical results and the dashed lines present estimates based on results obtained for smaller system sizes.}
     \label{fig:benchmark_results}
 \end{figure}
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "../main"
+%%% End:
