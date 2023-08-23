@@ -14,8 +14,8 @@ Let us start by considering an Ising spin glass problem defined on a square latt
 
 \begin{figure}
     \centering
-    \includegraphics[width=\textwidth]{sketches/lattice.png}
-    \caption{\textbf{Left}: Simple system of 9 spins on a square lattice. The border (green) of region $X$ (red) consists of those spins interacting with $\overline{X}$ blue. \textbf{Right}: A fragment of state space tree. States kept at each level are marked with green, and the pruned branches are marked with red.}
+    \includegraphics[width=\textwidth]{figures/squarelattice.pdf}
+    \caption{\textbf{a.} An example Ising spin--glass  of 16 spins on a square lattice. The conditional probability for spins in the region $\overline{X}$ conditioned with a given configuration of spins in the region $X$ depends only on part of the configuration on the border $\partial X$. \textbf{b.} A fragment of state space tree. States kept at each level are marked with green, and the pruned branches are marked with red.}
     \label{fig:lattice-and-border}
 \end{figure}
 
@@ -99,3 +99,8 @@ which leads to a shorter but wider tree \todo[color=magenta]{This is true, altho
 \subsection{Approximate network contraction}
 Cost of exact contraction of the proposed network is prohibitively large, therefore, it has to be contracted approximately
 After visiting every level of a tree, one is left with an approximation of $M$ lowest energy states. in principle, the algorithm could be used for certifying the solution.
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "../main"
+%%% End:
