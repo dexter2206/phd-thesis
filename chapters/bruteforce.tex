@@ -1,5 +1,5 @@
-%\chapter{Finding low--energy spectrum of spin glass using CUDA}
-\chapter{Brute--forcing spin--glass problems with CUDA}
+%\chaptermark{}ter{Finding low--energy spectrum of spin glass using CUDA}
+\chapter[Brute--forcing spin--glass problems]{Brute--forcing spin--glass problems with CUDA}
 \label{chapter:bruteforce}
 Optimization problems play an important role in modern society, especially in current volatile times. Instances of such problems can be found in numerous areas of industry and applied sciences. One could mention logistic issues, such as vehicle routing problem together with its variants, and the famous protein folding problem or job shop scheduling to name just a few. It is often the case where many of the aforementioned problems fall into the so called NP--hard complexity class. This fact alone renders hard to solve, making the entire operational research a challenging endeavour requiring enormous amount of computational resources.
 
@@ -122,7 +122,18 @@ Indeed, suppose $N=3$ and we are currently processing state corresponding to num
 
 Instead of using the positional system, we might utilize an encoding called Gray Code, or Reflected Binary Code (RBC), which is primarily used to improve the robustness of electromechanical switches and in error correction protocols. In this code, encoding of two successive integers always differs by at most one bit, which makes it suitable for application in our algorithm.
 
-The conceptual construction of Gray Code is straightforwrd. For Gray Code of length 1 we have two binary strings: $0$ and $1$. To obtain all Gray Codes for a given length $N > 1$, we first construct an ordered list of codes of length $N-1$ and call it $L$. Then, we reverse the list of codes, and call it $H$. Finally, we prepend $0$ to all elements of $L$ and prepend $1$ to all elements of $H$. The concatenation of $L$ and $H$ forms the $N$--bit Gray Code.
+The conceptual construction of Gray Code is straightforward. For Gray Code of length $1$ we have two binary strings: $0$ and $1$. To obtain all Gray Codes for a given length $N > 1$, we first construct an ordered list of codes of length $N-1$ and call it $L$. Then, we reverse the list of codes, and call it $H$, an operation called \emph{reflection}. Finally, we prepend $0$ to all elements of $L$ and prepend $1$ to all elements of $H$. The concatenation of $L$ and $H$ forms the $N$--bit Gray Code. The process is illustrated in Fig. \ref{fig:gray} .One useful consequence of the construction is that the shorter Gray Codes might
+be viewed as initial parts of the larger ones prepended with enough zeros. Thus,
+statements as ``$n$-th Gray code'' make sense and are unambiguous.
+
+\begin{figure}
+  \includegraphics[width=\textwidth]{figures/gray.pdf}
+  \caption{Reflection--based construction of Gray Code. The length of the code is denoted by $N$. For $N=1$, the code comprises two binary strings, $0$ and $1$. To construct the code of length $N>1$, the code of length $N-1$ and its vertical reflection are stacked. Then, the first, unreflected half is prepended with $0$ while the second, reflected half is prepended with $1$.}
+  \label{fig:gray}
+\end{figure}
+
+While the construction of
+
 \section{Numerical results}
 In order to test the performance of our algorithm, we run extensive benchmarks using the following hardware:
 %
