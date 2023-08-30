@@ -1,4 +1,4 @@
-\chapter{Ising model and complexity theory}
+\chapter{Ising model and QUBO problem}
 
 
 Quantum annealers are fundamentally different from classical computers. For one, they don't
@@ -17,6 +17,12 @@ there exists a plethora of heuristic, classical algorithms capable of finding so
 least ``good enough''. We conclude this chapter by providing a brief overview of the most popular ones.
 These algorithms will serve as a baseline for comparison with quantum annealing and a recent
 tensor network--based approach discussed later in the thesis.
+
+As the last point in the chapter, we define the Quadratic Unconstrained Binary Optimization (QUBO)
+problem, which is equivalent to the problem of finding the ground state of the Ising model. We will
+use the QUBO formulation on several occasions in the thesis, as it oftentimes results in a more
+natural phrasing of the problem, or leads to a surprising performance improvement when implementing
+software solvers.
 
 \section{Ising model}
 
@@ -195,6 +201,10 @@ annealing is another Monte Carlo method, sharing similarities with simulated ann
 tempering \cite{wang}. Other approaches for solving Ising spin--glasses include methods involving
 branch--and--bound framework \cite{rendl}, its chordal extensions \cite{baccari} or methods based on
 simulating dynamical systems \cite{sheldon}.
+
+\section{Quadratic Unconstrained Binary Optimization}
+
+
 %%% Local Variables:
 %%% mode: latex
 %%% TeX-master: "../main"
