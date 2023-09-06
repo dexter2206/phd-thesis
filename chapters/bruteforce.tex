@@ -22,12 +22,12 @@ To illustrate, if $S=1$ one could iterate over all possible states one-by-one, k
 \subsection{Conversion to QUBO and computation of energy}
 By performing a linear change of variables $s_i \mapsto 2q_i-1$ in spinglass problem, one obtains so called Quadratic Unconstrained Binary Optimization (QUBO) problem. Then, the function to be minimized takes a form
 \begin{equation}
-\label{eq:qubo}
+\label{eq:qubo2}
     F(q_1, \ldots, q_N) = \sum_{i=1}^N b_iq_i + \sum_{i \ne j} a_{ij} q_i q_j,
 \end{equation}
 where coefficients $b_i$ and $a_{ij}$ are given by
 \begin{equation}
-\label{eq:toQUBO}
+\label{eq:toQUBO2}
 a_{ij}= 4J_{ij},
 \quad 
 b_i= 2h_i - 2 \sum_{\langle i, j \rangle} J_{ij}.
