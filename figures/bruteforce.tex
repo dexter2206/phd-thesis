@@ -1,0 +1,22 @@
+\documentclass{standalone}
+
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,shapes.geometric,positioning}
+
+\begin{document}
+\begin{tikzpicture}
+  \node (start) {};
+  \node[draw, align=center, diamond, right=5cm of start] (decision) {All chunks\\processed?};
+
+  \coordinate [above=5cm of decision] (c1);
+
+
+  \node[draw,rectangle,right=2cm of c2] (suffix) {Compute next suffix};
+  \coordinate [right=8cm of c1] (suffix);
+  %\coordinate [right=2cm of suffi] (c3);
+  %\coordinate [right=2cm of c1] (c2);
+  \draw[-Latex] (start) -- (decision) node[midway, above, align=left] {\textbf{Input:}\\-QUBO $Q$\\-Suffix size $M$\\-desired num. states $k$\\-CUDA grid definition};
+  \draw (decision) -- (c1) node[left,midway] {No};
+  \draw (c2) -- (c1);
+\end{tikzpicture}
+\end{document}
