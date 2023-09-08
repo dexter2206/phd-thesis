@@ -1,6 +1,11 @@
 \documentclass{standalone}
+\usepackage[dvipsnames]{xcolor}
 \usepackage{tikz}
 \usetikzlibrary{calc, matrix, positioning, arrows.meta, decorations.pathreplacing}
+
+\colorlet{Memory}{Melon!50}
+\colorlet{Thread}{SkyBlue!50}
+\colorlet{8bit}{LimeGreen}
 
 \begin{document}
 
@@ -12,6 +17,9 @@
 matrix of nodes,
 nodes={gpunode},
 row sep=1cm,
+row 1/.style = {{nodes={fill=Memory}}},
+row 2/.style = {{nodes={fill=Thread}}},
+row 3/.style = {{nodes={fill=Memory}}},
 column 17/.style = {{nodes={dashed}}},
 column 18/.style = {{nodes={dashed}}},
 column 19/.style = {{nodes={dashed}}},

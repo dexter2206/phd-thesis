@@ -87,7 +87,7 @@ available D-Wave annealers
 \begin{table}
     \footnotesize
     \centering
-    \label{tab:dwave}
+
 \begin{tabular}[pos]{|l|c|c|c|c|}
 \hline
 \textbf{Series} &
@@ -114,6 +114,7 @@ Advantage 2 & 2023-2024 & $Z_{15}$ & 7440 & 71736 \\
     $Z_n$ refers to Chimera, Pegasus and Zephyr of size $n$ respectively. The numbers of qubits and
     couplers are given for a perfectly manufactured chip with full yield. Actual devices from any
     series typically have a lower number of qubits and/or couplers.}.
+  \label{tab:dwave}
 \end{table}
 
 % \begin{figure}
@@ -266,7 +267,7 @@ explain how this new logical graph can be used with the actual device.
 
 The idea is to make all the physical qubits in the chain behave like a single qubit. Since the
 qubits are connected, one can couple them, including a penalty large enough that violating qubits'
-alignment would prohibitively increase the energy of the solution. The example presents this idea.
+alignment would prohibitively increase the energy of the solution. The next example presents this idea.
 
 \begin{example}[Minor embedding, continued]
 Consider an Ising spin--glass instance with Hamiltonian:
@@ -306,7 +307,7 @@ $z_0, z_3, z_4, z_5$ & energy & $z_0, z_3, z_4, z_5$ & energy\\
 
 If $\alpha$ is large enough, e.g. $\alpha=2$, all feasible solutions (left part of the table) have
 energy lower than any solution in which qubits $z_0$ and $z_4$ are misaligned (right part of the
-table), which increases a change of sampling them on a physical device.On the other hand, if
+table), which increases a chance of sampling them on a physical device.On the other hand, if
 $\alpha=1$, the feasible solution $(1,1,1,1)$ has higher energy than the infeasible solution $(1,
 -1, -1, -1)$.
 \end{example}
@@ -331,7 +332,7 @@ of samples. Hence, the experiments needing some fixed number of samples have to 
 sample from the annealer multiple times until the desired number of feasible samples is collected.
 \item \emph{majority voting}: whenever the chain of qubits is misaligned, choose the most common value
 among the chain and use it as a value of the logical qubit. In case of a tie, choose
--1 or 1 both with equal probabilities.
+-1 or 1 with equal probability.
 \end{itemize}
 
 Having presented all the necessary aspects of using quantum annealers, we can conclude this section
@@ -355,7 +356,7 @@ include a serial part which limits speedup gained for introducing more execution
 CPUs). In contrast, quantum annealers are capable of annealing multiple qubits at the same time,
 which makes their operation inherently parallel.
 
-\section{Nvidia CUDA}
+\section{NVIDIA CUDA}
 
 Quantum annealing, introduced in the previous section, is an inherently heuristic process. Like many
 heuristic algorithms, it cannot certify that the solution it found is optimal. One way to assess the
@@ -364,7 +365,7 @@ test instances. Another viable approach is to compute the exact low energy spect
 instances, which in turn requires an exact solver. In particular, one might perform an exhaustive
 search over all possible states and extract only the selected number of the ones with the lowest
 energy, the approach also known as brute--force approach. In chapter \ref{chapter:bruteforce} we
-demonstrate a massively parallel implementation of the brute-force algorithm using Nvidia CUDa, but
+demonstrate a massively parallel implementation of the brute-force algorithm using NVIDIA CUDa, but
 before we do this, in this section we will introduce the basic principles of using CUDA--enabled
 graphic processing units.
 
@@ -380,9 +381,8 @@ General Purpose computing on GPU).
 
 Early efforts in the development of GPGPU required framing of computational problems in terms of
 operations performed on graphical primitives, as this was the only way for using specialized API of
-GPUs. This changed with the development of devices and toolkits that supported operations needed for
-the general--purpose computations out of the box. Notably, in 2007 Nvidia introduced its massively
-parallel CUDA architecture.
+GPUs. This changed with the development of devices, toolkits and frameworks that supported operations needed for
+the general--purpose computations out of the box. Notable examples of such computational frameworks include NVIDIA CUDA \cite{CUDAguide, CUDAvsOpenCL, CUDAExperience} (released in 2007), ATI/AMD FireStream \cite{firestream1,firestream2} (2006) and ROCm \cite{ROCm1,ROCm2,ROCm3} (2016) or OpenCL \cite{CUDAvsOpenCL} (2009). The research presented in this thesis was conducted using NVIDIA CUDA capable devices, which is why in the rest of the thesis we focus solely on CUDA framework.
 
 \subsection{Differences between CPU and GPU}
 The principles behind the operation of CUDA--enabled devices are fundamentally different from the
@@ -497,12 +497,12 @@ with a syntax for defining and launching kernels. The C/C++ CUDA code can be com
 \texttt{nvcc} compiler, shipped out of the box with CUDA toolkit. For CUDA Fortran code, the Nvidia
 High Performance Computing (HPC) suite containing \texttt{nvfortran} compiler\footnote{The
 \texttt{nvfortran} compiler was previously a third--party program called \texttt{pgfortran},
-developed by the Portland Computing group}. Giving a comprehensive walkthrough of using either
+developed by the PGI \cite{PGI}}. Giving a comprehensive walkthrough of using either
 C/C++ or Fortran with CUDA is well beyond the scope of this thesis, but for the sake of
 completeness, below we present a short example of the CUDA C/C++ and CUDA Fortran code.
 
 \begin{example}[Implementing parallel vector addition with CUDA]
-Listings \ref{lst:cuda_c} and \ref{lst:cuda_fortran} below present an example implementation of a
+Listings \ref{lst:cuda_fortran} and \ref{lst:cuda_c} below present an example implementation of a
 parallel vector addition using CUDA. The \texttt{addVec} defined with \texttt{global} attribute is a
 kernel and accepts two input vectors \texttt{x}, \texttt{y} (in the form of arrays) and their length
 \texttt{n}. Since CUDA kernels cannot return a value, both versions of the code accept an additional
@@ -510,15 +510,15 @@ argument \texttt{res} designating where the result will be stored. The \texttt{a
 launched on any one--dimensional grid of one--dimensional blocks. Hence, some threads may need to
 handle more than one position in the input arrays. The pattern presented here, where $i$--th thread
 handles positions $i$, $i+N$, $i+2N$, $\ldots$ with $N$ equal total number of blocks is called a
-\emph{strided loop}.
+\emph{grid-stride loop} and is illustrated in Fig. \ref{fig:strided-loop}.
 
 There are several differences between the two code examples stemming from the languages used. In
 CUDA Fortran we can copy data from the host to the GPU using array assignment. On
 the other hand, the equivalent code in C++ requires manually calling \texttt{cudaMemcpy} function.
 Similarly, the GPU arrays in C++ are declared as pointers, for which the memory has to be manually
 allocated and later deallocated using the combination of \texttt{cudaMalloc} and \texttt{cudaFree}.
-Lastly, C/C++ indexes arrays starting from zero, whereas Fortran indexes tables starting from 1.
-This affects how the thread id, stored in \texttt{tid} variable is computed.
+Lastly, C/C++ uses zero--based indexing, whereas Fortran uses one--based indexing.
+This affects how the thread id, stored in \texttt{tid} variable, is computed.
 
 
 \lstinputlisting[
@@ -539,6 +539,14 @@ This affects how the thread id, stored in \texttt{tid} variable is computed.
     captionpos=b
 ]{code/cuda_c.cu}
 
+\begin{figure}
+  \includegraphics[width=\textwidth]{figures/gpu_scheduling}
+  \caption{A schematic representation of a GPU kernel transforming an input array into an output array of the same size using a grid-stride loop pattern. Here, both arrays are of size $k=16$ and the hypothetical grid comprises $l=5$ threads (the exact grid configuration is irrelevant). During the first iteration, the $i$-th thread accesses $i$-th input
+  element, transforms it and stores the new value in $i$-th element of the output array. In subsequent iterations, each thread advances the index it processes by the stride equal to the total grid size. Observe that for the last iteration only the first thread needs to do processing and remaining 4 threads, marked with dashed line, remain inactive.
+  }
+  \label{fig:strided-loop}
+\end{figure}
+
 \end{example}
 
 \subsection{Software ecosystem}
@@ -554,8 +562,8 @@ Along with the \texttt{nvcc} compiler, the CUDA toolkit contains several, more s
 \end{itemize}
 
 For some high-level languages, there exist third-party libraries enabling the usage of CUDA. For
-Python, one could mention e.g. \texttt{PyCUDA}, \texttt{CuPy} or recently introduced
-\texttt{setuptools\_cuda}. In Julia, integration with CUDA can be achieved with \texttt{CUDA.jl} package.
+Python, one could mention e.g. \texttt{PyCUDA} \cite{pycuda}, \texttt{CuPy} \cite{cupy} or recently introduced
+\texttt{setuptools\_cuda} \cite{setuptoolscuda} created by the author of this thesis. In Julia, integration with CUDA can be achieved with \texttt{CUDA.jl} \cite{CUDAjl} package.
 
 
 
