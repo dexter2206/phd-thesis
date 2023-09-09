@@ -130,6 +130,8 @@ The following example demonstrates the representation described above in detail.
       7&$(111)_2$&224&$(11100000)_{2}$&255&$(11111111)_{2}$\\
       \hline
     \end{tabular}
+    \caption{An example enumeration of chunks iterated over by brute force algorithm.}
+    \label{tab:chunks}
   \end{table}
 
   \begin{table}{}
@@ -137,20 +139,35 @@ The following example demonstrates the representation described above in detail.
   \end{table}
 \end{example}
 
+\subsection{Performance benchmarks}
+
 \subsection{Implementation details}
-\subsubsection{GPU scheduling}
-In our implementation of the algorithm, each of the GPU thread computes energy
-of a single state. For a grid consisting of $2^N$ threads, the state given
-thread processes is given by a simple formula
-\begin{equation}
-  \label{eq:state-to-thread-idx}
-  \mathbf{q} = (\mbox{GPU thread index})_2
-\end{equation}
-Where $(n)_2$ denotes binary representation of integer $n$. In the case when algorithm has to be executed in chunks, equation \eqref{eq:state-to-thread-idx} has to be modified so that different states are processed in pass. Therefore, in general, the state being processed by the given thread is computed as
-\begin{equation}
-  \mathbf{q} = ((\mbox{GPU thread index} + \mbox{chunk offset})_2
-\end{equation}
-where chunk offset for $i$-th chunk of size $2^l$ is simply $i2^l$.
+
+In our approach we decided to store states and their corresponding energies in
+arrays of size $k+2^{M}$, where $k$ is the desired size of the low energy
+spectrum and $2^{M}$ is the chunk size. The arrays are always synchronized, i.e.
+at all times $i$-th state corresponds to $i$-th energy. The first $k$ elements
+store the lowest energies and corresponding configurations found so far. When a new chunk
+is being processed, the second part of the arrays is populated with new states
+and energies by the energy--computing kernel. Next, the best $k$ states from the
+current chunk are selected and moved into indices $k, k+1,\ldots,2k-1$. In this
+way, the global best solutions from previous chunks and the lowest
+energy states from the current chunk in a continuous space in memory, which
+facilitates updating the best configurations.
+
+One could use a parallel sorting procedure for extracting the $k$ lowest--energy states at each
+step. However, for improved performance, we decided to use a combination of
+the \texttt{bucketSelect} \cite{bucketselect} algorithm in tandem with \texttt{thrust::partition\_by\_key} \cite{thrust}.
+The \texttt{bucketSelect} algorithm is used to find the pivot configuration that would reside
+at $k$--th position in the sorted array. Then, \texttt{thrust::partition\_by\_key} is used to reorder
+both arrays such that the configurations with energies lower than the one of the pivot are moved
+to the beginning. The same procedure is used both for extracting the $k$-lowest energy
+states in the given chunk, as well as to update the global solution by extracting $k$-lowest energy
+configurations from the first $2k$ configurations. The whole procedure is depicted in Fig. \ref{fig:bruteforce}.
+
+Lastly, we would like to note that the algorithm we just described can also be implemented
+on homogenous, CPU--only architectures using any of the available parallelization approaches.
+In our implementation, we used the OpenMP\cite{openmp} for a CPU--only version.
 
 \begin{figure}
   \includegraphics[width=\textwidth]{figures/bruteforce}
@@ -168,6 +185,46 @@ where chunk offset for $i$-th chunk of size $2^l$ is simply $i2^l$.
   }
   \label{fig:bruteforce}
 \end{figure}
+
+\subsection{Performance benchmarks}
+In order to test the performance of our algorithm, we run extensive benchmarks
+using the following hardware:
+%
+\begin{itemize}
+  \item CPU:
+    \href{https://ark.intel.com/products/94456/Intel-Core-i7-6950X-Processor-Extreme-Edition-25M-Cache-up-to-3-50-GHz-}{$10$
+      Cores {\rmfamily Intel\textregistered} Core \textsuperscript{TM}i7-6950X};
+    %
+  \item GPU(1):
+    \href{https://www.nvidia.com/en-us/geforce/products/10series/geforce-gtx-1080}{Nvidia
+      GeForce GTX $1080$, $8$GB GDDR$5$ global memory, $2560$ CUDA Cores};
+    %
+  \item  GPU(2): \href{https://www.nvidia.com/en-us/titan/titan-v/}{Nvidia Titan V,
+      $12$GB HBM$2$ global memory, $5120$ CUDA Cores}.
+\end{itemize}
+
+For conducting our benchmarks we generated $100$ spinglass instances for each
+$N=24, 26, \ldots, 30, 32$. Additionally we generated $100$ instances of size
+$N=40$ and single instances of sizes $N=48, 50$ that were feasible to solve
+with Titan V GPU. Coefficients of each spinglass were drawn randomly from
+uniform distributions on the intervals $[-2, 2]$ and $[-1, 1]$ for magnetic
+fields and couplings respectively. For each instance, we computed low energy
+spectrum of $k=100$ states with our algorithm. We used maximum chunk size of
+$2^{29}$ for Titan V and CPU and chunk size of $2^{27}$ for GTX 1080.
+
+As already mentioned, larger instances $(N > 32)$ were solved only using Titan
+V GPU. For GTX 1080 and CPU implementation, the expected time to solve those
+instances was estimated based on the timings for smaller $N$. The results of
+our benchmarks are are presented in Fig. \ref{fig:benchmark_results}.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=\textwidth]{figures/resultsplot_reduced.pdf}
+  \caption{Results of benchmarks of our algorithm. {\textbf{a.}} Time to solution vs. system size $N$. {\textbf{b.}} Speedup of multi-core/GPU implementation with respect to a single core one vs. system size $N$. The solid lines represent the numerical results and the dashed lines present estimates based on results obtained for smaller system sizes.}
+  \label{fig:benchmark_results}
+\end{figure}
+
+
 
 \section{Improving the algorithm using Gray Code}
 
@@ -284,43 +341,6 @@ While the construction presented above is useful for explaining the concept of
 the Gray Code, it is not efficient enough to be used in an algorithm. More
 precisely, with this procedure, we would need to use.
 
-\section{Numerical results}
-In order to test the performance of our algorithm, we run extensive benchmarks
-using the following hardware:
-%
-\begin{itemize}
-  \item CPU:
-    \href{https://ark.intel.com/products/94456/Intel-Core-i7-6950X-Processor-Extreme-Edition-25M-Cache-up-to-3-50-GHz-}{$10$
-      Cores {\rmfamily Intel\textregistered} Core \textsuperscript{TM}i7-6950X};
-    %
-  \item GPU(1):
-    \href{https://www.nvidia.com/en-us/geforce/products/10series/geforce-gtx-1080}{Nvidia
-      GeForce GTX $1080$, $8$GB GDDR$5$ global memory, $2560$ CUDA Cores};
-    %
-  \item  GPU(2): \href{https://www.nvidia.com/en-us/titan/titan-v/}{Nvidia Titan V,
-      $12$GB HBM$2$ global memory, $5120$ CUDA Cores}.
-\end{itemize}
-
-For conducting our benchmarks we generated $100$ spinglass instances for each
-$N=24, 26, \ldots, 30, 32$. Additionally we generated $100$ instances of size
-$N=40$ and single instances of sizes $N=48, 50$ that were feasible to solve
-with Titan V GPU. Coefficients of each spinglass were drawn randomly from
-uniform distributions on the intervals $[-2, 2]$ and $[-1, 1]$ for magnetic
-fields and couplings respectively. For each instance, we computed low energy
-spectrum of $S=100$ states with our algorithm. We used maximum chunk size of
-$2^{29}$ for Titan V and CPU and chunk size of $2^{27}$ for GTX 1080.
-
-As already mentioned, larger instances $(N > 32)$ were solved only using Titan
-V GPU. For GTX 1080 and CPU implementation, the expected time to solve those
-instances was estimated based on the timings for smaller $N$. The results of
-our benchmarks are are presented in figure \todo{Add figure with results}.
-
-\begin{figure}
-  \centering
-  \includegraphics[width=\textwidth]{figures/resultsplot_reduced.pdf}
-  \caption{Results of benchmarks of our algorithm. {\textbf{a.}} Time to solution vs. system size $N$. {\textbf{b.}} Speedup of multi-core/GPU implementation with respect to a single core one vs. system size $N$. The solid lines represent the numerical results and the dashed lines present estimates based on results obtained for smaller system sizes.}
-  \label{fig:benchmark_results}
-\end{figure}
 %%% Local Variables:
 %%% mode: latex
 %%% TeX-master: "../main"
