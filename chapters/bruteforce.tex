@@ -43,7 +43,16 @@ summarized as follows:
   \item Let each thread compute the energy of one of the states.
   \item Extract (e.g. by sorting) the desired number of low--energy states.
 \end{enumerate}
-Naturally, an attempt to implement such an algorithm on real hardware is doomed to fail. To exemplify this, consider a problem with $N=40$ variables. Assuming we use 32-bit floating point numbers, one would need an enormous amount of $2^{40}\cdot 4B = 4398046511104\mbox{B}$, or $4\mbox{TB}$ of working memory to store the computed energies. For $N=50$, this number grows to $4096\mbox{TB}$. Clearly, such an amount of needed memory is prohibitively large, and that is even before we consider some form of storage for system states. Moreover, no current hardware can execute $2^{40}$ threads in parallel. Fortunately, we can adapt our algorithm to take into account limited memory and parallelism. To do so, we introduce the following assumptions:
+Naturally, an attempt to implement such an algorithm on real hardware is doomed
+to fail. To exemplify this, consider a problem with $N=40$ variables. Assuming
+we use 32-bit floating point numbers, one would need an enormous amount of
+$2^{40}\cdot 4B = 4398046511104\mbox{B}$, or $4\mbox{TB}$ of working memory to
+store the computed energies. For $N=50$, this number grows to $4096\mbox{TB}$.
+Clearly, such an amount of needed memory is prohibitively large, and that is
+even before we consider some form of storage for system states. Moreover, no
+current hardware can execute $2^{40}$ threads in parallel. Fortunately, we can
+adapt our algorithm to take into account limited memory and parallelism. To do
+so, we introduce the following assumptions:
 \begin{enumerate}
   \item We will process the solution space in \emph{chunks} that can fit into GPU
     memory.
@@ -51,9 +60,13 @@ Naturally, an attempt to implement such an algorithm on real hardware is doomed 
     Should this be the case, the threads will process the chunk using a
     grid--stride loop pattern.
 \end{enumerate}
-As an added benefit of our assumptions, we decouple the grid size from the problem size. The number of thread blocks and block size become parameters of our algorithm, which facilitates further fine-tuning of kernel execution parameters.
+As an added benefit of our assumptions, we decouple the grid size from the
+problem size. The number of thread blocks and block size become parameters of
+our algorithm, which facilitates further fine-tuning of kernel execution
+parameters.
 
 The algorithm will keep track of $k$ lowest--energy states computed so far.
+
 This information will be updated after each new chunk is processed. The
 downside of this approach is that the size of the low--energy spectrum we can
 compute is limited by the chunk size. However, this limitation is not as severe
@@ -101,33 +114,38 @@ into two parts:
     \emph{the same} for each state in the chunk.
 \end{enumerate}
 Now, since there are $2^{N-M}$ chunks, we can identify each chunk with a $N-M$
-bit number. Finally we arrive for a formula for an integer representation $\mathbf{q}_{i}^{j}$ of an $i$-th configuration in $j$-th chunk:
+bit number. Finally we arrive for a formula for an integer representation
+$\mathbf{q}_{i}^{j}$ of an $i$-th configuration in $j$-th chunk:
 \begin{equation}
   \mathbf{q}_{i}^{j} = i + 2^{M}\cdot j,\qquad i=0,\ldots,2^{M}-1, \; j=0,\ldots,2^{N-M}-1
 \end{equation}
-The following example demonstrates the representation described above in detail.
+The following example demonstrates the representation described above in
+detail.
 \begin{example}[Processing solution space in chunks]
-  Consider QUBO with $N=8$ variables. We decide to use $M=5$. Hence, there are $2^{M}=32$
-  states in each chunk and a total of $2^{N-M}=8$ chunks. The \emph{local} part of the
-  first state in each chunk is $0$, or $(00000000)_{2}$ in binary. The local part of the last state in each chunk is $31$, or $(00011111)_{2}$. The table \ref{tab:chunks} below enumerates ranges of combined integer representation of states in each chunk.
+  Consider QUBO with $N=8$ variables. We decide to use $M=5$. Hence, there are
+  $2^{M}=32$ states in each chunk and a total of $2^{N-M}=8$ chunks. The
+  \emph{local} part of the first state in each chunk is $0$, or $(00000000)_{2}$
+  in binary. The local part of the last state in each chunk is $31$, or
+  $(00011111)_{2}$. The table \ref{tab:chunks} below enumerates ranges of
+  combined integer representation of states in each chunk.
   \begin{table}[ht!]
     \centering
     \begin{tabular}{c|c|c|c|c|c}
       \hline
       \multicolumn{2}{c|}{Chunk}       &
       \multicolumn{2}{c|}{First state} &
-      \multicolumn{2}{c}{Last state}    \\
+      \multicolumn{2}{c}{Last state}                                                                         \\
       \hline
-      Index&Binary&Decimal&Binary&Decimal&Binary\\
+      Index                            & Binary    & Decimal & Binary           & Decimal & Binary           \\
       \hline
-      0&$(000)_2$&0&$(00000000)_{2}$&31&$(00011111)_{2}$\\
-      1&$(001)_2$&32&$(00100000)_{2}$&63&$(00111111)_{2}$\\
-      2&$(010)_2$&64&$(01000000)_{2}$&95&$(01011111)_{2}$\\
-      3&$(011)_2$&96&$(01100000)_{2}$&127&$(01111111)_{2}$\\
-      4&$(100)_2$&128&$(10000000)_{2}$&159&$(10011111)_{2}$\\
-      5&$(101)_2$&160&$(10100000)_{2}$&191&$(10111111)_{2}$\\
-      6&$(110)_2$&192&$(11000000)_{2}$&223&$(11011111)_{2}$\\
-      7&$(111)_2$&224&$(11100000)_{2}$&255&$(11111111)_{2}$\\
+      0                                & $(000)_2$ & 0       & $(00000000)_{2}$ & 31      & $(00011111)_{2}$ \\
+      1                                & $(001)_2$ & 32      & $(00100000)_{2}$ & 63      & $(00111111)_{2}$ \\
+      2                                & $(010)_2$ & 64      & $(01000000)_{2}$ & 95      & $(01011111)_{2}$ \\
+      3                                & $(011)_2$ & 96      & $(01100000)_{2}$ & 127     & $(01111111)_{2}$ \\
+      4                                & $(100)_2$ & 128     & $(10000000)_{2}$ & 159     & $(10011111)_{2}$ \\
+      5                                & $(101)_2$ & 160     & $(10100000)_{2}$ & 191     & $(10111111)_{2}$ \\
+      6                                & $(110)_2$ & 192     & $(11000000)_{2}$ & 223     & $(11011111)_{2}$ \\
+      7                                & $(111)_2$ & 224     & $(11100000)_{2}$ & 255     & $(11111111)_{2}$ \\
       \hline
     \end{tabular}
   \end{table}
@@ -146,7 +164,10 @@ thread processes is given by a simple formula
   \label{eq:state-to-thread-idx}
   \mathbf{q} = (\mbox{GPU thread index})_2
 \end{equation}
-Where $(n)_2$ denotes binary representation of integer $n$. In the case when algorithm has to be executed in chunks, equation \eqref{eq:state-to-thread-idx} has to be modified so that different states are processed in pass. Therefore, in general, the state being processed by the given thread is computed as
+Where $(n)_2$ denotes binary representation of integer $n$. In the case when
+algorithm has to be executed in chunks, equation \eqref{eq:state-to-thread-idx}
+has to be modified so that different states are processed in pass. Therefore,
+in general, the state being processed by the given thread is computed as
 \begin{equation}
   \mathbf{q} = ((\mbox{GPU thread index} + \mbox{chunk offset})_2
 \end{equation}
@@ -155,18 +176,18 @@ where chunk offset for $i$-th chunk of size $2^l$ is simply $i2^l$.
 \begin{figure}
   \includegraphics[width=\textwidth]{figures/bruteforce}
   \caption{
-    Detailed representation of brute force algorithm for finding $k$-lowest energy states of a QUBO.
-    The algorithm iterates over the set of all possbile states in chunks of size $2^{M}$, where $M$
-    is a user--defined parameter. Throughout the algorithm execution, we maintain arrays of states and
-    corresponding energies. The first part of those arrays stores the $k$ best configurations
-    encountered so far, and the second part stores configurations belonging to the currently processed chunk.
-    In the first phase of the iteration, an energy--computing kernel is launched. Then, the $k$--lowest energy
-    configurations from the given chunk are selected and moved towards the part of the array with the current
-    best solutions. Finally, the best $k$ states are selected from the
-    first $2k$ configurations and the
-    algorithm proceeds to the next chunk, or terminates if all the chunks have been iterated over.
-  }
-  \label{fig:bruteforce}
+    Detailed representation of brute force algorithm for finding $k$-lowest energy
+    states of a QUBO. The algorithm iterates over the set of all possbile states in
+    chunks of size $2^{M}$, where $M$ is a user--defined parameter. Throughout the
+    algorithm execution, we maintain arrays of states and corresponding energies.
+    The first part of those arrays stores the $k$ best configurations encountered
+    so far, and the second part stores configurations belonging to the currently
+    processed chunk. In the first phase of the iteration, an energy--computing
+    kernel is launched. Then, the $k$--lowest energy configurations from the given
+    chunk are selected and moved towards the part of the array with the current
+    best solutions. Finally, the best $k$ states are selected from the first $2k$
+    configurations and the algorithm proceeds to the next chunk, or terminates if
+    all the chunks have been iterated over. } \label{fig:bruteforce}
 \end{figure}
 
 \section{Improving the algorithm using Gray Code}
@@ -191,7 +212,9 @@ reads
     & = (1-2\q{1}_{k}) \left(b_{k} + \sum_{i \ne k}a_{ik}\q{1}_{i}\right).
   \end{split}
 \end{align}
-Interestingly, computing the difference in equation \eqref{eq:energydiff1} requires only $N$ multiplications.   But how can this be used to improve the performance of the exhaustive search through QUBO state space?
+Interestingly, computing the difference in equation \eqref{eq:energydiff1}
+requires only $N$ multiplications. But how can this be used to improve the
+performance of the exhaustive search through QUBO state space?
 
 Moving $F(\bq{1})$ to the right-hand side, we obtain a formula for $F(\bq{2})$
 which requires only $N$ instead of maximum of $N(N+1)/2$ multiplications.
@@ -206,20 +229,26 @@ bit of $\mathbf{q}$, i.e.
 \begin{equation}
   \flip{\mathbf{q}}{k} \coloneq (q_{1}, \ldots, q_{k-1}, 1-q_{k}, q_{k+1}, \ldots, q_{N})
 \end{equation}
-and by $\diff_{F}(\mathbf{q},k)$ we will denote the difference between the energies of $\flip{\mathbf{q}}{k}$ and $\mathbf{q}$. Using the equation \eqref{eq:energydiff1}, we see that the expression for $\diff_{F}(\mathbf{q},k)$ is
+and by $\diff_{F}(\mathbf{q},k)$ we will denote the difference between the
+energies of $\flip{\mathbf{q}}{k}$ and $\mathbf{q}$. Using the equation
+\eqref{eq:energydiff1}, we see that the expression for
+$\diff_{F}(\mathbf{q},k)$ is
 \begin{align}
   \begin{split}
     \diff_{F}(\mathbf{q},k) = F(\flip{\mathbf{q}}{k}) - F(\mathbf{q}).
   \end{split}
 \end{align}
-The pseudocode for a serial algorithm for solving QUBO problem using our observations is outlined in listing \ref{lst:grayserial}. Before we can implement it on GPU though, we need two additional things:
+The pseudocode for a serial algorithm for solving QUBO problem using our
+observations is outlined in listing \ref{lst:grayserial}. Before we can
+implement it on GPU though, we need two additional things:
 \begin{enumerate}
   \item Producing sequence of bit flips that results in visiting all states.
   \item Strategy for dividing work among CUDA threads.
   \item Suitable modifications enabling us to use the algorithm to find the low
     energy-spectrum.
 \end{enumerate}
-We will first tackle the bit flipping problem. To compute the needed sequence of bit flips, we will use \emph{Gray code}, which we will describe now.
+We will first tackle the bit flipping problem. To compute the needed sequence
+of bit flips, we will use \emph{Gray code}, which we will describe now.
 \begin{lstlisting}[
   language=Python,
   caption={Pseudocode for algorithm solving the QUBO problem using energy differences and bit flips.},
@@ -270,8 +299,11 @@ unambiguous.
 
 \begin{figure}
   \includegraphics[width=\textwidth]{figures/gray.pdf}
-  \caption{Reflection--based construction of Gray Code. The length of the code is denoted by $N$. For $N=1$, the code comprises two binary strings, $0$ and $1$. To construct the code of length $N>1$, the code of length $N-1$ and its vertical reflection are stacked. Then, the first, unreflected half is prepended with $0$ while the second, reflected half is prepended with $1$.}
-  \label{fig:gray}
+  \caption{Reflection--based construction of Gray Code. The length of the code is denoted
+    by $N$. For $N=1$, the code comprises two binary strings, $0$ and $1$. To
+    construct the code of length $N>1$, the code of length $N-1$ and its vertical
+    reflection are stacked. Then, the first, unreflected half is prepended with $0$
+    while the second, reflected half is prepended with $1$.} \label{fig:gray}
 \end{figure}
 
 An important thing to observe is that in our algorithm we need at most two Gray
@@ -318,8 +350,11 @@ our benchmarks are are presented in figure \todo{Add figure with results}.
 \begin{figure}
   \centering
   \includegraphics[width=\textwidth]{figures/resultsplot_reduced.pdf}
-  \caption{Results of benchmarks of our algorithm. {\textbf{a.}} Time to solution vs. system size $N$. {\textbf{b.}} Speedup of multi-core/GPU implementation with respect to a single core one vs. system size $N$. The solid lines represent the numerical results and the dashed lines present estimates based on results obtained for smaller system sizes.}
-  \label{fig:benchmark_results}
+  \caption{Results of benchmarks of our algorithm. {\textbf{a.}} Time to solution vs.
+    system size $N$. {\textbf{b.}} Speedup of multi-core/GPU implementation with
+    respect to a single core one vs. system size $N$. The solid lines represent the
+    numerical results and the dashed lines present estimates based on results
+    obtained for smaller system sizes.} \label{fig:benchmark_results}
 \end{figure}
 %%% Local Variables:
 %%% mode: latex
