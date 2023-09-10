@@ -163,29 +163,33 @@ detail.
 
 In our approach we decided to store states and their corresponding energies in
 arrays of size $k+2^{M}$, where $k$ is the desired size of the low energy
-spectrum and $2^{M}$ is the chunk size. The arrays are always synchronized, i.e.
-at all times $i$-th state corresponds to $i$-th energy. The first $k$ elements
-store the lowest energies and corresponding configurations found so far. When a new chunk
-is being processed, the second part of the arrays is populated with new states
-and energies by the energy--computing kernel. Next, the best $k$ states from the
-current chunk are selected and moved into indices $k, k+1,\ldots,2k-1$. In this
-way, the global best solutions from previous chunks and the lowest
-energy states from the current chunk in a continuous space in memory, which
-facilitates updating the best configurations.
+spectrum and $2^{M}$ is the chunk size. The arrays are always synchronized,
+i.e. at all times $i$-th state corresponds to $i$-th energy. The first $k$
+elements store the lowest energies and corresponding configurations found so
+far. When a new chunk is being processed, the second part of the arrays is
+populated with new states and energies by the energy--computing kernel. Next,
+the best $k$ states from the current chunk are selected and moved into indices
+$k, k+1,\ldots,2k-1$. In this way, the global best solutions from previous
+chunks and the lowest energy states from the current chunk in a continuous
+space in memory, which facilitates updating the best configurations.
 
-One could use a parallel sorting procedure for extracting the $k$ lowest--energy states at each
-step. However, for improved performance, we decided to use a combination of
-the \texttt{bucketSelect} \cite{bucketselect} algorithm in tandem with \texttt{thrust::partition\_by\_key} \cite{thrust}.
-The \texttt{bucketSelect} algorithm is used to find the pivot configuration that would reside
-at $k$--th position in the sorted array. Then, \texttt{thrust::partition\_by\_key} is used to reorder
-both arrays such that the configurations with energies lower than the one of the pivot are moved
-to the beginning. The same procedure is used both for extracting the $k$-lowest energy
-states in the given chunk, as well as to update the global solution by extracting $k$-lowest energy
-configurations from the first $2k$ configurations. The whole procedure is depicted in Fig. \ref{fig:bruteforce}.
+One could use a parallel sorting procedure for extracting the $k$
+lowest--energy states at each step. However, for improved performance, we
+decided to use a combination of the \texttt{bucketSelect} \cite{bucketselect}
+algorithm in tandem with \texttt{thrust::partition\_by\_key} \cite{thrust}. The
+\texttt{bucketSelect} algorithm is used to find the pivot configuration that
+would reside at $k$--th position in the sorted array. Then,
+\texttt{thrust::partition\_by\_key} is used to reorder both arrays such that
+the configurations with energies lower than the one of the pivot are moved to
+the beginning. The same procedure is used both for extracting the $k$-lowest
+energy states in the given chunk, as well as to update the global solution by
+extracting $k$-lowest energy configurations from the first $2k$ configurations.
+The whole procedure is depicted in Fig. \ref{fig:bruteforce}.
 
-Lastly, we would like to note that the algorithm we just described can also be implemented
-on homogenous, CPU--only architectures using any of the available parallelization approaches.
-In our implementation, we used the OpenMP\cite{openmp} for a CPU--only version.
+Lastly, we would like to note that the algorithm we just described can also be
+implemented on homogenous, CPU--only architectures using any of the available
+parallelization approaches. In our implementation, we used the
+OpenMP\cite{openmp} for a CPU--only version.
 
 \begin{figure}
   \includegraphics[width=\textwidth]{figures/bruteforce}
@@ -238,11 +242,12 @@ our benchmarks are are presented in Fig. \ref{fig:benchmark_results}.
 \begin{figure}
   \centering
   \includegraphics[width=\textwidth]{figures/resultsplot_reduced.pdf}
-  \caption{Results of benchmarks of our algorithm. {\textbf{a.}} Time to solution vs. system size $N$. {\textbf{b.}} Speedup of multi-core/GPU implementation with respect to a single core one vs. system size $N$. The solid lines represent the numerical results and the dashed lines present estimates based on results obtained for smaller system sizes.}
-  \label{fig:benchmark_results}
+  \caption{Results of benchmarks of our algorithm. {\textbf{a.}} Time to solution vs.
+    system size $N$. {\textbf{b.}} Speedup of multi-core/GPU implementation with
+    respect to a single core one vs. system size $N$. The solid lines represent the
+    numerical results and the dashed lines present estimates based on results
+    obtained for smaller system sizes.} \label{fig:benchmark_results}
 \end{figure}
-
-
 
 \section{Improving the algorithm using Gray Code}
 
@@ -256,8 +261,8 @@ Suppose we are given a QUBO with $F(q_{1},\ldots,q_{N})$ as in the equation
 \ref{eq:qubo}. Consider two states, say $\bq{1} = (\q{1}_{1},\ldots,\q{1}_{N})$
 and $\bq{2}=(\q{2}_{1},\ldots,\q{2}_{N})$ such that they only differ in the
 $k$-th bit, i.e. $\q{2}_{k}=1-\q{1}_{k}$ and $\q{2}_{i}=\q{1}_{i}$ for $i \ne
-  k$. The energy difference $F(\bq{2})-F(\bq{1})$ can be easily computed and
-reads
+  k$. The energy difference $F(\bq{2})-F(\bq{1})$ can be easily computed and the
+formula reads
 \begin{align}
   \begin{split}
     \label{eq:energydiff1}
@@ -270,14 +275,15 @@ Interestingly, computing the difference in equation \eqref{eq:energydiff1}
 requires only $N$ multiplications. But how can this be used to improve the
 performance of the exhaustive search through QUBO state space?
 
-Moving $F(\bq{1})$ to the right-hand side, we obtain a formula for $F(\bq{2})$
-which requires only $N$ instead of maximum of $N(N+1)/2$ multiplications.
-Remember that this is only possible because $\bq{1}$ and $\bq{2}$ differ only
-by a single bit. If we could enumerate states in such a fashion that every
-consecutive two states differ only by a single bit, we could leverage the above
-formula instead of recomputing energy for each state from scratch. Before
-describing the algorithm, let us first introduce a notation that we will use
-later in this section. Given a state $\mathbf{q} = (q_{1},\ldots,q_{N})$, by
+Moving $F(\bq{1})$ to the right-hand side, we obtain a formula for $F(\bq{2})$,
+which allows for computing it with only $N+1$ instead of maximum of $N(N+1)/2$
+multiplications, provided that $F(\bq{1})$ is known. Remember that this is only
+possible because $\bq{1}$ and $\bq{2}$ differ only by a single bit. If we could
+enumerate states in such a fashion that every consecutive two states differ
+only by a single bit, we could leverage the above formula instead of
+recomputing energy for each state from scratch. Before we describe how the
+procedure works and how to implement this on GPU, let us first introduce the
+necessary notation. Given a state $\mathbf{q} = (q_{1},\ldots,q_{N})$, by
 $\flip{\mathbf{q}}{k}$ we will denote a state resulting from flipping $k$-th
 bit of $\mathbf{q}$, i.e.
 \begin{equation}
@@ -292,17 +298,9 @@ $\diff_{F}(\mathbf{q},k)$ is
     \diff_{F}(\mathbf{q},k) = F(\flip{\mathbf{q}}{k}) - F(\mathbf{q}).
   \end{split}
 \end{align}
-The pseudocode for a serial algorithm for solving QUBO problem using our
+The pseudocode for a serial algorithm for solving a QUBO problem using our
 observations is outlined in listing \ref{lst:grayserial}. Before we can
-implement it on GPU though, we need two additional things:
-\begin{enumerate}
-  \item Producing sequence of bit flips that results in visiting all states.
-  \item Strategy for dividing work among CUDA threads.
-  \item Suitable modifications enabling us to use the algorithm to find the low
-    energy-spectrum.
-\end{enumerate}
-We will first tackle the bit flipping problem. To compute the needed sequence
-of bit flips, we will use \emph{Gray code}, which we will describe now.
+implement it on GPU though, we need to answer the following questions:
 \begin{lstlisting}[
   language=Python,
   caption={Pseudocode for algorithm solving the QUBO problem using energy differences and bit flips.},
@@ -317,7 +315,7 @@ def solve_qubo(F, q):
     best_energy = current_energy = F(q)
 
     for i in range(2 ** N - 1):
-        k = find_next_bit_to_flip(q, i)
+        k = find_next_bit_to_flip(i)
         current_energy = current_energy + diff(q, k)
         current_state = flip(q, k)
         if current_energy < best_energy:
@@ -325,6 +323,14 @@ def solve_qubo(F, q):
             best_state = current_state
     return best_state, best_energy
 \end{lstlisting}
+\begin{enumerate}
+  \item How to produce a sequence of $2^{N}-1$ bits such that executing them enumerates
+        all possible states?
+  \item How to divide work among CUDA threads?
+\end{enumerate}
+The answer to the first question is well--known and involves enumerating integers using
+the Gray code, which we will describe now.
+
 \subsection{Gray code}
 When one talks about a binary encoding of integers, the first thing that comes
 to mind is a usual positional base-2 system. This encoding certainly does not
@@ -334,13 +340,13 @@ next state, corresponding to $4$ is encoded by the string $(100)_{2}$, which
 differs in all three bits.
 
 Instead of using the positional system, we might utilize an encoding called
-Gray Code, or Reflected Binary Code (RBC), which is primarily used to improve
+Gray code, or Reflected Binary Code (RBC), which is primarily used to improve
 the robustness of electromechanical switches and in error correction protocols.
 In this code, encoding of two successive integers always differs by at most one
 bit, which makes it suitable for application in our algorithm.
 
-The conceptual construction of Gray Code is straightforward. For Gray Code of
-length $1$ we have two binary strings: $0$ and $1$. To obtain all Gray Codes
+The conceptual construction of Gray code is straightforward. For Gray Code of
+length $1$ we have two binary strings: $0$ and $1$. To obtain all Gray codes
 for a given length $N > 1$, we first construct an ordered list of codes of
 length $N-1$ and call it $L$. Then, we reverse the list of codes, and call it
 $H$, an operation called \emph{reflection}. Finally, we prepend $0$ to all
@@ -364,11 +370,41 @@ An important thing to observe is that in our algorithm we need at most two Gray
 Code--encoded numbers at the time to determine the bit to be flipped. The
 reflection--based construction outlined so far would require precomputing a
 large part (if not all) of the encodings at once. Considering the size of the
-state space, this is clearly infeasible. However, there is a
+state space, this is clearly infeasible. However, there exists an explicit formula
+for computing $n$-th Gray code, which reads:
+\begin{equation}
+\mbox{gray}(n) = n \oplus (n >> 1),
+\end{equation}
+where $\oplus$ denotes the bitwise xor operation and $>>$ is right bitshift.
 
-While the construction presented above is useful for explaining the concept of
-the Gray Code, it is not efficient enough to be used in an algorithm. More
-precisely, with this procedure, we would need to use.
+To compute which bit differs between consecutive Gray codes, we can xor them,
+and then find the position of the only set bit in the resulting integer. One can
+easily implement a function that finds the first set bit in a 64-bit integer,
+or use one of the available library or compiler-builtin functions. For instance,
+POSIX--compatible C standard libraries include \texttt{ffsll} function. In CUDA,
+there is a \texttt{\_\_ffsll} function available. For both of the above cases,
+the function counts bits from $1$. Using this convention, we can write a pseudocode
+for a function \texttt{find\_bit\_to\_flip} from listing \ref{lst:grayserial} like in the
+listing \ref{lst:findbit}
+
+\begin{lstlisting}[
+  language=Python,
+  caption={Pseudocode for a function generating bit flips for Gray code construction},
+  captionpos=b,
+  label=lst:findbit,
+  float,
+  floatplacement=H
+]
+def find_bit_to_flip(i): # i starts from 0
+    return ffs(gray(i) ^ gray(i+1))
+\end{lstlisting}
+
+Now that we know how to construct a correct sequence of bit flips, it is time we design
+how to distribute work among CUDA threads, which is what we will do next.
+
+\subsection{Parallelization using GPU}
+The algorithm presented in \ref{lst:gray} is inherently serial. Our task is now to
+parallelize it using GPU.
 
 %%% Local Variables:
 %%% mode: latex
