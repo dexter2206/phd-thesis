@@ -325,11 +325,11 @@ def solve_qubo(F, q):
 \end{lstlisting}
 \begin{enumerate}
   \item How to produce a sequence of $2^{N}-1$ bits such that executing them enumerates
-        all possible states?
+    all possible states?
   \item How to divide work among CUDA threads?
 \end{enumerate}
-The answer to the first question is well--known and involves enumerating integers using
-the Gray code, which we will describe now.
+The answer to the first question is well--known and involves enumerating
+integers using the Gray code, which we will describe now.
 
 \subsection{Gray code}
 When one talks about a binary encoding of integers, the first thing that comes
@@ -370,22 +370,22 @@ An important thing to observe is that in our algorithm we need at most two Gray
 Code--encoded numbers at the time to determine the bit to be flipped. The
 reflection--based construction outlined so far would require precomputing a
 large part (if not all) of the encodings at once. Considering the size of the
-state space, this is clearly infeasible. However, there exists an explicit formula
-for computing $n$-th Gray code, which reads:
+state space, this is clearly infeasible. However, there exists an explicit
+formula for computing $n$-th Gray code, which reads:
 \begin{equation}
-\mbox{gray}(n) = n \oplus (n >> 1),
+  \mbox{gray}(n) = n \oplus (n >> 1),
 \end{equation}
 where $\oplus$ denotes the bitwise xor operation and $>>$ is right bitshift.
 
 To compute which bit differs between consecutive Gray codes, we can xor them,
-and then find the position of the only set bit in the resulting integer. One can
-easily implement a function that finds the first set bit in a 64-bit integer,
-or use one of the available library or compiler-builtin functions. For instance,
-POSIX--compatible C standard libraries include \texttt{ffsll} function. In CUDA,
-there is a \texttt{\_\_ffsll} function available. For both of the above cases,
-the function counts bits from $1$. Using this convention, we can write a pseudocode
-for a function \texttt{find\_bit\_to\_flip} from listing \ref{lst:grayserial} like in the
-listing \ref{lst:findbit}
+and then find the position of the only set bit in the resulting integer. One
+can easily implement a function that finds the first set bit in a 64-bit
+integer, or use one of the available library or compiler-builtin functions. For
+instance, POSIX--compatible C standard libraries include \texttt{ffsll}
+function. In CUDA, there is a \texttt{\_\_ffsll} function available. For both
+of the above cases, the function counts bits from $1$. Using this convention,
+we can write a pseudocode for a function \texttt{find\_bit\_to\_flip} from
+listing \ref{lst:grayserial} like in the listing \ref{lst:findbit}
 
 \begin{lstlisting}[
   language=Python,
@@ -399,13 +399,87 @@ def find_bit_to_flip(i): # i starts from 0
     return ffs(gray(i) ^ gray(i+1))
 \end{lstlisting}
 
-Now that we know how to construct a correct sequence of bit flips, it is time we design
-how to distribute work among CUDA threads, which is what we will do next.
+Now that we know how to construct a correct sequence of bit flips, it is time
+we design parallelization strategy, which is what we will do next.
 
 \subsection{Parallelization using GPU}
-The algorithm presented in \ref{lst:gray} is inherently serial. Our task is now to
-parallelize it using GPU.
+The algorithm presented in \ref{lst:gray} is fully serial. Our task is now to
+parallelize it so that it can be executed on GPU. Unsurprisingly, we will once
+again employ the strategy of dividing each state into a suffix and a prefix
+part. This time, however, it is the suffix that will stay fixed between
+iterations. The prefix part will be updated in each iteration by flipping a
+single bit in Gray code order. The process is illustrated in Fig.
+\ref{fig:grayparallel}.
 
+\begin{figure}
+  \includegraphics[width=\textwidth]{figures/grayparallel}
+  \caption{
+    Parallel processing of $N$--variable QUBO configurations in Gray code order. In
+    our example, suffix length $M=2$, and hence $2^{M}=4$ states are processed in
+    each iteration. Consequently, there are $2^{N-M}=8$ iterations. For this
+    example, we consider a kernel that computes two iterations per kernel
+    invocation, resulting in $2^{N-M}/2 = 4$ kernel invocations total. }
+  \label{fig:grayparallel}
+\end{figure}
+
+Throughout the execution of the algorithm, we maintain four arrays of size
+$2^{M}$. In each array, the $i$-th item always corresponds to the $i$-th
+suffix. The \texttt{best\_states} and \texttt{best\_energies} arrays store the
+best states found so far amongst states with $i$-th suffix. The
+\texttt{current\_states} and \texttt{current\_energies} store configuration and
+corresponding energy of current state being processed for $i$-th suffix. Each
+iteration starts by determining the index of the next bit to be flipped. This
+value is the same for all suffixes. Next, the algorithm computes energy
+difference using the equation \ref{eq:energydiff1} and updates the
+corresponding energy accordingly. After all $2^{N-M}$ iterations, the
+\texttt{best\_states} and \texttt{best\_energies} arrays are used to extract
+the ground state.
+
+It is crucial to note that since we are only interested in finding the ground
+state, we can group several iterations in one kernel invocation. In fact, it is
+entirely possible to implement a kernel that runs all the iterations, which
+would avoid kernel launch overhead. Moreover, such kernel could use
+thread--local variables to store current state and energy instead of using
+global arrays, which would further increase performance. However, as we will
+see further in this chapter, we will propose further optimizations that would
+require us to split the algorithm into several kernel invocations.
+
+\subsection{Further optimizing parallel execution}
+
+There are two optimizations we can make to further reduce the number of
+operations performed in each iteration. Let us first notice, that the only bit
+flips that can happen, do so in the prefix part. Going back to the equation
+\eqref{eq:energydiff1}, we can rewrite the expression for $F(\bq{2})-F(\bq{1})$
+into a sum of two parts:
+\begin{align}
+  F(\bq{2})-F(\bq{1}) = & (1-2\q{1}_{k}) \left(b_{k} + \sum_{i=0,i\ne k}^{N-M-1}a_{ik}\q{1}_{i}\right) + \label{eq:energydiff2} \\
+                        & (1-2\q{1}_{k}) \left(b_{k} + \sum_{i=N-M}^{N-1}a_{ik}\q{1}_{i}\right)\label{eq:energydiff3}
+\end{align}
+Since the first summand \eqref{eq:energydiff2} is independent from the suffix,
+which means that for each of the considered suffixes in any given iteration, it
+has the same value. Since the states in the iteration are processed in parallel
+by GPU threads, we have to either redo the same computation multiple times, or
+use some synchronization mechanism, e.g. compute the prefix in one thread in
+each block and then propagate the result to the whole block through shared
+memory. However, there is a third approach. For each iteration, we compute the
+prefix part of the energy difference using CPU, and then use it as a kernel
+parameter. More precisely, we compute $L$ values of the prefix part of the
+energy difference and pass it to the kernel as an additional array. Since the
+information about which bit to flip is also relevant, we pass the bit sequence
+as another array as well.
+
+As for the \eqref{eq:energydiff3} part, observe that for each given prefix
+there are only $N-M$ possible values of $k$ (again, that's because the bit
+flips happen only in the prefix part, and there are $N-M$ prefix bits).
+However, not all values of $k$ are equally common. Examining the Gray code
+construction (c.f. Fig. \ref{fig:gray}) reveals that the least significant bit
+flips half of times and the second least significant bit flips a quarter of
+times. Generally, for $k=0,\ldots,N-M-1$ the $k$-th bit flips constitutes
+approximately \footnote{Approximately, because there is an odd number of
+  $2^{N-M}$ -1 flips performed, because we do not perform last bit flip which
+  would take us back to $(0,\ldots,0)_2$ prefix.} $1/2^{k+1}$ of times.
+Therefore, we can cache the value of \eqref{eq:energydiff3} for the $K$ most
+commonly--occuring bit flips, where $K$ is a user--controlled parameter.
 %%% Local Variables:
 %%% mode: latex
 %%% TeX-master: "../main"
