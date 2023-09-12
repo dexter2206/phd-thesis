@@ -15,71 +15,162 @@
 \begin{document}
 \begin{tikzpicture}[
     memcell/.style={draw, rectangle, minimum width=0.2cm, minimum height=0.2cm},
-    memarray/.style={minimum width=4cm, fill=white,minimum height=0.5cm, draw},
+    memarray/.style={minimum width=4.5cm, fill=white,minimum height=1cm, draw},
     energies/.style={memarray, nodes={memcell, fill=Energies}},
     rect/.style={minimum height=1cm, fill=Rect, draw, rectangle, align=left},
     decision/.style={draw, align=center, diamond, fill=Decision},
-    every node/.style={font={\footnotesize}},
+    every node/.style={font={\normalsize}},
     brace/.style={decorate,decoration={brace,amplitude=5pt,mirror,raise=1mm}},
     brace2/.style={decorate,decoration={brace,amplitude=5pt,mirror,raise=4mm}},
     subroutine/.style={draw, rounded corners},
     subsubroutine/.style={subroutine,dashed,thick},
-    gpuio/.style={-Latex,dashed}
+    gpuio/.style={-Latex,dashed},
+    baseline=(a)
+  ]
+
+  \node(start) {};
+
+  \node[rect, right=2cm of start] (initialize) {
+    Initialize partial\\differences buffer
+  };
+
+  \node[decision, right=1cm of initialize] (decision)
+  {All prefixes\\processed?};
+
+  \coordinate [above=10cm of decision] (c1);
+
+  \node[rect, right=2cm of c1] (prefix) {Compute next $K$ bit flips and\\prefix parts of energy differences};
+
+  \node[memarray, below=3cm of prefix] (prediffs) {Prefix parts of energy diffs};
+  \draw[gpuio] (prefix) -- (prediffs);
+  \node[memarray, below=1cm of prefix] (flips) {Indices of bits to flip};
+  \draw[gpuio] ($(prefix.south)+(0.5cm,0)$) -- ($(flips.north)+(0.5cm,0)$);
+  \node[memarray, below=5cm of prefix] (pdiffs) {Partial differences buffer};
+
+  \node[memarray, below=7cm of prefix, align=left] (current) {Current states\\Current energies};
+  \draw (current.east) -- (current.west);
+
+  \node[memarray, below=0.5cm of current, align=left] (best) {Best states\\Best energies};
+  \draw (best.east) -- (best.west);
+
+  \coordinate[right=3cm of prefix] (c2);
+
+  \node[
+    subroutine,
+    minimum width=3.5cm,
+    minimum height=8.5cm,
+    right=2cm of flips.north east,
+    anchor=north west
+  ]
+  (kernel)
+  {Kernel};
+
+  \node[rect, below=2cm of decision] (output) {Find ground energy\\and ground state};
+
+
+  \draw[gpuio] (flips.east) -- (flips-|kernel.south west);
+  \draw[gpuio] (prediffs.east) -- (prediffs-|kernel.south west);
+  \draw[gpuio] (pdiffs.east) -- (pdiffs-|kernel.south west);
+  \coordinate (c3) at ($(current.east)!0.5!(current.north east)$);
+  \coordinate (c4) at ($(current.east)!0.5!(current.south east)$);
+
+  \coordinate (c5) at ($(best.east)!0.5!(best.north east)$);
+  \coordinate (c6) at ($(best.east)!0.5!(best.south east)$);
+
+  \draw[gpuio] (c3) -- (c3-|kernel.south west);
+  \draw[gpuio] (c4-|kernel.south west) -- (c4);
+
+  \draw[gpuio] (c5) -- (c5-|kernel.south west);
+  \draw[gpuio] (c6-|kernel.south west) -- (c6);
+
+  \draw[-Latex] (start) -- (initialize)
+  node[midway, above=0.5, align=left]
+  {
+    \textbf{Input:}\\
+    - QUBO $Q$\\
+    - Suffix size $M$\\
+    - CUDA grid definition\\
+    - Number of iterations \\
+      ~~per kernel invocation $K$\\
+    - Partial differences\\
+      ~~buffer depth $L$
+  };
+
+  \draw[-Latex] (initialize) -- (decision);
+  \draw (decision) -- (c1) node[near start, left] {No};
+  \draw[-Latex] (c1) -- (prefix);
+  \draw[gpuio] (initialize) |- (pdiffs);
+  \draw[-Latex] (kernel) |- (decision);
+  \draw[gpuio] (best) |- (output);
+  \draw[-Latex] (decision) -- (output) node[midway, left] {Yes};
+  \draw[-Latex] (prefix) -| (kernel.north);
+
+  \node at (current bounding box.north west) [anchor=south east] (a) {\LARGE \textbf{a.}};
+\end{tikzpicture}
+\hspace{2cm}
+\begin{tikzpicture}[
+memcell/.style={draw, rectangle, minimum width=0.2cm, minimum height=0.2cm},
+    memarray/.style={minimum width=4cm, fill=white,minimum height=0.5cm, draw},
+    energies/.style={memarray, nodes={memcell, fill=Energies}},
+    rect/.style={minimum height=1cm, minimum width=5cm, fill=Rect, draw, rectangle, align=left},
+    decision/.style={draw, align=center, diamond, fill=Decision},
+    every node/.style={font={\normalsize}},
+    brace/.style={decorate,decoration={brace,amplitude=5pt,mirror,raise=1mm}},
+    brace2/.style={decorate,decoration={brace,amplitude=5pt,mirror,raise=4mm}},
+    subroutine/.style={draw, rounded corners},
+    subsubroutine/.style={subroutine,dashed,thick},
+    gpuio/.style={-Latex,dashed},
+    baseline=(b)
     ]
 
-    \node(start) {};
-    \node[rect, right=2cm of start] (initialize) {
-      Initialize partial\\differences buffer
+    \node [rect] (load) {
+      \texttt{ce = current\_energies[s]}\\
+      \texttt{cs= current\_state[s]}\\
+      \texttt{be = best\_energies[s]}\\
+      \texttt{bs = best\_state[s]}\\
+      \texttt{i=0}
+    };
+    \node [rect, below=1cm of load] (loop1) {\texttt{bit = bit\_flips[i]}\\\texttt{diff1 = pref\_diffs[i]}};
+    \node [decision, below=1cm of loop1] (decision) {\texttt{bit < L}};
+    \node [rect, right=2cm of decision] (diff2) {\texttt{diff2 = compute\_suffix\_diff(cs, bit)}};
+    \node [rect, below=1cm of decision] (diff2alt) {
+      \texttt{sign=(2 * (cs >> bit) \& 1) - 1}\\
+      \texttt{diff2 = sign * suffix\_diff\_cache[i]}
+    };
+    \node [rect, below=2cm of diff2alt] (updatecurrent) {\texttt{cs = flip(cs, bit)}\\\texttt{ce = ce + diff1 + diff2}};
+    \node [decision, below=1cm of updatecurrent] (decision2) {\texttt{ce < be}};
+    \node [rect, right=2cm of decision2] (updatebest) {\texttt{cs = flip(cs, bit)}\\\texttt{be = ce + diff1 + diff2}};
+    \node [decision, below=1cm of decision2] (decision3) {\texttt{~i < K~}};
+    \node [rect, left=1cm of decision3] (increment) {\texttt{i = i + 1}};
+    \node [rect, below=1cm of decision3] (update) {
+      \texttt{current\_energies[s] = ce}\\
+      \texttt{current\_state[s] = cs}\\
+      \texttt{best\_energies[s] = be}\\
+      \texttt{best\_state[s] = bs}
     };
 
-    \node[decision, right=1cm of initialize] (decision)
-    {All prefixes\\processed?};
+    \node[
+    fit=(update) (load) (diff2) (increment),
+    draw,
+    inner sep=0.5cm,
+    rounded corners,
+    dashed
+    ] (stridedloop) {};
 
-    \coordinate [above=8cm of decision] (c1);
+    \node[above=2mm of stridedloop] (label) {Strided loop over suffix \texttt{s}};
+    \draw[-Latex] (load) -- (loop1);
+    \draw[-Latex] (loop1) -- (decision);
+    \draw[-Latex] (decision) -- (diff2);
+    \draw[-Latex] (decision) -- (diff2alt);
+    \draw[-Latex] (diff2alt) -- (updatecurrent);
+    \draw[-Latex] (updatecurrent) -- (decision2);
+    \draw[-Latex] (decision2) -- (updatebest);
+    \draw[-Latex] (diff2) |- ($(diff2alt.south)!0.5!(updatecurrent.north)$);
+    \draw[-Latex] (decision2) -- (decision3);
+    \draw[-Latex] (decision3) -- (increment);
+    \draw[-Latex] (increment) |- (loop1);
+    \draw[-Latex] (decision3) -- (update);
 
-    \node[rect, right=2cm of c1] (prefix) {Compute next $L$ bit flips and\\prefix parts of energy differences};
-
-    \node[memarray, below=2cm of prefix] (prediffs) {Prefix parts of energy diffs};
-    \draw[gpuio] (prefix) -- (prediffs);
-    \node[memarray, below=1cm of prefix] (flips) {Indices of bits to flip};
-    \draw[gpuio] ($(prefix.south)+(0.5cm,0)$) -- ($(flips.north)+(0.5cm,0)$);
-    \node[memarray, below=3cm of prefix] (pdiffs) {Partial differences buffer};
-
-    \node[memarray, below=4cm of prefix, align=left] (current) {Current states\\Current energies};
-    \draw (current.east) -- (current.west);
-
-    \node[memarray, below=0.5cm of current, align=left] (best) {Best states\\Best energies};
-    \draw (best.east) -- (best.west);
-
-    \coordinate[right=3cm of prefix] (c2);
-
-    \node[subroutine, minimum width=3cm, minimum height=5.3cm, right=2cm of flips.north east, anchor=north west] (kernel) {Kernel};
-
-    \node[rect, below=2cm of decision] (output) {Find ground energy\\and ground state};
-
-    \draw[gpuio] (flips.east) -- (flips-|kernel.south west);
-    \draw[gpuio] (prediffs.east) -- (prediffs-|kernel.south west);
-    \draw[gpuio] (pdiffs.east) -- (pdiffs-|kernel.south west);
-    \coordinate (c3) at ($(current.east)!0.5!(current.north east)$);
-    \coordinate (c4) at ($(current.east)!0.5!(current.south east)$);
-
-    \coordinate (c5) at ($(best.east)!0.5!(best.north east)$);
-    \coordinate (c6) at ($(best.east)!0.5!(best.south east)$);
-
-    \draw[gpuio] (c3) -- (c3-|kernel.south west);
-    \draw[gpuio] (c4-|kernel.south west) -- (c4);
-
-    \draw[gpuio] (c5) -- (c5-|kernel.south west);
-    \draw[gpuio] (c6-|kernel.south west) -- (c6);
-
-    \draw[-Latex] (start) -- (initialize);
-    \draw[-Latex] (initialize) -- (decision);
-    \draw (decision) -- (c1);
-    \draw[-Latex] (c1) -- (prefix);
-    \draw[gpuio] (initialize) |- (pdiffs);
-    \draw[-Latex] (kernel) |- (decision);
-    \draw[gpuio] (best) |- (output);
-    \draw[-Latex] (decision) -- (output);
-    \draw[-Latex] (prefix) -| (kernel.north);
-  \end{tikzpicture}
+    \node at (current bounding box.north west) [anchor=south east] (b) {\LARGE \textbf{b.}};
+\end{tikzpicture}
 \end{document}
