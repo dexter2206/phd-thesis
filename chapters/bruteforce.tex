@@ -484,6 +484,35 @@ commonly--occuring bit flips, where $K$ is a user--controlled parameter.
 \begin{figure}
 \includegraphics[width=\textwidth]{figures/bruteforcegray}
 \end{figure}
+
+\subsection{Benchmarks}
+
+\begin{figure}
+  \includegraphics[width=\textwidth]{figures/bf_benchmarks_initial}
+  \caption{
+    Benchmarking results for Gray code--based brute force algorithm for finding a ground state
+    of Ising model. The dashed lines between data points are provided for visual guidance. For each
+    system size $N$, the solution times were averaged over 20 different instances with known ground
+    states. Observe that for setups with multiple GPUs and small system sizes, the solution time
+    remains virtually constant. This is because, for small system sizes, the execution time is
+    dominated by tasks related to distributing work and gathering results. The parameters used for
+    benchmarking in each setup are summarized in table \ref{tab:bruteforce-gs-only-table}.
+  }
+  \label{fig:bruteforce-gsonly-benchmarks}
+\end{figure}
+
+\begin{table}[!ht]
+  \tiny
+  \begin{tabular}{|c|c|c|c|c|c|}
+    \hline
+    \multirow{2}{*}{GPU(s)} & \multicolumn{2}{c|}{Kernel launch parameters} & \multicolumn{2}{c|}{Algorithm parameters} & \multirow{2}{*}{\makecell{\# Fixed \\ variables}}\\
+    \cline{2-5}
+     & Block size & Grid size & Suffix size & \makecell{\# Steps per \\ kernel launch} &\\
+    \hline
+  \end{tabular}
+  \caption{Parameters used for benchmarking}
+  \label{tab:bruteforce-gs-only-table}
+\end{table}
 %%% Local Variables:
 %%% mode: latex
 %%% TeX-master: "../main"
