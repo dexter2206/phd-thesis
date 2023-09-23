@@ -482,7 +482,17 @@ Therefore, we can cache the value of \eqref{eq:energydiff3} for the $K$ most
 commonly--occuring bit flips, where $K$ is a user--controlled parameter.
 
 \begin{figure}
-\includegraphics[width=\textwidth]{figures/bruteforcegray}
+  \includegraphics[width=\textwidth]{figures/bruteforcegray}
+  \caption{
+    Schematic representation of the GPU--enabled brute force algorithm for finding
+    ground state of a QUBO problem using Gray codes.
+  }
+  \label{fig:bruteforcegray}
+\end{figure}
+
+\begin{figure}
+  \includegraphics[width=\textwidth]{figures/bruteforcegray2}
+  \caption{Implementation of the strided loop for kernel in fig \ref{fig:bruteforcegray}.}
 \end{figure}
 %%% Local Variables:
 %%% mode: latex
