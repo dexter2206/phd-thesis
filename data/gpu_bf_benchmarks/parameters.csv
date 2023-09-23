@@ -1,0 +1,7 @@
+GPU,suffix_size,partial_diff_buffer_depth,num_threads,num_blocks,max_num_steps_per_kernel,num_fixed_variables
+A10,27,10,512,4096,4096,
+A100,27,10,512,4096,4096,
+A6000,27,10,1024,4096,4096,
+V100x8,27,10,1024,4096,4096,3.0
+DGXH100x8,29,10,1024,8192,8192,3.0
+4090x2,28,10,512,4096,4096,1.0
