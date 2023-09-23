@@ -513,11 +513,23 @@ commonly--occuring bit flips, where $K$ is a user--controlled parameter.
 
 \begin{table}[!ht]
   \tiny
-  \begin{tabular}{|c|c|c|c|c|c|}
+  \begin{tabular}{|l|c|c|c|c|c|}
     \hline
     \multirow{2}{*}{GPU(s)} & \multicolumn{2}{c|}{Kernel launch parameters} & \multicolumn{2}{c|}{Algorithm parameters} & \multirow{2}{*}{\makecell{\# Fixed \\ variables}}\\
     \cline{2-5}
      & Block size & Grid size & Suffix size & \makecell{\# Steps per \\ kernel launch} &\\
+    \hline
+    A10& 512 & 4096 & 27 & 4096 & N/A\\
+    \hline
+    A100& 512 & 4096 & 27 & 4096 & N/A\\
+    \hline
+    A6000 & 1024 & 4096 & 27 & 4096 & N/A\\
+    \hline
+    V100 x8 & 1024 & 4096 & 27 & 4096 & 3\\
+    \hline
+    DGX H100 x8 & 1024 & 8192 & 29 & 8192 & 3\\
+    \hline
+    RTX 4090 x8 & 512 & 4096 & 28 & 4096 & 1\\
     \hline
   \end{tabular}
   \caption{Parameters used for benchmarking}
