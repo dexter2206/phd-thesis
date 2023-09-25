@@ -130,13 +130,14 @@ detail.
   combined integer representation of states in each chunk.
   \begin{table}[ht!]
     \centering
-    \begin{tabular}{c|c|c|c|c|c}
+    \begin{tabular}{|c|c|c|c|c|c|}
       \hline
-      \multicolumn{2}{c|}{Chunk}       &
+      \rowcolor{theader}
+      \multicolumn{2}{|c|}{Chunk}       &
       \multicolumn{2}{c|}{First state} &
-      \multicolumn{2}{c}{Last state}                                                                         \\
+      \multicolumn{2}{c|}{Last state}                                                                         \\
       \hline
-      Index                            & Binary    & Decimal & Binary           & Decimal & Binary           \\
+      \rowcolor{tsubheader} Index                            &  Binary    & Decimal & Binary           & Decimal & Binary           \\
       \hline
       0                                & $(000)_2$ & 0       & $(00000000)_{2}$ & 31      & $(00011111)_{2}$ \\
       1                                & $(001)_2$ & 32      & $(00100000)_{2}$ & 63      & $(00111111)_{2}$ \\
