@@ -496,29 +496,26 @@ commonly--occuring bit flips, where $K$ is a user--controlled parameter.
   \caption{Implementation of the strided loop for kernel in fig \ref{fig:bruteforcegray}.}
 \end{figure}
 
-\subsection{Benchmarks}
+\subsection{Performance evaluation of the optimized algorithm}
 
-\begin{figure}
-  \includegraphics[width=\textwidth]{figures/bf_benchmarks_initial}
-  \caption{
-    Benchmarking results for Gray code--based brute force algorithm for finding a ground state
-    of Ising model. The dashed lines between data points are provided for visual guidance. For each
-    system size $N$, the solution times were averaged over 20 different instances with known ground
-    states. Observe that for setups with multiple GPUs and small system sizes, the solution time
-    remains virtually constant. This is because, for small system sizes, the execution time is
-    dominated by tasks related to distributing work and gathering results. The parameters used for
-    benchmarking in each setup are summarized in table \ref{tab:bruteforce-gs-only-table}.
-  }
-  \label{fig:bruteforce-gsonly-benchmarks}
-\end{figure}
+We performed a preliminary performance evaluation of the Gray code--based algorithm for finding the ground state. For our benchmarks, we used several setups with different Nvidia GPUs. Some setups were equipped with more than one copy of the same GPU. The summary of test setups, as well as capabilities of the used GPUs is presented in table \ref{tab:setups2}.
+
+Since each of the test setups was available to us only for a limited amount of time, we were only able to measure
+execution times for a very limited subset of parameters, and we needed to make some educated guesses. We decided to
+use a constant depth of the prefix differences buffer equal to 10. Depending on the available memory size, we used suffix sizes of 27, 28 and 29. The tested kernel executions grids included blocks of 256, 512 or 1024 threads, and 4096 or 8192 blocks per grid. We also considered 2048, 4096 and 8192 algorithm steps per single kernel execution. The best parameters found for each setup are presented in table \ref{tab:bruteforce-gs-only-table}. We would like to stress out,  however, that such a coarse--grained process of parameter tuning does not guarantee their global optimality. Further
+parameter tuning could be achieved by searching through a finer grid of parameters, possibly combined with profiling.
+Lastly, for multi-GPU setups, we solved each instance by distributing the work equally between GPUs by splitting the problem into chunks of equal size. The splitting was done by constructing new QUBOs by fixing the values of $l$ variables, resulting in $2^{l}$ total subproblems.
+
+The figure Fig. \ref{fig:bruteforce-gsonly-benchmarks} shows the results of our benchmarks. Observe that for multi-GPU setups and system sizes $N \le 40$, the execution time is almost constant. This is because the time presented on the graph factors in the time of scattering work among GPUs and gathering the results, which for small system sizes dominates the actual solver execution times. Aside from these plateaus, as expected, the graphs of measured solution times
+resemble exponential curves. On the setup with eight DGX H100 GPUs, the optimized code was able to find the ground state of instances with system size $N=50$ in less than 5 minutes.
 
 \begin{table}[!ht]
-  \tiny
+  \footnotesize
   \begin{tabular}{|l|c|c|c|c|c|}
     \hline
-    \multirow{2}{*}{GPU(s)} & \multicolumn{2}{c|}{Kernel launch parameters} & \multicolumn{2}{c|}{Algorithm parameters} & \multirow{2}{*}{\makecell{\# Fixed \\ variables}}\\
-    \cline{2-5}
-     & Block size & Grid size & Suffix size & \makecell{\# Steps per \\ kernel launch} &\\
+    \cellcolor{theader}  & \multicolumn{2}{c|}{\cellcolor{theader} Kernel launch parameters} & \multicolumn{2}{c|}{\cellcolor{theader}Algorithm parameters} & \cellcolor{theader}\\
+    \hhline{~----~}
+     \cellcolor{theader} \multirow{-2}{*}{\cellcolor{theader} GPU(s)}& \cellcolor{tsubheader} Block size & \cellcolor{tsubheader} Grid size & \cellcolor{tsubheader} Suffix size & \cellcolor{tsubheader} \makecell{\# Steps per \\ kernel launch} & \multirow{-2}{*}{\cellcolor{theader} \makecell{\# Fixed \\ variables}}\\
     \hline
     A10& 512 & 4096 & 27 & 4096 & N/A\\
     \hline
@@ -536,6 +533,22 @@ commonly--occuring bit flips, where $K$ is a user--controlled parameter.
   \caption{Parameters used for benchmarking}
   \label{tab:bruteforce-gs-only-table}
 \end{table}
+
+\begin{figure}
+  \includegraphics[width=\textwidth]{figures/bf_benchmarks_initial}
+  \caption{
+    Benchmarking results for Gray code--based brute force algorithm for finding a ground state
+    of Ising model. The dashed lines between data points are provided for visual guidance. For each
+    system size $N$, the solution times were averaged over 20 different instances with known ground
+    states. Observe that for setups with multiple GPUs and small system sizes, the solution time
+    remains virtually constant. This is because, for small system sizes, the execution time is
+    dominated by tasks related to distributing work and gathering results. The parameters used for
+    benchmarking in each setup are summarized in table \ref{tab:bruteforce-gs-only-table}.
+  }
+  \label{fig:bruteforce-gsonly-benchmarks}
+\end{figure}
+
+
 %%% Local Variables:
 %%% mode: latex
 %%% TeX-master: "../main"
