@@ -1,0 +1,15 @@
+\documentclass{standalone}
+
+\usepackage{tikz}
+\usepackage{pgfplots}
+
+\begin{document}
+
+\begin{tikzpicture}
+  \begin{axis}[width=10cm, height=5cm,ymode=log, ]
+    \addplot[ybar, bar width=0.1]
+    table [x=energy, y=count, col sep=comma] {../data/Qfile_short_15.0_7_new_summary.csv};
+  \end{axis}
+\end{tikzpicture}
+
+\end{document}
