@@ -1,0 +1,76 @@
+\documentclass{standalone}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usetikzlibrary{plotmarks}
+
+\colorlet{A10}{Melon!70}
+\colorlet{A100}{SkyBlue!70}
+\colorlet{A6000}{Orchid!70}
+\colorlet{4090x2}{LimeGreen}
+\colorlet{DGXH100x8}{Magenta}
+\colorlet{V100x8}{NavyBlue}
+
+\begin{document}
+
+\begin{tikzpicture}[
+    result/.style={dashed, ultra thick, mark size=3pt, mark options={solid}},
+    level/.style={dashed, mark=none}
+  ]
+
+  \begin{axis}
+    [
+      name=main,
+      ymode=log,
+      width=18cm,
+      height=10cm,
+      legend style={at={(0.01,0.99)}, anchor=north west},
+      legend cell align={left},
+      xlabel={System size $N$},
+      ylabel={Mean solve time [$s$]},
+      xmin=30,
+      xmax=54,
+      xtick={32, 34, 36, 38, 40, 42, 44, 46, 48, 50}
+    ]
+
+    \addplot[color=A10, mark=*, result]
+    table [x=N, y=solve_time_in_seconds, col sep=comma]
+      {../data/gpu_bf_benchmarks/A10-best.csv};
+
+    \addplot[color=A100, mark=square*, result]
+    table [x=N, y=solve_time_in_seconds, col sep=comma]
+      {../data/gpu_bf_benchmarks/A100-best.csv};
+
+    \addplot[color=A6000, mark=triangle*, result]
+    table [x=N, y=solve_time_in_seconds, col sep=comma]
+      {../data/gpu_bf_benchmarks/A6000-best.csv};
+
+    \addplot[color=4090x2, mark=o, result]
+    table [x=N, y=solve_time_in_seconds, col sep=comma]
+      {../data/gpu_bf_benchmarks/4090x2-best.csv};
+
+    \addplot[color=DGXH100x8, mark=square, result]
+    table [x=N, y=solve_time_in_seconds, col sep=comma]
+      {../data/gpu_bf_benchmarks/DGXH100x8-best.csv};
+
+    \addplot[color=V100x8, mark=triangle, result]
+    table [x=N, y=solve_time_in_seconds, col sep=comma,]
+      {../data/gpu_bf_benchmarks/V100x8-best.csv};
+
+    \addplot[level] coordinates {(30, 1) (56, 1)};
+    \addplot[level] coordinates {(30, 10) (56, 10)};
+    \addplot[level] coordinates {(30, 60) (56, 60)};
+    \addplot[level] coordinates {(30, 600) (56, 600)};
+    \addplot[level] coordinates {(30, 1800) (56, 1800)};
+
+    \node[anchor=south east] at (axis cs: 54,1) {1 second};
+    \node[anchor=south east] at (axis cs: 54,10) {10 seconds};
+    \node[anchor=south east] at (axis cs: 54,60) {1 minute};
+    \node[anchor=south east] at (axis cs: 54,600) {10 minutes};
+    \node[anchor=south east] at (axis cs: 54,1800) {30 minutes};
+
+    \legend{A10,A100,A6000,GTX 4090 x2,DGXH100 x8,V100 x8}
+  \end{axis}
+\end{tikzpicture}
+
+\end{document}
