@@ -77,14 +77,14 @@ Here, $\mathbf{s_c}$ collects all spins in a given cluster, and $\mathbf{s_c}^l$
     \label{fig:quasi2d}
 \end{figure}
 We start off by representing the probability distribution $\exp[-\beta H(\mathbf{s})]$ using a PEPS-equivalent tensor network.
-Contracting the network can give probability of any full configuration, as well as marginal probabilities
+Contracting the network can give the probability of any full configuration, as well as marginal probabilities
 
 \begin{equation}
     p(s_1, s_2, \ldots, s_k) \sim \tr[\mathcal{P}_{(s_1, \ldots, s_k)} e^{-\beta H(\mathbf{s})}]
 \end{equation}
 Here, $\mathcal{P}_{(s_1, \ldots, s_k)}$ is a projector on the subspace with a given configuration $(s_1, \ldots, s_k)$.
 \todo[inline,color=SkyBlue]{Write marginal probability using conditional probability, show that this depends only on the boundary and not the whole searched configuration}
-To this end, with each cluster we associate a tensor
+To this end, with each cluster, we associate a tensor
 \begin{equation}
 A^{\mathbf{s_c}}_{\mathbf{lrud}} = e^{-\beta H(\mathbf{s_c})} B^{\mathbf{s_c}^l}_\mathbf{l}C^{\mathbf{s_c}^r}_\mathbf{r}B^{\mathbf{s_c}^u}_\mathbf{u}C^{\mathbf{s_c}^d}_\mathbf{d}
 \end{equation}
