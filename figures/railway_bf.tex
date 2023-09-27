@@ -1,14 +1,38 @@
 \documentclass{standalone}
-
+\usepackage[dvipsnames]{xcolor}
 \usepackage{tikz}
 \usepackage{pgfplots}
+
+\pgfplotsset{
+    discard if not/.style 2 args={
+        x filter/.code={
+            \edef\tempa{\thisrow{#1}}
+            \edef\tempb{#2}
+            \ifx\tempa\tempb
+            \else
+                \def\pgfmathresult{inf}
+            \fi
+        }
+    }
+}
 
 \begin{document}
 
 \begin{tikzpicture}
-  \begin{axis}[width=10cm, height=5cm,ymode=log, ]
-    \addplot[ybar, bar width=0.1]
-    table [x=energy, y=count, col sep=comma] {../data/Qfile_short_15.0_7_new_summary.csv};
+  \begin{axis}[width=10cm, height=5cm,ymode=log]
+    \addplot[ybar, color=PineGreen, bar width=0.35, discard if not={color}{g}]
+    table [
+    x=energy,
+    y=count,
+    col sep=comma
+    ] {../data/Qfile_1.csv};
+
+    \addplot[ybar, color=RubineRed, bar width=0.35, discard if not={color}{r}]
+    table [
+    x=energy,
+    y=count,
+    col sep=comma
+    ] {../data/Qfile_1.csv};
   \end{axis}
 \end{tikzpicture}
 
