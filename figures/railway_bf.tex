@@ -16,24 +16,99 @@
     }
 }
 
+\newcommand{\barwidth}{1}
+
 \begin{document}
 
 \begin{tikzpicture}
-  \begin{axis}[width=10cm, height=5cm,ymode=log]
-    \addplot[ybar, color=PineGreen, bar width=0.35, discard if not={color}{g}]
+  \begin{axis}[
+    width=10cm,
+    height=5cm,
+    ymode=log,
+    xmin=-9.4,
+    xmax=-6.6,
+    tick pos=left,
+    tick align=outside,
+    grid=minor,
+    grid style={line width=.1pt, draw=gray!70},
+    legend style={at={(0.05,0.95)}, anchor=north west},
+    xlabel=Energy,
+    ylabel=Count
+    ]
+    \addplot[
+      ybar,
+      color=PineGreen,
+      fill=PineGreen!50,
+      bar width=\barwidth,
+      discard if not={color}{g},
+      area legend
+    ]
     table [
-    x=energy,
-    y=count,
-    col sep=comma
-    ] {../data/Qfile_1.csv};
+        x=energy,
+        y=count,
+        col sep=comma
+      ] {../data/Qfile_1.csv};
 
-    \addplot[ybar, color=RubineRed, bar width=0.35, discard if not={color}{r}]
+    \addplot[
+      ybar,
+      color=RubineRed,
+      fill=RubineRed!50,
+      bar width=\barwidth,
+      discard if not={color}{r},
+      area legend
+    ]
     table [
-    x=energy,
-    y=count,
-    col sep=comma
-    ] {../data/Qfile_1.csv};
+        x=energy,
+        y=count,
+        col sep=comma
+      ] {../data/Qfile_1.csv};
+
+    \legend{Feasible, Infeasible};
   \end{axis}
 \end{tikzpicture}
+%
+\begin{tikzpicture}
+  \begin{axis}[
+    width=10cm,
+    height=5cm,
+    ymode=log,
+    tick pos=left,
+    tick align=outside,
+    grid=minor,
+    grid style={line width=.1pt, draw=gray!70},
+    legend style={at={(0.05,0.95)}, anchor=north west},
+    xlabel=Energy,
+    ylabel=Count
+    ]
+    \addplot[
+      ybar,
+      color=PineGreen,
+      fill=PineGreen!50,
+      bar width=\barwidth,
+      discard if not={color}{g},
+      area legend
+    ]
+    table [
+        x=energy,
+        y=count,
+        col sep=comma
+      ] {../data/Qfile_2.csv};
 
+    \addplot[
+      ybar,
+      color=RubineRed,
+      fill=RubineRed!50,
+      bar width=\barwidth,
+      discard if not={color}{r},
+      area legend
+    ]
+    table [
+        x=energy,
+        y=count,
+        col sep=comma
+      ] {../data/Qfile_2.csv};
+
+    \legend{Feasible, Infeasible};
+  \end{axis}
+\end{tikzpicture}
 \end{document}
