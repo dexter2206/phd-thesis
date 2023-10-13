@@ -1,414 +1,484 @@
 \chapter{Application to railway conflict management}
 
-As the last point in the thesis, in this chapter we describe how the results presented so far can be
-applied in the field of operational research. Namely, we propose an approach to solving the railway
-dispatching problem using quantum annealing. We benchmark the implementation of our algorithm on the
-current generation of D-Wave annealers, using solutions obtained via tensor networks and exhaustive
-search as a baseline for comparison.
-
+As the last point in the thesis, in this chapter we describe how the results
+presented so far can be applied in the field of operational research. Namely,
+we propose an approach to solving the railway dispatching problem using quantum
+annealing. We benchmark the implementation of our algorithm on the current
+generation of D-Wave annealers, using solutions obtained via tensor networks
+and exhaustive search as a baseline for comparison.
 
 \section{Overview of the problem}
-We will consider a part of a railway network, which we will simply refer to as a
-\emph{network}. The network is divided into \emph{block sections} or simply \emph{blocks}.
-In our approach, we focused only on the single--track railways, which means that the network
-can only comprise the following types of blocks:
+We will consider a part of a railway network, which we will simply refer to as
+a \emph{network}. The network is divided into \emph{block sections} or simply
+\emph{blocks}. In our approach, we focused only on the single--track railways,
+which means that the network can only comprise the following types of blocks:
 \begin{itemize}
   \item \emph{Line blocks}, or \emph{single tracks}, sections that can be occupied by one train
-        at a time.
+    at a time.
   \item \emph{Sidings}, or \emph{parallel tracks} (occurring e.g. at stations). At the sidings,
-        trains passing in the same direction can meet--and--overtake (M--O), and trains passing
-        in the opposite directions can meet--and--pass (M--P). Each siding comprises two or more
-        tracks, each of which can also be occupied by one train at a time. When appropriate, the
-        sidings occurring at the stations will be called \emph{station blocks}.
+    trains passing in the same direction can meet--and--overtake (M--O), and trains passing
+    in the opposite directions can meet--and--pass (M--P). Each siding comprises two or more
+    tracks, each of which can also be occupied by one train at a time. When appropriate, the
+    sidings occurring at the stations will be called \emph{station blocks}.
 \end{itemize}
 Fig. \ref{fig:railway-network} shows an example network.
 
 \begin{figure}[ht]
   \includegraphics[width=\textwidth]{figures/example_line}
   \caption{
-    An example network. Sections $2, 3, 4$ and $6$ are \emph{line blocks}, while sections $1$ and
-    $5$ are \emph{sidings} with respectively $4$ and $2$ tracks. Rectangles represent platforms.
-    Circles represent points where a line block and a siding join (white) or where two line blocks
-    join (blue). Superscripts denote tracks within a siding.
-  }
-  \label{fig:railway-network}
+    An example network. Sections $2, 3, 4$ and $6$ are \emph{line blocks}, while
+    sections $1$ and $5$ are \emph{sidings} with respectively $4$ and $2$ tracks.
+    Rectangles represent platforms. Circles represent points where a line block and
+    a siding join (white) or where two line blocks join (blue). Superscripts denote
+    tracks within a siding. } \label{fig:railway-network}
 \end{figure}
 
-The trains move through the network according to a \emph{timetable}. It is assumed that this
-timetable is conflict-free. That is, at any time no two trains occupy the same block section, except
-possibly at sidings, where the number of trains cannot exceed the number of tracks in the siding.
+The trains move through the network according to a \emph{timetable}. It is
+assumed that this timetable is conflict-free, i.e. at any time no two trains
+occupy the same track.
 
-Now, suppose the network is affected by a disturbance, which prevented some trains from running
-according to their original timetable. Examples of possible disturbances include, but are not
-limited to, a malfunction of one or more trains or a malfunction of railway tracks. After the
-disturbance, some trains occupy different parts of the networks than they are supposed to.
-Resuming operations according to the original timetable might not be
-possible. First of all, some trains might already be delayed too much to be physically able to
-follow the timetable. Secondly, trying to closely follow the timetable after the disturbance
-might generate conflicts. Hence, a new, conflict--free timetable has to be promptly created.
-Preferably, this new timetable should, in some sense, minimize the resulting delays.
+Now, suppose the network is affected by a disturbance, which has prevented some
+trains from running according to their original timetable. Examples of possible
+disturbances include, but are not limited to, a malfunction of one or more
+trains or a malfunction of railway tracks. After the disturbance, some trains
+occupy different parts of the networks than they are supposed to and resuming
+operations according to the original timetable might not be possible. First of
+all, some trains might already be delayed too much to be physically able to
+follow the timetable. Secondly, trying to closely follow the timetable after
+the disturbance might generate conflicts. Hence, a new, conflict--free
+timetable has to be promptly created. Preferably, this new timetable should, in
+some sense, minimize the resulting delays.
 
+Let us observe that independently from the algorithm for constructing a new
+timetable, some delays after the disturbance might be inevitable, e.g. due to
+engineering or even physical limits. For instance, if a train has been broken
+for some time, it can only follow the timetable if it is not already late and
+it can make up for the time it already lost -- and this can only happen if it
+can reach a sufficiently large speed. If this is not the case, the train will
+be necessarily delayed. Moreover, by taking into account the maximum speed with
+which the trains can move through each section, one can calculate the lower
+bounds on how much the train will be delayed at each station. These lower
+bounds are known as unavoidable, or \emph{primary}, delays.
 
-Let us observe that even with the best possible algorithm for constructing a new timetable, some
-delays after the disturbance might be inevitable, e.g. due to engineering or even physical limits.
-For instance, if a train has been broken for some time, it can only follow the timetable if it
-is not already late and it can make up for the time it already lost -- and this can only happen
-if it can reach a sufficiently large speed. If this is not the case, the train will be necessarily
-delayed. Moreover, by taking into account the maximum speed with which the trains can move
-through each section, one can calculate the lower bounds on how much the train will be delayed
-at each station. These lower bounds are known as unavoidable, or \emph{primary}, delays.
+In the ideal case, if all the trains could travel at their maximum speed, all
+trains would be delayed only by their primary delays and there would be nothing
+to optimize. However, it might not always be possible. Suppose for instance,
+that two trains going in the same direction are already delayed at a station
+neighboring a line block. From each train's perspective, the optimal solution
+is to start its route immediately when possible. However, as only one of them
+can do this because a line block can only be occupied by one train at a time.
+Hence, at least one of these two trains will have a delay larger than the
+primary one. What is important is that this additional delay is not a
+consequence of some physical or engineering limitations, but rather a
+consequence of the dispatcher's decision made to avoid a potential conflict.
+All such delays are called the \emph{secondary} delays and, unlike the primary
+ones, they are subject to optimization.
 
-In the ideal case, if all the trains could travel at their maximum speed, the overall delay
-would be equal to the sum of all primary delays and there would be nothing to optimize. However,
-it might not always be possible. Suppose for instance, that two trains going in the same
-direction are already delayed at a station neighboring a line block. From each train's perspective,
-the optimal solution is to start its route immediately when possible. However, only one of them
-can do this because a line block can only be occupied by one train at a time. Hence, at least
-one of these two trains will have a delay larger than the primary one. What is important is that
-this additional delay is not a consequence of some physical or engineering limitations, but rather
-a consequence of the dispatcher's decision. All such delays are called the \emph{secondary} delays
-and, unlike the primary ones, they are subject to optimization.
+The distinction between primary and secondary delays might seem artificial at
+first, but it has profound consequences. Namely, when constructing a function
+to be minimized we only need to take into account the secondary delays. For
+instance, we might want to minimize their total sum or their weighted sum, with
+weights corresponding to the trains' priorities.
 
-The distinction between primary and secondary delays might seem
-artificial at first, but it has profound consequences. Namely, when constructing a function to
-be minimized we only need to take into account the secondary delays. For instance, we might
-want to minimize their total sum or their weighted sum, with weights corresponding to the trains'
-priorities.
-
-Our high--level description of the problem needs now a mathematical formulation. We start by
-describing the details of the network model in the next section.
+Our high--level description of the problem needs now a mathematical
+formulation. We start by describing the details of the network model in the
+next section.
 
 \section{The delay representation}
-Before we can formulate the optimization problem to be run on D-Wave, we need first to
-formally describe the railway model. The first idea that comes to mind is to define
-quantities corresponding to departure and arrival times of each train and relevant
-station blocks, and express all other quantities in the model in terms of their
-difference with respect to the times found in the original timetable. However, as we
-will soon see, one can almost completely forget about arrival and departure times,
-and instead express all qunatities in the model using delays. Moreover, we will
-further simplify our model by assuming all secondary delays are integers falling into
-some finite range.
+Before we can formulate the optimization problem to be run on D-Wave, we need
+first to formally describe the railway model. The first idea that comes to mind
+is to define quantities corresponding to departure and arrival times of each
+train and relevant station blocks, and express all other quantities in the
+model in terms of their difference with respect to the times found in the
+original timetable. However, as we will soon see, one can almost completely
+forget about arrival and departure times, and instead express all qunatities in
+the model using delays. Moreover, we will further simplify our model by
+assuming all secondary delays are integers falling into some finite range.
 
-The set of all trains will be denoted by $\JJ$. This set is naturally partitioned into
-the set $\JJ_0$ of trains going into one direction and the set $\JJ_1$ of trains going
-into the opposite direction. This is a proper partition, i.e.:
+The set of all trains will be denoted by $\JJ$. This set is naturally
+partitioned into the set $\JJ_0$ of trains going into one direction and the set
+$\JJ_1$ of trains going into the opposite direction. This is a proper
+partition, i.e.:
 \begin{equation}
-	\JJ_0 \cup \JJ_1 = \JJ \quad \JJ_0 \cap \JJ_1 = \emptyset
+  \JJ_0 \cup \JJ_1 = \JJ \quad \JJ_0 \cap \JJ_1 = \emptyset
 \end{equation}
-For any train $j \in \JJ$ its route is a sequence of blocks. Our model forbids recirculation,
-i.e. each train passes every block in its route exactly once. Furthermore, we assume that each train
-starts and ends its route at some station, and its route is uniquely identified by a sequence of
-station blocks $\left(s_{j,1}, s_{j, 2}, \ldots, s_{j, \text{end}_j}\right)$, i.e., there
-are no alternative routes between any two stations. For convenience, we will denote the station
-block preceding $s_{j,k}$ in a given train's route by $\pi(s_{j,k})$ and the station block succeeding
-it by $\rho(s_{j,k})$:
+For any train $j \in \JJ$ its route is a sequence of blocks. Our model forbids
+recirculation, i.e. each train passes every block in its route exactly once.
+Furthermore, we assume that each train starts and ends its route at some
+station, and its route is uniquely identified by a sequence of station blocks
+$\left(s_{j,1}, s_{j, 2}, \ldots, s_{j, \text{end}_j}\right)$, i.e., there are
+no alternative routes between any two stations. For convenience, we will denote
+the station block preceding $s_{j,k}$ in a given train's route by
+$\pi(s_{j,k})$ and the station block succeeding it by $\rho(s_{j,k})$:
 \begin{align}
-	\pi(s_{j,k})  & = s_{j,k-1} \quad \mbox{for } 2 \le k \le \mbox{end}_j      \\
-	\rho(s_{j,k}) & = s_{j,k+1} \quad \mbox{for } 1 \le k \le \mbox{end}_j - 1.
+  \pi(s_{j,k})  & = s_{j,k-1} \quad \mbox{for } 2 \le k \le \mbox{end}_j      \\
+  \rho(s_{j,k}) & = s_{j,k+1} \quad \mbox{for } 1 \le k \le \mbox{end}_j - 1.
 \end{align}
-We will denote the time at which the train $j$ should leave the block $s$ according to the original
-timetable by $\ttout(j, s)$. Similarly, the time at which the train $j$ is supposed to leave block $s$
-will be denoted by $\ttin(j, s)$. In our model, we assume that the time at which a train leaves one
-block is precisely the same as the time it enters the next block, i.e.
+We will denote the time at which the train $j$ should leave the block $s$
+according to the original timetable by $\ttout(j, s)$. Similarly, the time at
+which the train $j$ is supposed to leave block $s$ will be denoted by $\ttin(j,
+  s)$. In our model, we assume that the time at which a train leaves one block is
+precisely the same as the time it enters the next block, i.e.
 \begin{equation}
-	\ttout(j, s) = \ttin(j, \rho_j(s))
+  \ttout(j, s) = \ttin(j, \rho_j(s))
 \end{equation}
-It is clear that the original timetable determines how long it takes for a train $j$ to travel
-through a given block $s$. We call this time the passage time, denoted by $\pt(j, s)$
+It is clear that the original timetable determines how long it takes for a
+train $j$ to travel through a given block $s$. We call this time the passage
+time, denoted by $\pt(j, s)$
 \begin{equation}
-	\pt(j, s) = \ttout(j, s) - \ttin(j, s)
+  \pt(j, s) = \ttout(j, s) - \ttin(j, s)
 \end{equation}
-An important observation is that passage times defined by the timetable may not be the minimum physically
-achievable passing times $\pmin(j, s)$. In other words, for each train $j$ and block $s$ there
-exists a time reserve
+An important observation is that passage times defined by the timetable may not
+be the minimum physically achievable passing times $\pmin(j, s)$. In other
+words, for each train $j$ and block $s$ there exists a time reserve
 \begin{equation}
-	\label{eq:pt}
-	0 \le \alpha(j, s) = \pt(j, s) - \pmin(j, s)
+  \label{eq:pt}
+  0 \le \alpha(j, s) = \pt(j, s) - \pmin(j, s)
 \end{equation}
-This time reserve will become important when discussing the propagation of the primary delays.
+This time reserve will become important when discussing the propagation of the
+primary delays.
 
 \subsection{Delay representation}
-Suppose the disturbance happened, resulting in some trains not being able to meet the schedule.
-Hence, the actual leaving and arrival times (denoted by $\tout$ and $\tin$) differ from the
-scheduled ones. The delay $d(j, s)$ of the train $j$ at block $s$ is defined as the difference
+Suppose the disturbance happened, resulting in some trains not being able to
+meet the schedule. Hence, the actual leaving and arrival times (denoted by
+$\tout$ and $\tin$) differ from the scheduled ones. The delay $d(j, s)$ of the
+train $j$ at block $s$ is defined as the difference
 \begin{equation}
-	\label{eq:djs}
-	d(j, s) \coloneqq \tout(j, s) - \ttout(j, s) = \tin(j, \rho(s)) - \ttin(j, \rho(s)).
+  \label{eq:djs}
+  d(j, s) \coloneqq \tout(j, s) - \ttout(j, s) %= \tin(j, \rho(s)) - \ttin(j, \rho(s)).
 \end{equation}
 As already mentioned, $d(j, s)$ can be expressed as a sum
 \begin{equation}
-	d(j, s) = d_U(j, s) + d_S(j, s)
+  d(j, s) = d_U(j, s) + d_S(j, s)
 \end{equation}
-where $d_U$ denotes the primary (or unavoidable) delay, and $d_S$ denotes the secondary delay.  In
-the absence of time reserve, one would simply have $d_U(j, s) = d_U(j, s')$ for a given train $j$
-and blocks $s$ and $s'$ on its route. However, the time reserve allows
+where $d_U$ denotes the primary (or unavoidable) delay, and $d_S$ denotes the
+secondary delay. In the absence of time reserve, one would simply have $d_U(j,
+  s) = d_U(j, s')$ for a given train $j$ and blocks $s$ and $s'$ on its route.
+However, the time reserve allows to somewhat compensate the delays
 \begin{equation}
-	d_U(j, \rho(s)) = \max\{0, d_U(j, s) - \alpha(j, \rho(s))\}
+  d_U(j, \rho(s)) = \max\{0, d_U(j, s) - \alpha(j, \rho(s))\}
 \end{equation}
 
-The secondary delays can be, in principle, arbitrary large. However, it is convenient to assume that
-all secondary delays for the train $j$ are bound from above by some constant $d_{\max}(j)$. One can find
-a reasonable upper bound by running some fast heuristic or determine it manually (e.g. there might
-be an \emph{a priori} established maximum allowable delay of the train). Henceforth, we will consider
-$d_{\max}(j)$ to be a parameter of the model. With this assumption, we have the following upper and
-lower bound on the overall delay
+The secondary delays can be, in principle, arbitrary large. However, it is
+convenient to assume that all secondary delays for the train $j$ are bound from
+above by some constant $d_{\max}(j)$. One can find a reasonable upper bound by
+running some fast heuristic or determine it manually (e.g. there might be an
+\emph{a priori} established maximum allowable delay of the train). Henceforth,
+we will consider $d_{\max}(j)$ to be a parameter of the model. With this
+assumption, we have the following upper and lower bound on the overall delay
 \begin{equation}
-	d_U(j, s) \le d(j, s) \le d_U(j, s) + d_{\max}(j).
+  d_U(j, s) \le d(j, s) \le d_U(j, s) + d_{\max}(j).
 \end{equation}
-In our model, we will treat $d_{\max}(j)$ as a parameter.
+
+\section{Discretizing delays}
+Formulation of the problem presented so far can facilitate the construction of
+a linear, constrained model of the dispatching problem. However, since the
+secondary delay values are continuous variables, such a model would not be
+compatible with the quantum annealer. We circumvent this issue by discretizing
+the delays. One way to do it is to require that all secondary delays are natural
+numbers, i.e.
+\begin{equation}
+  \forall_{j \in \JJ} \forall_{s \in S_{j}}\quad  d_{s}(j, s) \in \{0, 1, \ldots, d_{\max}(j)\}.
+\end{equation}
+As a consequence, the total delays get discretized as well. We will denote the
+set of possible values for $d(j, s)$ by $A_{j, s}$, i.e.
+\begin{equation}
+  A_{j, s} \coloneq \{d_{U}(j, s), d_{U}(j, s) + 1, \ldots, d_{U}(j, s) + d_{\max}(j)\}.
+\end{equation}
+Notice that this discretization is not particularly restrictive, as timetables
+typically have a finite resolution of minutes anyway.
+
+We can now use one--hot encoding for $d(j, s)$ and introduce binary variables
+$x_{s, j, m}$:
+
+\begin{equation}
+  \label{eq:onehotconstraint}
+  \forall_{j \in \JJ}\forall_{s \in S_{j}} \forall_{m \in A_{j, s}} \quad x_{s,j,m} = \begin{cases}
+    1, & d(j, s) = m      \\
+    0, & \mbox{otherwise}
+  \end{cases}.
+\end{equation}
+Naturally, possible values for $d(j, s)$ are mutually exclusive, which can be expressed as
+the following constraint:
+\begin{equation}
+  \forall_{j \in \JJ}\forall_{s \in S_{j}} \sum_{m \in A_{j, s}} x_{s, j, m} = 1
+\end{equation}
+As for the cost function, we decided to use a simple weighted sum of the delays, i.e. the
+cost function of the form
+\begin{equation}
+  \label{eq:qubo:cost}
+  f(\mathbf{x}) = \sum_{j \in \mathcal{J}}\sum_{s \in S^{*}_{j}}\sum_{m \in A_{j,s}} w(s,j,m) \cdot x_{j,s,m},
+\end{equation}
+For instance, choosing $w(s, j, m)=m$ would result in an objective of minimizing the sum of all
+delays. In general, however, one could take into account the relative importance of the
+trains, as we will describe later when introducing the real railway sections considered in our research.
 
 \section{Dispatching conditions}
-Now that we established the necessary notation, let us discuss some constraints that our model has to obey.\\
-\textbf{The minimum passing time condition.} A train cannot travel through a block faster than the corresponding minimum passing time
+The cost function \eqref{eq:cost} together with constraint \eqref{eq:onehotconstraint} is not enough to
+construct a meaningful optimization problem. We also have to take into account other constraints stemming
+from dispatching conditions. For instance, we cannot allow a schedule in which two trains occupy the
+same track at the same time. We will address these additional dispatching conditions next.
+
+\subsection{The minimum passing time condition.}
+Train cannot travel through a block faster than the corresponding minimum
+passing time
 \begin{equation}
-	\label{eq:dc1}
-	\tout(j, s) \ge \tin(j, s) + \pmin(j, s).
+  \label{eq:dc1}
+  \tout(j, s) \ge \tin(j, s) + \pmin(j, s).
 \end{equation}
-Using \eqref{eq:djs} and \eqref{eq:pt} one can easily verify that \eqref{eq:dc1} is equivalent to
+Using \eqref{eq:djs} and \eqref{eq:pt} one can easily verify that
+inequality \eqref{eq:dc1} is equivalent to
 \begin{equation}
   \label{eq:passingtime}
-	d(j, \rho(s)) \ge d(j, s) - \alpha(j, s, \rho(s)).
-\end{equation}\\
-\textbf{The single block occupation condition.} Two trains cannot occupy the same part of a single
+  d(j, \rho(s)) \ge d(j, s) - \alpha(j, s, \rho(s)).
+\end{equation}
+In binary variables, it means that if, for a fixed $j,s,m$, the $x_{j,s,m}=1$, then delays
+$d(j,s)$ smaller than $m-\alpha(j, s, \rho_j(s))$ are prohibited and thus the corresponding
+  variables have to zero out. Hence, we arrive at the following condition:
+\begin{equation}
+  \label{eq:qubo:passingtime}
+  \forall_{j} \forall_{s \in S_j \setminus \{s_{{j,\text{end}}}\}}
+  \sum_{d \in A_{j,s}}
+  \left(
+  \sum_{ d' \in D(d) \cap A_{j, \rho_j(s)}} x_{j, s, d}
+  x_{j, \rho_j(s), d'} \right) = 0,
+\end{equation}
+where $D(d) = \{0, 1, \ldots, d - \alpha(j, s, \rho_j(s)) -1\}$.
+\subsection{The single block occupation condition.}
+Two trains cannot occupy the same part of a single
 railway track. Consider two trains, $j, j' \in \JJ_0$ leaving the same station $s$ in the direction
 of the next station block $\rho_j(s)$. Suppose further that the train $j$ leaves first. i.e.
-$\tout(j's) > \tout(j, s)$. Since two trains cannot occupy the same block, some amount of time has
+$\tout(j', s) > \tout(j, s)$. Since two trains cannot occupy the same block, some amount of time has
 to pass after $\tout(j, s)$ before the train $j'$ can leave. This amount of time is dependent on
 both $j$ and a sequence of blocks, and hence we denote it by $\tauu(j, s, \rho_j(s))$. Thus, the
 condition becomes
 \begin{equation}
-	\label{eq:single-block}
-	\tout(j', s) \ge \tout(j, s) + \tauu(j, s, \rho_j(s)).
+  \label{eq:single-block}
+  \tout(j', s) \ge \tout(j, s) + \tauu(j, s, \rho_j(s)).
 \end{equation}
-Substituting for $\tout$ in \eqref{eq:single-block} yields the following inequality for delays
+Substituting for $\tout$ in \eqref{eq:single-block} yields the following
+inequality for delays
 \begin{equation}
-	\label{eq:single-block-delays}
-	d(j', s) \ge d(j, s) + \ttout(j, s) - \ttout(j', s) + \tauu(j, s, \rho_j(s))
+  \label{eq:single-block-delays}
+  d(j', s) \ge d(j, s) + \ttout(j, s) - \ttout(j', s) + \tauu(j, s, \rho_j(s))
 \end{equation}
 or,
 \begin{equation}
-	d(j', s) \ge d(j, s) + \Delta(j, s, j', s) + \tauu(j, s, \rho_j(s))
+  d(j', s) \ge d(j, s) + \Delta(j, s, j', s) + \tauu(j, s, \rho_j(s))
 \end{equation}
 where
 \begin{equation}
-	\label{eq:delta}
-	\Delta(j, s, j', s) = \ttout(j, s) - \ttout(j', s)
+  \label{eq:delta}
+  \Delta(j, s, j', s) = \ttout(j, s) - \ttout(j', s)
 \end{equation}
-The precise form of $\tauu$ depends on the dispatching detail of the problem. In our approach, we
-propose the following from
-
+The precise form of $\tauu$ depends on the dispatching detail of the problem.
+In our approach, we propose the following form:
 \begin{equation}
-	\tauu(j, s) = \max_{i \in \{k+1,\ldots,l-1\}}(\ttin(j, m_{i+1}) - \ttin(j, m_i))
+  \tauu(j, s) = \max_{i \in \{k+1,\ldots,l-1\}}(\ttin(j, m_{i+1}) - \ttin(j, m_i))
 \end{equation}
-\textbf{The deadlock condition.} No two trains heading in the opposite direction can enter
-a sequence of blocks between the two consecutive station blocks at the same time. Suppose trains $j$
-and $j'$ are heading in the opposite directions on a route determined by two consecutive stations
+
+For our decision variables, we use a similar scheme as with the previous constraint, and the
+condition becomes:
+\begin{equation}
+  \label{eq:qubo:singleblock}
+  \forall_{i=0,1} \forall_{j, j' \in \JJ^{i}} \forall_{s \in S^{*}_{j} \cap S^{*}_{j'}} \sum_{m \in A_{j, s}} \left(
+    \sum_{m' \in B(m) \cap A_{j', s}} x_{j,s,m}x_{j',s,m'}
+  \right) = 0
+\end{equation}
+\section{The deadlock condition}
+The deadlock condition is analogous to the single block occupation condition but for
+trains going into opposite directions. Suppose trains $j$ and $j'$ are heading in the opposite
+directions on a route determined by two consecutive stations
 $s$ and $\rho_j(s)$. Note that for $j'$ the order is reversed, i.e. it starts at $\rho_j(s)$ and
 travels in the direction of $s$. In this case, $j$ has to arrive at $\rho_j(s)$ before $j'$ can
-leave $\rho_j(s)$. We formalize this similarly as the previous condition
+leave $\rho_j(s)$. We formalize it as:
 \begin{equation}
-	\label{eq:deadlock}
-	\tout(j', \rho_j(s)) \ge \tout(j,s) + \tauuu(j, s, \rho_j(s))
+  \label{eq:deadlock}
+  \tout(j', \rho_j(s)) \ge \tout(j,s) + \tauuu(j, s, \rho_j(s)),
 \end{equation}
+where $\tauuu(j, s, \rho_j(s))$ is the minimum time required for train $j$ to get from station
+block $s$ to $\rho_{j}(s)$.
 Rewritten in terms of delays, the inequality \eqref{eq:deadlock} reads:
 \begin{equation}
   \label{eq:deadlock2}
-	d(j',\rho_j(s)) \ge d(j, s) + \Delta(j,s,j',\rho_j(s)) + \tauuu(j, s, \rho_j(s))
+  d(j',\rho_j(s)) \ge d(j, s) + \Delta(j,s,j',\rho_j(s)) + \tauuu(j, s, \rho_j(s)).
 \end{equation}
-\textbf{The rolling stock circulation condition.} Our model assumes that some trains are
-assigned the same train set. Naturally, there exists some necessary \emph{turnover time},
-before a train set can be used. Formally, if trains $j$ and $j'$ going in opposite
+This condition is to be applied if train $j$ is supposed to leave before train $j'$ leaves
+$\rho_{j}(s)$, otherwise the order has to be appropriately reversed.
+
+In decision variables, the deadlock condition in its basic form looks as follows
+\begin{equation}
+  \label{eq:qubo:deadlock}
+  \forall_{s \in S^{*}_{j} \cap S^{*}_{j'}} \sum_{m \in A_{j, s}} \left(
+    \sum_{m' \in B(m) \cap A_{j', s}} x_{j,s,m}x_{j',s,m'}
+  \right) = 0,
+\end{equation}
+and has to be applied for limited number of trains $j \in \JJ^{0} (\JJ^{1})$ and $j' \in \JJ^{1}(\JJ^{0})$.
+This limit is imposed indirectly by the upper bounds on the delays.
+\section{The rolling stock circulation condition}
+Our model assumes that some trains are assigned the same train set. Naturally, there exists some necessary \emph{turnover time}, before a train set can be used. Formally, if trains $j$ and $j'$ going in opposite
 directions are assigned the same train set, then the following inequality has to hold:
 \begin{equation}
-\tout(j', s_{j',1}) > \tout(j, s_{j,end}) + \Delta(j, j')
+  \tout(j', s_{j',1}) > \tout(j, s_{j,end}) + \Delta(j, j')
 \end{equation}
-where $\Delta(j, j')$ is the minimum turnover time. In the delay representation, the
-inequality becomes:
+where $\Delta(j, j')$ is the minimum turnover time. In the delay
+representation, the inequality becomes:
 \begin{equation}
-\label{eq:rolling}
-\begin{split}
-  d(j',1) + \ttout(j',1) > & \; d(j, s_{j,end-1}) + \ttout(j, s_{j,end-1}) + \\
-                           & \; \tauuu(j, s_{j,end-1}) + \Delta(j,j').
-\end{split}
+  \label{eq:rolling}
+  \begin{split}
+    d(j',s_{j',1}) + \ttout(j',s_{j',1}) > & \; d(j, s_{j,end-1}) + \ttout(j, s_{j,end-1}) + \\
+    & \; \tauuu(j, s_{j,end-1}) + \Delta(j,j').
+  \end{split}
 \end{equation}
 Inequality \eqref{eq:rolling} can be simplified to
 \begin{equation}
-  d(j',1) > d(j, s_{j,end-1}) - R(j,j'),
+  d(j',s_{j',1}) > d(j, s_{j,end-1}) - R(j,j'),
 \end{equation}
 by setting
 \begin{equation}
   \label{eq:rolling2}
-  R(j, j') = \ttout(j',1) - \ttout(j, s_{j,end-1}) - \tauuu(j,s_{j,end-1})
+  R(j, j') = \ttout(j',s_{j',1}) - \ttout(j, s_{j,end-1}) - \tauuu(j,s_{j,end-1})
 \end{equation}
-\section{Constructing the QUBO}
-The delays occurring in our model are real numbers, and hence they cannot be used
-to formulate QUBO to be solved on the annealer. We can get around this problem by limiting
-the possible delays to a discrete set. Naturally, the set of possible delay values is
-model--dependent. Furthermore, the allowable range of delays might vary between trains and blocks,
-which we also have to take into account.
-
-Let $S^{*}_{j}=  S_{j} \setminus \{s_{j,end}\}$. For each $j \in \mathcal{J}$ and $s \in S^{*}_{j}$
-we will denote the set of possible values of $d(j, s)$ by $A_{j, s}$. Now, we can define a set of binary variables $x_{s,j,m}$  of the form:
+In decision variables, the rolling stock circulation condition for trains $j$ and $j'$ can
+be written as
 \begin{equation}
-  x_{s,j,m} = \begin{cases}
-                1, & d(j, s) = m\\
-                0, & \mbox{otherwise}
-\end{cases},
+  \label{eq:qubo:rollingstock}
+  \sum_{m \in A_{j, s_{(j, end-1)}}} \sum_{m' \in E(d) \cap A_{j',s_{(j',1)}}} x_{j,s_{(j,end-1)},m}x_{j', s_{(j',1)},m'} = 0
 \end{equation}
-i.e. for fixed $s$ and $j$ the tuple $(x_{s,j,m}\colon m \in A_{j,s})$  is a one-hot encoding of
-the  delay $d(j,s)$. Naturally, each delay can assume only one value. Mathematically, this
-can be expressed as the following constraint:
-\begin{equation}
-  \forall_{j \in \mathcal{J}}\forall_{s \in S^{*}_{j}} \sum_{m \in A_{j, s}} x_{s,j,m} = 1
-\end{equation}
+where $E(d) = \{0, 1, \ldots, m-R(j, j')\}$.
 
-For the objective function, we opt for one of the form:
-\begin{equation}
-  \label{eq:onehot}
-f(\mathbf{x}) = \sum_{j \in \mathcal{J}}\sum_{s \in S^{*}_{j}}\sum_{m \in A_{j,s}} w(s,j,m) \cdot x_{j,s,m},
-\end{equation}
-where $w(s,j,m)$ are some predefined weights constituting part of the model. In particular, they
-can be chosen so that they depend only on the secondary delays.
+\subsection{Penalties}
+The conditions \eqref{eq:qubo:passingtime}, \eqref{eq:qubo:singleblock}, \eqref{eq:qubo:deadlock}, \eqref{eq:qubo:rollingstock} together with cost function \eqref{eq:qubo:cost} define a constrained $0-1$ problem.
+However, in use a quantum annealer, we must convert it to QUBO, which means we have to incorporate those constraints
+into the cost function.
 
-To proceed further in our construction, we need to rephrase the constraints discussed in the
-previous section in terms of our binary variables. Preferably, we want them to be a quadratic
-polynomial such that they are zero if a given constraint is satisfied, and positive otherwise.
-\todo[inline]{Need to rewrite it, for now those are just copy-pasted from the paper}
-They read as follows:\\
-\subsubsection{The minimum passing time condition (c.f. \eqref{eq:passingtime})}
+One might observe that penalties defined by the dispatching conditions are of the form:
 \begin{equation}
-  \label{eq:passingtime-binary}
-\forall_{j} \forall_{s \in S_j^{**}}
-\sum_{d \in A_{j,s}}
-\left(
-\sum_{ d' \in D(d) \cap A_{j, \rho_j(s)}} x_{j, s, d}
-x_{j, \rho_j(s), d'} \right) = 0,
+  \label{eq:quadraticpenalty}
+  \sum_{(j, j') \in \mathcal{V}_{p}} x_{i}x_{j} = 0,
 \end{equation}
-where $D(d) = \{0, 1, \ldots, d - \alpha(j, s, \rho_j(s)) -1\}$, and
-$S_j^{**} = S_j \setminus \{s_{j, \text{end}}, s_{j, \text{end}-1}\}$.
+for some set of pairs of indices $\mathcal{V}_{p}$. For every feasible solution (i.e. one meeting all the constraints) the sum in equation \eqref{eq:quadraticpenalty} is 0, whereas violation of the corresponding condition gives a strictly
+positive value. Hance, one can add such a sum to the cost function, effectively penalizing the infeasible solutions.
+More generally, one might multiply the sum by some constant $p_{pair} \ge 1$, to further increase the value of the
+cost function for the infeasible solutions.
 
-\subsubsection{The single--block occupation condition (c.f. \eqref{eq:single-block} and \eqref{eq:single-block-delays})}
+The same reasoning cannot be applied e.g. to the constraint \eqref{eq:onehot}, which comprises equations of the form
 \begin{equation}
-  \label{eq:singleblock-binary}
-\forall_{(j,j') \in \mathcal{J}^0 (\mathcal{J}^1)}
-\forall_{s \in S^*_{j,j'}}
-\sum_{d \in A_{j,s}}\left(\sum_{d' \in B(d) \cap A_{j', s}}
-x_{j, s, d} x_{j', s, d'}\right) = 0,
+  \label{eq:linearpenalty}
+  \sum_{i \in \mathcal{V}_{s}}x_{i} = 1.
 \end{equation}
-where $B(d) = \{d + \Delta(j, s, j', s), d + \Delta(j, s, j', s)+ 1,\ldots, d +
-\Delta(j,
-s, j', s) + \\ \tau_{(1)}(j,s, \rho_j(s))-1
-\}$ is a set of delays that violates the block occupation condition.
-\subsubsection{The deadlock condition (c.f. \eqref{eq:deadlock} and \eqref{eq:deadlock2})}
+If one added sums from the equation \eqref{eq:linearpenalty} to the cost function, it would favor the infeasible solution
+comprising of all 0s. Instead, one can consider the following quadratic form of the same penalty:
 \begin{equation}
-  \label{eq:deadlock-binary}
-  \forall_{j \in \mathcal{J}^0(\mathcal{J}^1),  j' \in
-\mathcal{J}^1(\mathcal{J}^0) }
-\forall_{s \in S^*_{j,j'}}
-\sum_{d \in A_{j,s}}\left(\sum_{d' \in C(d) \cap A_{j', \rho_j(s)}}
-x_{j, s, d}
-x_{j', \rho_j(s), d'}\right) = 0
-\end{equation}
-\subsubsection{The rolling stock circulation condition (c.f. \eqref{eq:rolling}--\eqref{eq:rolling2})}
-\begin{equation}
-  \label{eq:rollingstock}
-    \forall_{j,j' \in \text{terminal pairs}}
-  \sum_{d \in A_{j,s_{(j, end-1)}}}
-  \sum_{ d' \in E(d) \cap A_{j', 1}} x_{j, s_{(j, end-1)}, d}
-  \cdot x_{j', s_{(j,' 1)}, d'}  = 0,
-\end{equation}
+  \label{eq:linearpenalty2}
+    \left(\sum_{i \in \mathcal{V}_{s}}x_{i} -1 \right)^{2} = 0
+  \end{equation}
+  In contrast to \eqref{eq:linearpenalty}, this time the left hand is equal to 0 for feasible solution, and a positive value for any solution violating the one--hot encoding constraint. As with previous, quadratic penalties, we might want to multiply such penalties by some constant $p_{sum} > 1$. An important thing to mention here is that the expansion of the left--hand side in \eqref{eq:linearpenalty2} gives a nonzero constant offset, which we will ignore.
+  therefore, the final form of the penalty term reads:
+  \begin{equation}
+    \mathcal{P}_{sum}(\mathbf{x}) = \sum_{\mathcal{V}_{s}}p_{sum}\left(\sum_{i,j \in \mathcal{V}_{s}^{\times 2}, i\ne j} x_{i}x_{j}  - \sum_{i \in \mathcal{V}_{s}}x_{i}\right).
+  \end{equation}
+  Lastly, the total cost function for our QUBO reads:
+  \begin{equation}
+    f'(\mathbf{x}) = f(\mathbf{x}) + \mathcal{P}_{sum}(\mathbf{x}) + \mathcal{P}_{pair}(\mathbf{x}).
+  \end{equation}
+  \section{Results}
 
-
-\section{Results}
-
-\subsection{Studies railway segments}
-In our work, we considered two single-track railway lines managed by the polish state--owned
-company PKP Polskie Linie Kolejowe:
+\subsection{Studied railway segments}
+In our work, we considered two single-track railway lines managed by the polish
+state--owned company PKP Polskie Linie Kolejowe:
 
 \begin{itemize}
-	\item Railway line No. 216 (Nidzica -- Olsztynek section)
-	\item Railway line No. 191 (Goleszów -- Wisła Uzdrowisko section)
+  \item Railway line No. 216 (Nidzica -- Olsztynek section)
+  \item Railway line No. 191 (Goleszów -- Wisła Uzdrowisko section)
 \end{itemize}
 
-
 Both segments are depicted in Fig. \ref{fig:line} and Fig. \ref{fig:linesmall}.
-For the railway line No. 216, we considered its official train schedule (as of April 2020). The
-line No. 191 was undergoing a renovation at the time of writing, and hence it had no
-available timetable. Based on the planned parameters of the line, as described in the official
-documents \cite{PKPPLK}, we constructed a cyclic timetable. Initial, undisturbed timetables are
-depicted in Fig. \ref{fig:diagram} and Fig. \ref{fig:diaramsmall}.
-
+For the railway line No. 216, we considered its official train schedule (as of
+April 2020). The line No. 191 was undergoing a renovation at the time of
+writing, and hence it had no available timetable. Based on the planned
+parameters of the line, as described in the official documents \cite{PKPPLK},
+we constructed a cyclic timetable. Initial, undisturbed timetables are depicted
+in Fig. \ref{fig:diagram} and Fig. \ref{fig:diaramsmall}.
 
 \begin{figure}
   \begin{subfigure}{\textwidth}
     \includegraphics[width=\textwidth]{figures/line_small.pdf}
-    \caption{Nidzica -- Olsztynek segment of line No. 216. The segment comprises
-      three station blocks (1 -- Nidzica, 3 -- Waplewo, 5 -- Olsztynek), and two line blocks (2, 4).
-      We assume that passing through the station block takes the same amount of time independently of
-      which track is used.
-    }
-    \label{fig:linesmall}
+    \caption{Nidzica -- Olsztynek segment of line No. 216. The segment comprises three
+      station blocks (1 -- Nidzica, 3 -- Waplewo, 5 -- Olsztynek), and two line
+      blocks (2, 4). We assume that passing through the station block takes the same
+      amount of time independently of which track is used. } \label{fig:linesmall}
   \end{subfigure}
   \begin{subfigure}{\textwidth}
     \includegraphics[width=\textwidth]{figures/train_diagram_small}
     \subcaption{
-    Train diagram for the undisturbed timetable of the line in \textbf{(a)}. The timetable features two
-    \emph{Inter--City} trains IC3521 and IC3520 and one \emph{Regio} train R90602. The paths for the
-    \emph{Inter-City} trains are marked with red and path of the \emph{Regio} train is marked with black.
-  }\label{fig:diagramsmall}
+      Train diagram for the undisturbed timetable of the line in \textbf{(a)}. The timetable features two
+      \emph{Inter--City} trains IC3521 and IC3520 and one \emph{Regio} train R90602. The paths for the
+      \emph{Inter-City} trains are marked with red and path of the \emph{Regio} train is marked with black.
+    }\label{fig:diagramsmall}
   \end{subfigure}
-  \caption{Nidzica-Olsztynek segment of line No. 216 and a train diagram for its initial (undisturbed) timetable}
+  \caption{Nidzica-Olsztynek segment of line No. 216 and a train diagram for its initial
+    (undisturbed) timetable}
 \end{figure}
 
 \begin{figure}
   \begin{subfigure}{\textwidth}
     \includegraphics[width=\textwidth]{figures/line.pdf}
-    \caption{Goleszów -- Wisła Uzdrowisko segment of line No. 191. The segment comprises 4 station blocks (1 -- Goleszów, 3 -- Ustroń, 7 -- Ustroń Polana, 10 -- Wisła Uzdrowisko) and 6 line blocks (2, 4, 5, 6, 8, 9). Between line blocks there are additional passenger platforms at Ustroń Zdrój, Ustroń Poniwiec and Wisła Jawornik.
-    }
-    \label{fig:line}
+    \caption{Goleszów -- Wisła Uzdrowisko segment of line No. 191. The segment comprises 4
+      station blocks (1 -- Goleszów, 3 -- Ustroń, 7 -- Ustroń Polana, 10 -- Wisła
+      Uzdrowisko) and 6 line blocks (2, 4, 5, 6, 8, 9). Between line blocks there are
+      additional passenger platforms at Ustroń Zdrój, Ustroń Poniwiec and Wisła
+      Jawornik. } \label{fig:line}
   \end{subfigure}
   \begin{subfigure}{\textwidth}
     \includegraphics[width=\textwidth]{figures/train_diagram}
     \subcaption{
-    Train diagram for the timetable of the line in \textbf{(a)}.
+      Train diagram for the timetable of the line in \textbf{(a)}.
       The timetable features two \emph{Inter--City} trains (IC1 and IC2) and four regional trains (Ks1--Ks4).
       The paths of the \emph{Inter--City} trains are marked with red and paths of the regional trains are
       marked with black.
-  }\label{fig:diagram}
+    }\label{fig:diagram}
   \end{subfigure}
-  \caption{Goleszów -- Olsztynek segment of line No. 216 and a train diagram for its initial (undisturbed) timetable}
+  \caption{Goleszów -- Olsztynek segment of line No. 216 and a train diagram for its
+    initial (undisturbed) timetable}
 \end{figure}
 
-For both network segments, we assume that the minimum waiting times at all considered stations
-are 1 minute. Also, we assume that the passing times through all the line blocks were initially
-scheduled according to the maximum permissible speeds.
+For both network segments, we assume that the minimum waiting times at all
+considered stations are 1 minute. Also, we assume that the passing times
+through all the line blocks were initially scheduled according to the maximum
+permissible speeds.
 
-For the Nidzica--Olsztynek railway segment, we considered two delays. The first one is a 15 minutes delay
-of IC5320 from station block 5. The second one is that of the IC3521 leaving station block 1 5 minutes late.
-Considering this and our assumptions, this creates conflicts, where two \emph{Inter--City} trains, as well
-as an \emph{Inter--City} train and the regio train, have conflicts at block 4. The conflicted, infeasible
-train diagram for this situation is depicted in Fig. \ref{fig:conflictsmall}.
+For the Nidzica--Olsztynek railway segment, we considered two delays. The first
+one is a 15 minutes delay of IC5320 from station block 5. The second one is
+that of the IC3521 leaving station block 1 5 minutes late. Considering this and
+our assumptions, this creates conflicts, where two \emph{Inter--City} trains,
+as well as an \emph{Inter--City} train and the regio train, have conflicts at
+block 4. The conflicted, infeasible train diagram for this situation is
+depicted in Fig. \ref{fig:conflictsmall}.
 
-For the Goleszów -- Wisła Uzdrowisko line, we considered several scenarios allowing us to analyze the
-behavior of our algorithm under different circumstances. Those scenarios are:
+For the Goleszów -- Wisła Uzdrowisko line, we considered several scenarios
+allowing us to analyze the behavior of our algorithm under different
+circumstances. Those scenarios are:
 
 \begin{enumerate}
-  \item A moderate delay of the \emph{Inter--City} train starting from the station block 1.
+  \item A moderate delay of the \emph{Inter--City} train starting from the station
+    block 1.
   \item A moderate delay of all the trains starting from station block 1.
   \item A significant delay of some trains starting from station block 1.
-  \item A significant delay of the \emph{Inter--City} train starting from the station block 1.
+  \item A significant delay of the \emph{Inter--City} train starting from the station
+    block 1.
 \end{enumerate}
 
-The delays in all the aforementioned scenarios were chosen so that they indeed result in a delay.
-The conflicted timetables are presented in Fig. \ref{fig:conflictlarge}.
+The delays in all the aforementioned scenarios were chosen so that they indeed
+result in a delay. The conflicted timetables are presented in Fig.
+\ref{fig:conflictlarge}.
 
 \begin{figure}
   \begin{subfigure}[b]{0.4\columnwidth}
     \includegraphics[width=0.8\linewidth]{figures/case1_conflict}
     \caption{
-      Case $1$ -- single conflict, observe that the additinal delay of Ks$2$ will propagate to the delay of Ks$3$.
-    }
-    \label{fig::c1_conflict}
+      Case $1$ -- single conflict, observe that the additinal delay of Ks$2$ will
+      propagate to the delay of Ks$3$. } \label{fig::c1_conflict}
   \end{subfigure}
   \begin{subfigure}[b]{0.4\columnwidth}
     \includegraphics[width=0.8\linewidth]{figures/case2_conflict}
@@ -418,8 +488,7 @@ The conflicted timetables are presented in Fig. \ref{fig:conflictlarge}.
 
   \begin{subfigure}[b]{0.4\columnwidth}
     \includegraphics[width=0.8\linewidth]{figures/case3_conflict}
-    \caption{Case $3$ -- multiple conflicts.}
-    \label{fig::c3_conflict}
+    \caption{Case $3$ -- multiple conflicts.} \label{fig::c3_conflict}
   \end{subfigure}
   \begin{subfigure}[b]{0.4\columnwidth}
     \includegraphics[width=0.8\textwidth]{figures/case4_conflict}
@@ -430,10 +499,10 @@ The conflicted timetables are presented in Fig. \ref{fig:conflictlarge}.
   \label{fig:conflictlarge}
 \end{figure}
 
-
 \subsection{Solution using simple heuristics}
-To establish baseline for Quantum Annealing, we solved the problems described in the previous chapter
-using simple heuristics common to the railways practice. Those heuristics are:
+To establish baseline for Quantum Annealing, we solved the problems described
+in the previous chapter using simple heuristics common to the railways
+practice. Those heuristics are:
 
 \begin{itemize}
   \item FCFS (First Come First Served),
@@ -441,40 +510,42 @@ using simple heuristics common to the railways practice. Those heuristics are:
   \item AMCC (Avoid Maximum Current $C_{\max}$.
 \end{itemize}
 
-In FCFS (resp. FLFS) the way is given to the train that first arrives (resp. first leaves) the
-considered station block at which the conflict occurs. AMCC is slightly more complex. In this
-heuristic, one tries to minimize the maximum secondary delays of the trains. We want to stress
-that those heuristics facilitate different objective functions, it is not possible to directly
-compare them -- nevertheless, it might be useful to discuss qualitative differences between
-the solutions they produce.
+In FCFS (resp. FLFS) the way is given to the train that first arrives (resp.
+first leaves) the considered station block at which the conflict occurs. AMCC
+is slightly more complex. In this heuristic, one tries to minimize the maximum
+secondary delays of the trains. We want to stress that those heuristics
+facilitate different objective functions, it is not possible to directly
+compare them -- nevertheless, it might be useful to discuss qualitative
+differences between the solutions they produce.
 
-For the case of Nidzica--Olsztynek line, all heuristics returned the same solution, depicted in
-Fig. \ref{fig:smallheurresolution}. The conflict is avoided by delaying IC3521 by another
-3-minutes, and allowing R9062 to enter the block not earlier than 14:25, i.e. 4 minutes later
-than in the conflicted timetable. In this case, the additional 4 minutes constitute the maximum
+For the case of Nidzica--Olsztynek line, all heuristics returned the same
+solution, depicted in Fig. \ref{fig:smallheurresolution}. The conflict is
+avoided by delaying IC3521 by another 3-minutes, and allowing R9062 to enter
+the block not earlier than 14:25, i.e. 4 minutes later than in the conflicted
+timetable. In this case, the additional 4 minutes constitute the maximum
 secondary delay of the solution.
 
-We also applied the aforementioned heuristics to all the considered distrubances in the
-Goleszów -- Wisła Uzdrowisko segment. For brevity, we refrain from presenting the detailed
-discussion of the solutions for all the cases and limit ourselves to the summary of the maximum
-secondary delay, which is presented in Table \ref{tab:simple}
+We also applied the aforementioned heuristics to all the considered
+distrubances in the Goleszów -- Wisła Uzdrowisko segment. For brevity, we
+refrain from presenting the detailed discussion of the solutions for all the
+cases and limit ourselves to the summary of the maximum secondary delay, which
+is presented in Table \ref{tab:simple}
 
 \begin{table}
-\centering
-\begin{tabular}{ccccc}
-Heuristics & case $1$ & case $2$ & case $3$ & case $4$  \\
-\hline
-FLFS & 6 & 13 & 4 & 2 \\
-\hline
-FCFS & 5 & 5 & 5 & 2 \\
-\hline
-AMCC & 5 & 5 & 4 & 2 \\
-\hline
-\end{tabular}
-\caption{The maximum secondary delays, in minutes, resulting from simple heuristics.
-  Observe that for each case, there are solutions far below $d_{\text{max}}
-= 10$.}
-\label{tab:simple}
+  \centering
+  \begin{tabular}{ccccc}
+    Heuristics & case $1$ & case $2$ & case $3$ & case $4$ \\
+    \hline
+    FLFS       & 6        & 13       & 4        & 2        \\
+    \hline
+    FCFS       & 5        & 5        & 5        & 2        \\
+    \hline
+    AMCC       & 5        & 5        & 4        & 2        \\
+    \hline
+  \end{tabular}
+  \caption{The maximum secondary delays, in minutes, resulting from simple heuristics.
+    Observe that for each case, there are solutions far below $d_{\text{max}} =
+      10$.} \label{tab:simple}
 \end{table}
 
 %%% Local Variables:
