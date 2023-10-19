@@ -1,4 +1,4 @@
-\chapter{Application to railway conflict management}
+\chapter[Railway conflict management]{Application to railway conflict management}
 
 As the last point in the thesis, in this chapter we describe how the results
 presented so far can be applied in the field of operational research. Namely,
@@ -393,54 +393,50 @@ state--owned company PKP Polskie Linie Kolejowe:
   \item Railway line No. 191 (Goleszów -- Wisła Uzdrowisko section)
 \end{itemize}
 
-Both segments are depicted in Fig. \ref{fig:line} and Fig. \ref{fig:linesmall}.
+The segments are depicted in Fig. \ref{fig:linesmall:line} and Fig. \ref{fig:linelarge:line}.
 For the railway line No. 216, we considered its official train schedule (as of
 April 2020). The line No. 191 was undergoing a renovation at the time of
 writing, and hence it had no available timetable. Based on the planned
 parameters of the line, as described in the official documents \cite{PKPPLK},
 we constructed a cyclic timetable. Initial, undisturbed timetables are depicted
-in Fig. \ref{fig:diagram} and Fig. \ref{fig:diaramsmall}.
+in Fig. \ref{fig:linesmall:diagram} and Fig. \ref{fig:linelarge:diagram}.
 
 \begin{figure}
   \begin{subfigure}{\textwidth}
+    \caption{}\label{fig:linesmall:line}
     \includegraphics[width=\textwidth]{figures/line_small.pdf}
-    \caption{Nidzica -- Olsztynek segment of line No. 216. The segment comprises three
-      station blocks (1 -- Nidzica, 3 -- Waplewo, 5 -- Olsztynek), and two line
-      blocks (2, 4). We assume that passing through the station block takes the same
-      amount of time independently of which track is used. } \label{fig:linesmall}
   \end{subfigure}
   \begin{subfigure}{\textwidth}
+    \caption{}\label{fig:linesmall:diagram}
     \includegraphics[width=\textwidth]{figures/train_diagram_small}
-    \subcaption{
-      Train diagram for the undisturbed timetable of the line in \textbf{(a)}. The timetable features two
-      \emph{Inter--City} trains IC3521 and IC3520 and one \emph{Regio} train R90602. The paths for the
-      \emph{Inter-City} trains are marked with red and path of the \emph{Regio} train is marked with black.
-    }\label{fig:diagramsmall}
   \end{subfigure}
-  \caption{Nidzica-Olsztynek segment of line No. 216 and a train diagram for its initial
-    (undisturbed) timetable}
+  \caption{\subref{fig:linesmall:line} Nidzica -- Olsztynek segment of line No. 216. The segment comprises three
+      station blocks (1 -- Nidzica, 3 -- Waplewo, 5 -- Olsztynek), and two line
+      blocks (2, 4). We assume that passing through the station block takes the same
+      amount of time independently of which track is used. \subref{fig:linesmall:diagram} Train diagram for the undisturbed timetable of the line in \subref{fig:linesmall:line}. The timetable features two
+      \emph{Inter--City} trains IC3521 and IC3520 and one \emph{Regio} train R90602. The paths for the
+      \emph{Inter-City} trains are marked with red and path of the \emph{Regio} train is marked with black.}
+    \label{fig:linesmall}
 \end{figure}
 
 \begin{figure}
   \begin{subfigure}{\textwidth}
+    \caption{}\label{fig:linelarge:line}
     \includegraphics[width=\textwidth]{figures/line.pdf}
-    \caption{Goleszów -- Wisła Uzdrowisko segment of line No. 191. The segment comprises 4
+  \end{subfigure}
+  \begin{subfigure}{\textwidth}
+    \caption{}\label{fig:linelarge:diagram}
+    \includegraphics[width=\textwidth]{figures/train_diagram}
+  \end{subfigure}
+  \caption{\subref{fig:linelarge:line} Goleszów -- Wisła Uzdrowisko segment of line No. 191. The segment comprises 4
       station blocks (1 -- Goleszów, 3 -- Ustroń, 7 -- Ustroń Polana, 10 -- Wisła
       Uzdrowisko) and 6 line blocks (2, 4, 5, 6, 8, 9). Between line blocks there are
       additional passenger platforms at Ustroń Zdrój, Ustroń Poniwiec and Wisła
-      Jawornik. } \label{fig:line}
-  \end{subfigure}
-  \begin{subfigure}{\textwidth}
-    \includegraphics[width=\textwidth]{figures/train_diagram}
-    \subcaption{
-      Train diagram for the timetable of the line in \textbf{(a)}.
+      Jawornik. \subref{fig:linelarge:diagram} Train diagram for the timetable of the line in \subref{fig:linelarge:line}.
       The timetable features two \emph{Inter--City} trains (IC1 and IC2) and four regional trains (Ks1--Ks4).
       The paths of the \emph{Inter--City} trains are marked with red and paths of the regional trains are
-      marked with black.
-    }\label{fig:diagram}
-  \end{subfigure}
-  \caption{Goleszów -- Olsztynek segment of line No. 216 and a train diagram for its
-    initial (undisturbed) timetable}
+      marked with black.}
+    \label{fig:linelarge}
 \end{figure}
 
 For both network segments, we assume that the minimum waiting times at all
@@ -455,6 +451,24 @@ our assumptions, this creates conflicts, where two \emph{Inter--City} trains,
 as well as an \emph{Inter--City} train and the regio train, have conflicts at
 block 4. The conflicted, infeasible train diagram for this situation is
 depicted in Fig. \ref{fig:conflictsmall}.
+
+\begin{figure}
+  \begin{subfigure}[b]{0.5\columnwidth}
+    \caption{}\label{conflict}
+    \includegraphics[width=\textwidth]{figures/small_conflict}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.5\columnwidth}
+    \caption{}\label{resolution}
+    \includegraphics[width=\textwidth]{figures/small_solution}
+  \end{subfigure}
+  \caption{
+    \subref{conflict} Conflicted timetable for line No. 191. Compared to the original timetable
+    from \ref{fig:linesmall:diagram}, two trains are delayed, resulting in a conflict where all three
+    trains meet at block 4. \subref{resolution} Conflict resolution
+    via AMCC heuristics. The same solution was obtained using FCFS and FLFS heuristics.
+  }
+  \label{fig:smallconflict}
+\end{figure}
 
 For the Goleszów -- Wisła Uzdrowisko line, we considered several scenarios
 allowing us to analyze the behavior of our algorithm under different
@@ -474,34 +488,32 @@ result in a delay. The conflicted timetables are presented in Fig.
 \ref{fig:conflictlarge}.
 
 \begin{figure}
-  \begin{subfigure}[b]{0.4\columnwidth}
-    \includegraphics[width=0.8\linewidth]{figures/case1_conflict}
-    \caption{
-      Case $1$ -- single conflict, observe that the additinal delay of Ks$2$ will
-      propagate to the delay of Ks$3$. } \label{fig::c1_conflict}
+  \begin{subfigure}[b]{0.5\textwidth}
+    \caption{}\label{c1}
+    \includegraphics[width=\textwidth]{figures/case1_conflict}
   \end{subfigure}
-  \begin{subfigure}[b]{0.4\columnwidth}
-    \includegraphics[width=0.8\linewidth]{figures/case2_conflict}
-    \caption{Case $2$ -- two conflicts, with no impact of Ks$2$ on Ks$3$.}
-    \label{fig::c2_conflict}
+  \begin{subfigure}[b]{0.5\textwidth}
+    \caption{}\label{c2}
+    \includegraphics[width=\textwidth]{figures/case2_conflict}
   \end{subfigure}
 
-  \begin{subfigure}[b]{0.4\columnwidth}
-    \includegraphics[width=0.8\linewidth]{figures/case3_conflict}
-    \caption{Case $3$ -- multiple conflicts.} \label{fig::c3_conflict}
+  \begin{subfigure}[b]{0.5\textwidth}
+    \caption{} \label{c3}
+    \includegraphics[width=\textwidth]{figures/case3_conflict}
   \end{subfigure}
-  \begin{subfigure}[b]{0.4\columnwidth}
-    \includegraphics[width=0.8\textwidth]{figures/case4_conflict}
-    \caption{Case $4$ -- conflict that is straightforward to resolve.}
-    \label{fig::c4_conflict}
+  \begin{subfigure}[b]{0.5\textwidth}
+    \caption{}\label{c4}
+    \includegraphics[width=\textwidth]{figures/case4_conflict}
   \end{subfigure}
-  \caption{The conflicted timetables, various types of conflicts.}
+  \caption{Conflicted timetables for line No. 216. \subref{c1} Single conflict, observe that the additional delay of Ks$2$ will propagate to the delay of Ks$3$ which is operated with the same train set.
+    \subref{c2} two conflicts, with no impact of Ks$2$ on Ks$3$. \subref{c3} Multiple conflicts. \subref{c4}
+  One conflict, straightforward to resolve.}
   \label{fig:conflictlarge}
 \end{figure}
 
 \subsection{Solution using simple heuristics}
-To establish baseline for Quantum Annealing, we solved the problems described
-in the previous chapter using simple heuristics common to the railways
+To establish a baseline for Quantum Annealing, we solved the problems described
+in the previous section using simple heuristics common in the railways
 practice. Those heuristics are:
 
 \begin{itemize}
@@ -514,7 +526,7 @@ In FCFS (resp. FLFS) the way is given to the train that first arrives (resp.
 first leaves) the considered station block at which the conflict occurs. AMCC
 is slightly more complex. In this heuristic, one tries to minimize the maximum
 secondary delays of the trains. We want to stress that those heuristics
-facilitate different objective functions, it is not possible to directly
+facilitate different objective functions, and hence it is not possible to directly
 compare them -- nevertheless, it might be useful to discuss qualitative
 differences between the solutions they produce.
 
@@ -531,7 +543,7 @@ refrain from presenting the detailed discussion of the solutions for all the
 cases and limit ourselves to the summary of the maximum secondary delay, which
 is presented in Table \ref{tab:simple}
 
-\begin{table}
+\begin{table}[bh]
   \centering
   \begin{tabular}{ccccc}
     Heuristics & case $1$ & case $2$ & case $3$ & case $4$ \\

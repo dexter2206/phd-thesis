@@ -1,0 +1,59 @@
+\documentclass{standalone}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{tikz}
+\usepackage{pgfplots}
+
+\pgfplotsset{
+    discard if not/.style 2 args={
+        x filter/.code={
+            \edef\tempa{\thisrow{#1}}
+            \edef\tempb{#2}
+            \ifx\tempa\tempb
+            \else
+                \def\pgfmathresult{inf}
+            \fi
+        }
+    }
+}
+
+\newcommand{\barwidth}{1}
+\pgfplotsset{compat=1.18}
+
+\begin{document}
+
+\begin{tikzpicture}
+  \begin{axis}[
+    width=10cm,
+    height=5cm,
+    xmin=-1,
+    xmax=2,
+    ymin=-11,
+    ymax=0
+    ]
+    \addplot[
+      scatter,
+      color=PineGreen,
+      %discard if not={feasibility}{1},
+      area legend
+    ]
+    table [
+        x=feasibility,
+        y=energy,
+        col sep=comma
+      ] {../data/Qfile_short_bf_1.75_1.75.csv};
+
+    \addplot[
+      scatter,
+      color=RubineRed,
+      %discard if not={feasibility}{0},
+      area legend
+    ]
+    table [
+        x=feasibility,
+        y=energy,
+        col sep=comma
+      ] {../data/Qfile_short_bf_1.75_1.75.csv};
+  \end{axis}
+\end{tikzpicture}%
+
+\end{document}

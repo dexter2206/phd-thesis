@@ -6,7 +6,7 @@
 \usepackage{todonotes}
 \usepackage{graphicx}
 \usepackage{tikz}
-\usepackage{hyperref}
+\usepackage[colorlinks=true, linkcolor=blue]{hyperref}
 \usepackage{hhline}
 \usepackage{physics}
 \usepackage{mathtools}
@@ -17,9 +17,18 @@
 \usepackage{float}
 \usepackage[bibstyle=nature,maxbibnames=10,backend=bibtex]{biblatex}
 \usepackage{subcaption}
+\usepackage[font={small}]{caption}
 \usepackage{xfrac}
 \usepackage{multirow}
 \usepackage{makecell}
+
+\DeclareCaptionLabelFormat{subfigure}{\textbf{#2.}}
+
+\captionsetup[subfigure]{
+  font={bf}, skip=1pt, singlelinecheck=false, labelformat=subfigure, subrefformat=parens
+}
+\captionsetup{subrefformat=subfigure}
+
 
 \colorlet{theader}{ProcessBlue!30}
 \colorlet{tsubheader}{ProcessBlue!20}
