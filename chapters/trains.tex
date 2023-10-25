@@ -439,18 +439,29 @@ in Fig. \ref{fig:linesmall:diagram} and Fig. \ref{fig:linelarge:diagram}.
     \label{fig:linelarge}
 \end{figure}
 
+Timetable for the network segment of line No. 216 includes two \emph{Inter-City} trains,
+IC5320 and IC3521, and a regional \emph{Regio} train R90602. For the line No. 191,
+the timetable includes two \emph{Inter-City} trains IC1, IC2 and four regional trains
+Ks1--Ks4. We assume both \emph{Inter-City} trains in line No. 191 are operated with the same
+train set, with a minimum service time of $R(j,j') = 20\mbox{minutes}$.
+
 For both network segments, we assume that the minimum waiting times at all
 considered stations are 1 minute. Also, we assume that the passing times
 through all the line blocks were initially scheduled according to the maximum
-permissible speeds.
+permissible speeds. As a result of those assumptions, the only possible nonzero
+time reserve occurs at the station blocks.
 
-For the Nidzica--Olsztynek railway segment, we considered two delays. The first
-one is a 15 minutes delay of IC5320 from station block 5. The second one is
+\subsection{Disturbance scenarios}
+
+For the Nidzica--Olsztynek railway segment, we considered a single scenario with two delays.
+The purpose of this scenario is to illustrate our approach on a simple and yet real-world example.
+The first
+one is a 15-minute delay of IC5320 starting from station block 5. The second one is
 that of the IC3521 leaving station block 1 5 minutes late. Considering this and
 our assumptions, this creates conflicts, where two \emph{Inter--City} trains,
-as well as an \emph{Inter--City} train and the regio train, have conflicts at
+as well as an \emph{Inter--City} train and the \emph{Regio} train, have conflicts at
 block 4. The conflicted, infeasible train diagram for this situation is
-depicted in Fig. \ref{fig:conflictsmall}.
+depicted in Fig. \ref{fig:smallconflict}.
 
 \begin{figure}
   \begin{subfigure}[b]{0.5\columnwidth}
@@ -462,29 +473,28 @@ depicted in Fig. \ref{fig:conflictsmall}.
     \includegraphics[width=\textwidth]{figures/small_solution}
   \end{subfigure}
   \caption{
-    \subref{conflict} Conflicted timetable for line No. 191. Compared to the original timetable
-    from \ref{fig:linesmall:diagram}, two trains are delayed, resulting in a conflict where all three
-    trains meet at block 4. \subref{resolution} Conflict resolution
-    via AMCC heuristics. The same solution was obtained using FCFS and FLFS heuristics.
+    \subref{conflict} Conflicted timetable for railway segment of line No. 216. Compared to the original timetable
+    (Fig. \ref{fig:linesmall:diagram}), two trains are delayed, resulting in two conflicts. The conflicts
+    can be quickly identified visually as intersections of train paths at line blocks.
+    \subref{resolution} Conflict resolution via AMCC heuristics. The same solution was obtained using FCFS and FLFS heuristics.
   }
   \label{fig:smallconflict}
 \end{figure}
 
-For the Goleszów -- Wisła Uzdrowisko line, we considered several scenarios
-allowing us to analyze the behavior of our algorithm under different
-circumstances. Those scenarios are:
+For the Goleszów -- Wisła Uzdrowisko line, we considered several different scenarios, which were
+designed to illustrate our approach on a larger example:
 
 \begin{enumerate}
   \item A moderate delay of the \emph{Inter--City} train starting from the station
-    block 1.
-  \item A moderate delay of all the trains starting from station block 1.
-  \item A significant delay of some trains starting from station block 1.
-  \item A significant delay of the \emph{Inter--City} train starting from the station
-    block 1.
+    block 1. This results in a single conflict between IC1 and Ks2.
+  \item A moderate delay of all the trains starting from station block 1, resulting in two conflicts.
+  \item A significant delay of some trains starting from station block 1. Results in two conflicts.
+  \item A significant delay of the \emph{Inter--City} train IC1 starting from the station
+    block 1. Results in a single conflict, which is straightforward to resolve.
 \end{enumerate}
 
 The delays in all the aforementioned scenarios were chosen so that they indeed
-result in a delay. The conflicted timetables are presented in Fig.
+result in conflicts. The conflicted timetables are presented in Fig.
 \ref{fig:conflictlarge}.
 
 \begin{figure}
@@ -505,8 +515,8 @@ result in a delay. The conflicted timetables are presented in Fig.
     \caption{}\label{c4}
     \includegraphics[width=\textwidth]{figures/case4_conflict}
   \end{subfigure}
-  \caption{Conflicted timetables for line No. 216. \subref{c1} Single conflict, observe that the additional delay of Ks$2$ will propagate to the delay of Ks$3$ which is operated with the same train set.
-    \subref{c2} two conflicts, with no impact of Ks$2$ on Ks$3$. \subref{c3} Multiple conflicts. \subref{c4}
+  \caption{Conflicted timetables for line No. 216. \subref{c1} Single conflict, observe that the additional delay of Ks$2$ will propagate to the delay of Ks$3$.
+    \subref{c2} Two conflicts, with no impact of Ks$2$ on Ks$3$. \subref{c3} Multiple conflicts. \subref{c4}
   One conflict, straightforward to resolve.}
   \label{fig:conflictlarge}
 \end{figure}
@@ -538,7 +548,7 @@ timetable. In this case, the additional 4 minutes constitute the maximum
 secondary delay of the solution.
 
 We also applied the aforementioned heuristics to all the considered
-distrubances in the Goleszów -- Wisła Uzdrowisko segment. For brevity, we
+disturbances in the Goleszów -- Wisła Uzdrowisko segment. For brevity, we
 refrain from presenting the detailed discussion of the solutions for all the
 cases and limit ourselves to the summary of the maximum secondary delay, which
 is presented in Table \ref{tab:simple}
@@ -560,6 +570,35 @@ is presented in Table \ref{tab:simple}
       10$.} \label{tab:simple}
 \end{table}
 
+\subsection{Details on QUBO construction}
+
+To formulate our dispatching problems as QUBO and solve them on the D-Wave annealer
+(or using any other method), we first need to decide on the values of several parameters
+of the model, as well as the precise form of the cost function. We start with the latter.
+
+We decided on using the cost function proportional to the secondary delays of all trains
+entering their last station block. Additionally, we weight the contributions of each delay with
+a coefficient depending on the prioritization of the corresponding train, resulting in the cost
+function of the form:
+\begin{equation}
+  f(\mathbf{x}) = \sum_{j \in J}\left(\sum_{m  \in A_{j,s^{*}}}w_{j} \frac{d(j,s^{*}) - d_{U}(j,s^{*})}{d_{\max}(j)}x_{j,s^{*},m}\right),
+\end{equation}
+where $s^{*} = s_{j,end-1}$. The priorities $w_{j}$ are chosen specifically for both networks. One can immediately observe that larger values of $w_{j}$ increase contribution stemming from the delay of given train, and hence the objective function favors solutions with smaller delays for the trains with larger priorities. For the segment of line No. 216, we assume $w_{j}= 1.5$ for all \emph{Inter-City} trains, and the $w_{j}=1.0$ for the regional train. This prioritization coincides with the usual prioritization
+of trains in Poland (and many countries). For the segment of line No. 191, we decided to adopt a slightly more complicated prioritization. For the trains heading toward block 10, we set a lower priority of $w_{j}=0.9$. For the trains heading in the opposite direction, we set $w_{j}=1.5$ and $w_{j}=1.0$ for \emph{Inter-City} and regional trains respectively. This is because the trains heading towards block 1 (Goleszów) also head towards important junctions in Polish railway network (Katowice for regional trains, and capital city of Warsaw for \emph{Inter-city} trains). Our strategy therefore tries to avoid larger delays in this direction to limit further disturbance to the rest of the network.
+
+As for the maximum secondary delay $d_{\max}$, for simplicity, we assume it is the same for all trains. On the one hand, its value cannot be smaller than the one returned by the AMCC heuristics. On the other hand, setting this value too high increases the number of decision variables and complicates the objective function, which is especially undesirable because of the limited number of qubits on D-Wave annealers. For line No. 216, we set $d_{\max}=7$ and for line No. 191 we set $d_{\max}=10$. The total number of decision variables is given by
+\begin{equation}
+  \mbox{\#variables} = (\mbox{\#station blocks}-1) \cdot (\mbox{\#number of trains}) \cdot (d_{\max}+1)
+\end{equation}
+We therefore get $2\cdot 3 \cdot 8 = 48$ decision variables for line No. 216 and $3 \cdot 6 \cdot 11 = 198$ variables for line No. 191. Importantly, the moderately low number of variables for line no. 216 allows us to solve it using the brute--force algorithm presented in Chapter \ref{chapter:bruteforce}.
+
+Lastly, we need to choose values for $p_{pair}$ and $p_{sum}$ penalty weights. This is a very subtle choice. On the one hand, setting it too low may cause some of the infeasible solutions to have the value of the objective function smaller than that of feasible solutions, which is undesirable. On the other hand, if penalty weights are too high, the actual cost function becomes merely a perturbation for the penalty terms, which is also undesirable. To illustrate the difference those weights make to the energy landscape, we computed the low-energy spectrum for the problem defined on line No. 216 for several different values of $p_{pair}$ and $p_{sum}$. The histograms of energies obtained in this way are presented in Fig. \ref{fig:penaltyhistogram}.
+
+\begin{figure}
+  \includegraphics[width=\textwidth]{figures/railway_histograms_bf}
+  \caption{Energy histogram for feasible (green) and infeasible (red) solutions of QUBO defined for line No. 216 with varying penalty weights. The figure takes into account first 5000 low energy states.}
+  \label{fig:penaltyhistogram}
+\end{figure}
 %%% Local Variables:
 %%% mode: pdflatex
 %%% TeX-master: "../main"
