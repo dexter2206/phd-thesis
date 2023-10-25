@@ -175,8 +175,8 @@ Formulation of the problem presented so far can facilitate the construction of
 a linear, constrained model of the dispatching problem. However, since the
 secondary delay values are continuous variables, such a model would not be
 compatible with the quantum annealer. We circumvent this issue by discretizing
-the delays. One way to do it is to require that all secondary delays are natural
-numbers, i.e.
+the delays. One way to do it is to require that all secondary delays are
+natural numbers, i.e.
 \begin{equation}
   \forall_{j \in \JJ} \forall_{s \in S_{j}}\quad  d_{s}(j, s) \in \{0, 1, \ldots, d_{\max}(j)\}.
 \end{equation}
@@ -198,26 +198,29 @@ $x_{s, j, m}$:
     0, & \mbox{otherwise}
   \end{cases}.
 \end{equation}
-Naturally, possible values for $d(j, s)$ are mutually exclusive, which can be expressed as
-the following constraint:
+Naturally, possible values for $d(j, s)$ are mutually exclusive, which can be
+expressed as the following constraint:
 \begin{equation}
   \forall_{j \in \JJ}\forall_{s \in S_{j}} \sum_{m \in A_{j, s}} x_{s, j, m} = 1
 \end{equation}
-As for the cost function, we decided to use a simple weighted sum of the delays, i.e. the
-cost function of the form
+As for the cost function, we decided to use a simple weighted sum of the
+delays, i.e. the cost function of the form
 \begin{equation}
   \label{eq:qubo:cost}
   f(\mathbf{x}) = \sum_{j \in \mathcal{J}}\sum_{s \in S^{*}_{j}}\sum_{m \in A_{j,s}} w(s,j,m) \cdot x_{j,s,m},
 \end{equation}
-For instance, choosing $w(s, j, m)=m$ would result in an objective of minimizing the sum of all
-delays. In general, however, one could take into account the relative importance of the
-trains, as we will describe later when introducing the real railway sections considered in our research.
+For instance, choosing $w(s, j, m)=m$ would result in an objective of
+minimizing the sum of all delays. In general, however, one could take into
+account the relative importance of the trains, as we will describe later when
+introducing the real railway sections considered in our research.
 
 \section{Dispatching conditions}
-The cost function \eqref{eq:cost} together with constraint \eqref{eq:onehotconstraint} is not enough to
-construct a meaningful optimization problem. We also have to take into account other constraints stemming
-from dispatching conditions. For instance, we cannot allow a schedule in which two trains occupy the
-same track at the same time. We will address these additional dispatching conditions next.
+The cost function \eqref{eq:cost} together with constraint
+\eqref{eq:onehotconstraint} is not enough to construct a meaningful
+optimization problem. We also have to take into account other constraints
+stemming from dispatching conditions. For instance, we cannot allow a schedule
+in which two trains occupy the same track at the same time. We will address
+these additional dispatching conditions next.
 
 \subsection{The minimum passing time condition.}
 Train cannot travel through a block faster than the corresponding minimum
@@ -226,15 +229,16 @@ passing time
   \label{eq:dc1}
   \tout(j, s) \ge \tin(j, s) + \pmin(j, s).
 \end{equation}
-Using \eqref{eq:djs} and \eqref{eq:pt} one can easily verify that
-inequality \eqref{eq:dc1} is equivalent to
+Using \eqref{eq:djs} and \eqref{eq:pt} one can easily verify that inequality
+\eqref{eq:dc1} is equivalent to
 \begin{equation}
   \label{eq:passingtime}
   d(j, \rho(s)) \ge d(j, s) - \alpha(j, s, \rho(s)).
 \end{equation}
-In binary variables, it means that if, for a fixed $j,s,m$, the $x_{j,s,m}=1$, then delays
-$d(j,s)$ smaller than $m-\alpha(j, s, \rho_j(s))$ are prohibited and thus the corresponding
-  variables have to zero out. Hence, we arrive at the following condition:
+In binary variables, it means that if, for a fixed $j,s,m$, the $x_{j,s,m}=1$,
+then delays $d(j,s)$ smaller than $m-\alpha(j, s, \rho_j(s))$ are prohibited
+and thus the corresponding variables have to zero out. Hence, we arrive at the
+following condition:
 \begin{equation}
   \label{eq:qubo:passingtime}
   \forall_{j} \forall_{s \in S_j \setminus \{s_{{j,\text{end}}}\}}
@@ -245,13 +249,14 @@ $d(j,s)$ smaller than $m-\alpha(j, s, \rho_j(s))$ are prohibited and thus the co
 \end{equation}
 where $D(d) = \{0, 1, \ldots, d - \alpha(j, s, \rho_j(s)) -1\}$.
 \subsection{The single block occupation condition.}
-Two trains cannot occupy the same part of a single
-railway track. Consider two trains, $j, j' \in \JJ_0$ leaving the same station $s$ in the direction
-of the next station block $\rho_j(s)$. Suppose further that the train $j$ leaves first. i.e.
-$\tout(j', s) > \tout(j, s)$. Since two trains cannot occupy the same block, some amount of time has
-to pass after $\tout(j, s)$ before the train $j'$ can leave. This amount of time is dependent on
-both $j$ and a sequence of blocks, and hence we denote it by $\tauu(j, s, \rho_j(s))$. Thus, the
-condition becomes
+Two trains cannot occupy the same part of a single railway track. Consider two
+trains, $j, j' \in \JJ_0$ leaving the same station $s$ in the direction of the
+next station block $\rho_j(s)$. Suppose further that the train $j$ leaves
+first. i.e. $\tout(j', s) > \tout(j, s)$. Since two trains cannot occupy the
+same block, some amount of time has to pass after $\tout(j, s)$ before the
+train $j'$ can leave. This amount of time is dependent on both $j$ and a
+sequence of blocks, and hence we denote it by $\tauu(j, s, \rho_j(s))$. Thus,
+the condition becomes
 \begin{equation}
   \label{eq:single-block}
   \tout(j', s) \ge \tout(j, s) + \tauu(j, s, \rho_j(s)).
@@ -277,47 +282,53 @@ In our approach, we propose the following form:
   \tauu(j, s) = \max_{i \in \{k+1,\ldots,l-1\}}(\ttin(j, m_{i+1}) - \ttin(j, m_i))
 \end{equation}
 
-For our decision variables, we use a similar scheme as with the previous constraint, and the
-condition becomes:
+For our decision variables, we use a similar scheme as with the previous
+constraint, and the condition becomes:
 \begin{equation}
   \label{eq:qubo:singleblock}
   \forall_{i=0,1} \forall_{j, j' \in \JJ^{i}} \forall_{s \in S^{*}_{j} \cap S^{*}_{j'}} \sum_{m \in A_{j, s}} \left(
-    \sum_{m' \in B(m) \cap A_{j', s}} x_{j,s,m}x_{j',s,m'}
+  \sum_{m' \in B(m) \cap A_{j', s}} x_{j,s,m}x_{j',s,m'}
   \right) = 0
 \end{equation}
 \section{The deadlock condition}
-The deadlock condition is analogous to the single block occupation condition but for
-trains going into opposite directions. Suppose trains $j$ and $j'$ are heading in the opposite
-directions on a route determined by two consecutive stations
-$s$ and $\rho_j(s)$. Note that for $j'$ the order is reversed, i.e. it starts at $\rho_j(s)$ and
-travels in the direction of $s$. In this case, $j$ has to arrive at $\rho_j(s)$ before $j'$ can
-leave $\rho_j(s)$. We formalize it as:
+The deadlock condition is analogous to the single block occupation condition
+but for trains going into opposite directions. Suppose trains $j$ and $j'$ are
+heading in the opposite directions on a route determined by two consecutive
+stations $s$ and $\rho_j(s)$. Note that for $j'$ the order is reversed, i.e. it
+starts at $\rho_j(s)$ and travels in the direction of $s$. In this case, $j$
+has to arrive at $\rho_j(s)$ before $j'$ can leave $\rho_j(s)$. We formalize it
+as:
 \begin{equation}
   \label{eq:deadlock}
   \tout(j', \rho_j(s)) \ge \tout(j,s) + \tauuu(j, s, \rho_j(s)),
 \end{equation}
-where $\tauuu(j, s, \rho_j(s))$ is the minimum time required for train $j$ to get from station
-block $s$ to $\rho_{j}(s)$.
-Rewritten in terms of delays, the inequality \eqref{eq:deadlock} reads:
+where $\tauuu(j, s, \rho_j(s))$ is the minimum time required for train $j$ to
+get from station block $s$ to $\rho_{j}(s)$. Rewritten in terms of delays, the
+inequality \eqref{eq:deadlock} reads:
 \begin{equation}
   \label{eq:deadlock2}
   d(j',\rho_j(s)) \ge d(j, s) + \Delta(j,s,j',\rho_j(s)) + \tauuu(j, s, \rho_j(s)).
 \end{equation}
-This condition is to be applied if train $j$ is supposed to leave before train $j'$ leaves
-$\rho_{j}(s)$, otherwise the order has to be appropriately reversed.
+This condition is to be applied if train $j$ is supposed to leave before train
+$j'$ leaves $\rho_{j}(s)$, otherwise the order has to be appropriately
+reversed.
 
-In decision variables, the deadlock condition in its basic form looks as follows
+In decision variables, the deadlock condition in its basic form looks as
+follows
 \begin{equation}
   \label{eq:qubo:deadlock}
   \forall_{s \in S^{*}_{j} \cap S^{*}_{j'}} \sum_{m \in A_{j, s}} \left(
-    \sum_{m' \in B(m) \cap A_{j', s}} x_{j,s,m}x_{j',s,m'}
+  \sum_{m' \in B(m) \cap A_{j', s}} x_{j,s,m}x_{j',s,m'}
   \right) = 0,
 \end{equation}
-and has to be applied for limited number of trains $j \in \JJ^{0} (\JJ^{1})$ and $j' \in \JJ^{1}(\JJ^{0})$.
-This limit is imposed indirectly by the upper bounds on the delays.
+and has to be applied for limited number of trains $j \in \JJ^{0} (\JJ^{1})$
+and $j' \in \JJ^{1}(\JJ^{0})$. This limit is imposed indirectly by the upper
+bounds on the delays.
 \section{The rolling stock circulation condition}
-Our model assumes that some trains are assigned the same train set. Naturally, there exists some necessary \emph{turnover time}, before a train set can be used. Formally, if trains $j$ and $j'$ going in opposite
-directions are assigned the same train set, then the following inequality has to hold:
+Our model assumes that some trains are assigned the same train set. Naturally,
+there exists some necessary \emph{turnover time}, before a train set can be
+used. Formally, if trains $j$ and $j'$ going in opposite directions are
+assigned the same train set, then the following inequality has to hold:
 \begin{equation}
   \tout(j', s_{j',1}) > \tout(j, s_{j,end}) + \Delta(j, j')
 \end{equation}
@@ -339,8 +350,8 @@ by setting
   \label{eq:rolling2}
   R(j, j') = \ttout(j',s_{j',1}) - \ttout(j, s_{j,end-1}) - \tauuu(j,s_{j,end-1})
 \end{equation}
-In decision variables, the rolling stock circulation condition for trains $j$ and $j'$ can
-be written as
+In decision variables, the rolling stock circulation condition for trains $j$
+and $j'$ can be written as
 \begin{equation}
   \label{eq:qubo:rollingstock}
   \sum_{m \in A_{j, s_{(j, end-1)}}} \sum_{m' \in E(d) \cap A_{j',s_{(j',1)}}} x_{j,s_{(j,end-1)},m}x_{j', s_{(j',1)},m'} = 0
@@ -348,41 +359,54 @@ be written as
 where $E(d) = \{0, 1, \ldots, m-R(j, j')\}$.
 
 \subsection{Penalties}
-The conditions \eqref{eq:qubo:passingtime}, \eqref{eq:qubo:singleblock}, \eqref{eq:qubo:deadlock}, \eqref{eq:qubo:rollingstock} together with cost function \eqref{eq:qubo:cost} define a constrained $0-1$ problem.
-However, in use a quantum annealer, we must convert it to QUBO, which means we have to incorporate those constraints
-into the cost function.
+The conditions \eqref{eq:qubo:passingtime}, \eqref{eq:qubo:singleblock},
+\eqref{eq:qubo:deadlock}, \eqref{eq:qubo:rollingstock} together with cost
+function \eqref{eq:qubo:cost} define a constrained $0-1$ problem. However, in
+use a quantum annealer, we must convert it to QUBO, which means we have to
+incorporate those constraints into the cost function.
 
-One might observe that penalties defined by the dispatching conditions are of the form:
+One might observe that penalties defined by the dispatching conditions are of
+the form:
 \begin{equation}
   \label{eq:quadraticpenalty}
   \sum_{(j, j') \in \mathcal{V}_{p}} x_{i}x_{j} = 0,
 \end{equation}
-for some set of pairs of indices $\mathcal{V}_{p}$. For every feasible solution (i.e. one meeting all the constraints) the sum in equation \eqref{eq:quadraticpenalty} is 0, whereas violation of the corresponding condition gives a strictly
-positive value. Hance, one can add such a sum to the cost function, effectively penalizing the infeasible solutions.
-More generally, one might multiply the sum by some constant $p_{pair} \ge 1$, to further increase the value of the
-cost function for the infeasible solutions.
+for some set of pairs of indices $\mathcal{V}_{p}$. For every feasible solution
+(i.e. one meeting all the constraints) the sum in equation
+\eqref{eq:quadraticpenalty} is 0, whereas violation of the corresponding
+condition gives a strictly positive value. Hance, one can add such a sum to the
+cost function, effectively penalizing the infeasible solutions. More generally,
+one might multiply the sum by some constant $p_{pair} \ge 1$, to further
+increase the value of the cost function for the infeasible solutions.
 
-The same reasoning cannot be applied e.g. to the constraint \eqref{eq:onehot}, which comprises equations of the form
+The same reasoning cannot be applied e.g. to the constraint \eqref{eq:onehot},
+which comprises equations of the form
 \begin{equation}
   \label{eq:linearpenalty}
   \sum_{i \in \mathcal{V}_{s}}x_{i} = 1.
 \end{equation}
-If one added sums from the equation \eqref{eq:linearpenalty} to the cost function, it would favor the infeasible solution
-comprising of all 0s. Instead, one can consider the following quadratic form of the same penalty:
+If one added sums from the equation \eqref{eq:linearpenalty} to the cost
+function, it would favor the infeasible solution comprising of all 0s. Instead,
+one can consider the following quadratic form of the same penalty:
 \begin{equation}
   \label{eq:linearpenalty2}
-    \left(\sum_{i \in \mathcal{V}_{s}}x_{i} -1 \right)^{2} = 0
-  \end{equation}
-  In contrast to \eqref{eq:linearpenalty}, this time the left hand is equal to 0 for feasible solution, and a positive value for any solution violating the one--hot encoding constraint. As with previous, quadratic penalties, we might want to multiply such penalties by some constant $p_{sum} > 1$. An important thing to mention here is that the expansion of the left--hand side in \eqref{eq:linearpenalty2} gives a nonzero constant offset, which we will ignore.
-  therefore, the final form of the penalty term reads:
-  \begin{equation}
-    \mathcal{P}_{sum}(\mathbf{x}) = \sum_{\mathcal{V}_{s}}p_{sum}\left(\sum_{i,j \in \mathcal{V}_{s}^{\times 2}, i\ne j} x_{i}x_{j}  - \sum_{i \in \mathcal{V}_{s}}x_{i}\right).
-  \end{equation}
-  Lastly, the total cost function for our QUBO reads:
-  \begin{equation}
-    f'(\mathbf{x}) = f(\mathbf{x}) + \mathcal{P}_{sum}(\mathbf{x}) + \mathcal{P}_{pair}(\mathbf{x}).
-  \end{equation}
-  \section{Results}
+  \left(\sum_{i \in \mathcal{V}_{s}}x_{i} -1 \right)^{2} = 0
+\end{equation}
+In contrast to \eqref{eq:linearpenalty}, this time the left hand is equal to 0
+for feasible solution, and a positive value for any solution violating the
+one--hot encoding constraint. As with previous, quadratic penalties, we might
+want to multiply such penalties by some constant $p_{sum} > 1$. An important
+thing to mention here is that the expansion of the left--hand side in
+\eqref{eq:linearpenalty2} gives a nonzero constant offset, which we will
+ignore. therefore, the final form of the penalty term reads:
+\begin{equation}
+  \mathcal{P}_{sum}(\mathbf{x}) = \sum_{\mathcal{V}_{s}}p_{sum}\left(\sum_{i,j \in \mathcal{V}_{s}^{\times 2}, i\ne j} x_{i}x_{j}  - \sum_{i \in \mathcal{V}_{s}}x_{i}\right).
+\end{equation}
+Lastly, the total cost function for our QUBO reads:
+\begin{equation}
+  f'(\mathbf{x}) = f(\mathbf{x}) + \mathcal{P}_{sum}(\mathbf{x}) + \mathcal{P}_{pair}(\mathbf{x}).
+\end{equation}
+\section{Results}
 
 \subsection{Studied railway segments}
 In our work, we considered two single-track railway lines managed by the polish
@@ -393,13 +417,14 @@ state--owned company PKP Polskie Linie Kolejowe:
   \item Railway line No. 191 (Goleszów -- Wisła Uzdrowisko section)
 \end{itemize}
 
-The segments are depicted in Fig. \ref{fig:linesmall:line} and Fig. \ref{fig:linelarge:line}.
-For the railway line No. 216, we considered its official train schedule (as of
-April 2020). The line No. 191 was undergoing a renovation at the time of
-writing, and hence it had no available timetable. Based on the planned
-parameters of the line, as described in the official documents \cite{PKPPLK},
-we constructed a cyclic timetable. Initial, undisturbed timetables are depicted
-in Fig. \ref{fig:linesmall:diagram} and Fig. \ref{fig:linelarge:diagram}.
+The segments are depicted in Fig. \ref{fig:linesmall:line} and Fig.
+\ref{fig:linelarge:line}. For the railway line No. 216, we considered its
+official train schedule (as of April 2020). The line No. 191 was undergoing a
+renovation at the time of writing, and hence it had no available timetable.
+Based on the planned parameters of the line, as described in the official
+documents \cite{PKPPLK}, we constructed a cyclic timetable. Initial,
+undisturbed timetables are depicted in Fig. \ref{fig:linesmall:diagram} and
+Fig. \ref{fig:linelarge:diagram}.
 
 \begin{figure}
   \begin{subfigure}{\textwidth}
@@ -411,12 +436,12 @@ in Fig. \ref{fig:linesmall:diagram} and Fig. \ref{fig:linelarge:diagram}.
     \includegraphics[width=\textwidth]{figures/train_diagram_small}
   \end{subfigure}
   \caption{\subref{fig:linesmall:line} Nidzica -- Olsztynek segment of line No. 216. The segment comprises three
-      station blocks (1 -- Nidzica, 3 -- Waplewo, 5 -- Olsztynek), and two line
-      blocks (2, 4). We assume that passing through the station block takes the same
-      amount of time independently of which track is used. \subref{fig:linesmall:diagram} Train diagram for the undisturbed timetable of the line in \subref{fig:linesmall:line}. The timetable features two
-      \emph{Inter--City} trains IC3521 and IC3520 and one \emph{Regio} train R90602. The paths for the
-      \emph{Inter-City} trains are marked with red and path of the \emph{Regio} train is marked with black.}
-    \label{fig:linesmall}
+    station blocks (1 -- Nidzica, 3 -- Waplewo, 5 -- Olsztynek), and two line
+    blocks (2, 4). We assume that passing through the station block takes the same
+    amount of time independently of which track is used. \subref{fig:linesmall:diagram} Train diagram for the undisturbed timetable of the line in \subref{fig:linesmall:line}. The timetable features two
+    \emph{Inter--City} trains IC3521 and IC3520 and one \emph{Regio} train R90602. The paths for the
+    \emph{Inter-City} trains are marked with red and path of the \emph{Regio} train is marked with black.}
+  \label{fig:linesmall}
 \end{figure}
 
 \begin{figure}
@@ -429,21 +454,22 @@ in Fig. \ref{fig:linesmall:diagram} and Fig. \ref{fig:linelarge:diagram}.
     \includegraphics[width=\textwidth]{figures/train_diagram}
   \end{subfigure}
   \caption{\subref{fig:linelarge:line} Goleszów -- Wisła Uzdrowisko segment of line No. 191. The segment comprises 4
-      station blocks (1 -- Goleszów, 3 -- Ustroń, 7 -- Ustroń Polana, 10 -- Wisła
-      Uzdrowisko) and 6 line blocks (2, 4, 5, 6, 8, 9). Between line blocks there are
-      additional passenger platforms at Ustroń Zdrój, Ustroń Poniwiec and Wisła
-      Jawornik. \subref{fig:linelarge:diagram} Train diagram for the timetable of the line in \subref{fig:linelarge:line}.
-      The timetable features two \emph{Inter--City} trains (IC1 and IC2) and four regional trains (Ks1--Ks4).
-      The paths of the \emph{Inter--City} trains are marked with red and paths of the regional trains are
-      marked with black.}
-    \label{fig:linelarge}
+    station blocks (1 -- Goleszów, 3 -- Ustroń, 7 -- Ustroń Polana, 10 -- Wisła
+    Uzdrowisko) and 6 line blocks (2, 4, 5, 6, 8, 9). Between line blocks there are
+    additional passenger platforms at Ustroń Zdrój, Ustroń Poniwiec and Wisła
+    Jawornik. \subref{fig:linelarge:diagram} Train diagram for the timetable of the line in \subref{fig:linelarge:line}.
+    The timetable features two \emph{Inter--City} trains (IC1 and IC2) and four regional trains (Ks1--Ks4).
+    The paths of the \emph{Inter--City} trains are marked with red and paths of the regional trains are
+    marked with black.}
+  \label{fig:linelarge}
 \end{figure}
 
-Timetable for the network segment of line No. 216 includes two \emph{Inter-City} trains,
-IC5320 and IC3521, and a regional \emph{Regio} train R90602. For the line No. 191,
-the timetable includes two \emph{Inter-City} trains IC1, IC2 and four regional trains
-Ks1--Ks4. We assume both \emph{Inter-City} trains in line No. 191 are operated with the same
-train set, with a minimum service time of $R(j,j') = 20\mbox{minutes}$.
+Timetable for the network segment of line No. 216 includes two
+\emph{Inter-City} trains, IC5320 and IC3521, and a regional \emph{Regio} train
+R90602. For the line No. 191, the timetable includes two \emph{Inter-City}
+trains IC1, IC2 and four regional trains Ks1--Ks4. We assume both
+\emph{Inter-City} trains in line No. 191 are operated with the same train set,
+with a minimum service time of $R(j,j') = 20\mbox{minutes}$.
 
 For both network segments, we assume that the minimum waiting times at all
 considered stations are 1 minute. Also, we assume that the passing times
@@ -453,15 +479,15 @@ time reserve occurs at the station blocks.
 
 \subsection{Disturbance scenarios}
 
-For the Nidzica--Olsztynek railway segment, we considered a single scenario with two delays.
-The purpose of this scenario is to illustrate our approach on a simple and yet real-world example.
-The first
-one is a 15-minute delay of IC5320 starting from station block 5. The second one is
-that of the IC3521 leaving station block 1 5 minutes late. Considering this and
-our assumptions, this creates conflicts, where two \emph{Inter--City} trains,
-as well as an \emph{Inter--City} train and the \emph{Regio} train, have conflicts at
-block 4. The conflicted, infeasible train diagram for this situation is
-depicted in Fig. \ref{fig:smallconflict}.
+For the Nidzica--Olsztynek railway segment, we considered a single scenario
+with two delays. The purpose of this scenario is to illustrate our approach on
+a simple and yet real-world example. The first one is a 15-minute delay of
+IC5320 starting from station block 5. The second one is that of the IC3521
+leaving station block 1 5 minutes late. Considering this and our assumptions,
+this creates conflicts, where two \emph{Inter--City} trains, as well as an
+\emph{Inter--City} train and the \emph{Regio} train, have conflicts at block 4.
+The conflicted, infeasible train diagram for this situation is depicted in Fig.
+\ref{fig:smallconflict}.
 
 \begin{figure}
   \begin{subfigure}[b]{0.5\columnwidth}
@@ -481,16 +507,19 @@ depicted in Fig. \ref{fig:smallconflict}.
   \label{fig:smallconflict}
 \end{figure}
 
-For the Goleszów -- Wisła Uzdrowisko line, we considered several different scenarios, which were
-designed to illustrate our approach on a larger example:
+For the Goleszów -- Wisła Uzdrowisko line, we considered several different
+scenarios, which were designed to illustrate our approach on a larger example:
 
 \begin{enumerate}
   \item A moderate delay of the \emph{Inter--City} train starting from the station
     block 1. This results in a single conflict between IC1 and Ks2.
-  \item A moderate delay of all the trains starting from station block 1, resulting in two conflicts.
-  \item A significant delay of some trains starting from station block 1. Results in two conflicts.
-  \item A significant delay of the \emph{Inter--City} train IC1 starting from the station
-    block 1. Results in a single conflict, which is straightforward to resolve.
+  \item A moderate delay of all the trains starting from station block 1, resulting in
+    two conflicts.
+  \item A significant delay of some trains starting from station block 1. Results in
+    two conflicts.
+  \item A significant delay of the \emph{Inter--City} train IC1 starting from the
+    station block 1. Results in a single conflict, which is straightforward to
+    resolve.
 \end{enumerate}
 
 The delays in all the aforementioned scenarios were chosen so that they indeed
@@ -515,9 +544,10 @@ result in conflicts. The conflicted timetables are presented in Fig.
     \caption{}\label{c4}
     \includegraphics[width=\textwidth]{figures/case4_conflict}
   \end{subfigure}
-  \caption{Conflicted timetables for line No. 216. \subref{c1} Single conflict, observe that the additional delay of Ks$2$ will propagate to the delay of Ks$3$.
-    \subref{c2} Two conflicts, with no impact of Ks$2$ on Ks$3$. \subref{c3} Multiple conflicts. \subref{c4}
-  One conflict, straightforward to resolve.}
+  \caption{Conflicted timetables for line No. 216. \subref{c1} Single conflict, observe
+    that the additional delay of Ks$2$ will propagate to the delay of Ks$3$.
+    \subref{c2} Two conflicts, with no impact of Ks$2$ on Ks$3$. \subref{c3}
+    Multiple conflicts. \subref{c4} One conflict, straightforward to resolve.}
   \label{fig:conflictlarge}
 \end{figure}
 
@@ -536,9 +566,9 @@ In FCFS (resp. FLFS) the way is given to the train that first arrives (resp.
 first leaves) the considered station block at which the conflict occurs. AMCC
 is slightly more complex. In this heuristic, one tries to minimize the maximum
 secondary delays of the trains. We want to stress that those heuristics
-facilitate different objective functions, and hence it is not possible to directly
-compare them -- nevertheless, it might be useful to discuss qualitative
-differences between the solutions they produce.
+facilitate different objective functions, and hence it is not possible to
+directly compare them -- nevertheless, it might be useful to discuss
+qualitative differences between the solutions they produce.
 
 For the case of Nidzica--Olsztynek line, all heuristics returned the same
 solution, depicted in Fig. \ref{fig:smallheurresolution}. The conflict is
@@ -572,33 +602,75 @@ is presented in Table \ref{tab:simple}
 
 \subsection{Details on QUBO construction}
 
-To formulate our dispatching problems as QUBO and solve them on the D-Wave annealer
-(or using any other method), we first need to decide on the values of several parameters
-of the model, as well as the precise form of the cost function. We start with the latter.
+To formulate our dispatching problems as QUBO and solve them on the D-Wave
+annealer (or using any other method), we first need to decide on the values of
+several parameters of the model, as well as the precise form of the cost
+function. We start with the latter.
 
-We decided on using the cost function proportional to the secondary delays of all trains
-entering their last station block. Additionally, we weight the contributions of each delay with
-a coefficient depending on the prioritization of the corresponding train, resulting in the cost
-function of the form:
+We decided on using the cost function proportional to the secondary delays of
+all trains entering their last station block. Additionally, we weight the
+contributions of each delay with a coefficient depending on the prioritization
+of the corresponding train, resulting in the cost function of the form:
 \begin{equation}
   f(\mathbf{x}) = \sum_{j \in J}\left(\sum_{m  \in A_{j,s^{*}}}w_{j} \frac{d(j,s^{*}) - d_{U}(j,s^{*})}{d_{\max}(j)}x_{j,s^{*},m}\right),
 \end{equation}
-where $s^{*} = s_{j,end-1}$. The priorities $w_{j}$ are chosen specifically for both networks. One can immediately observe that larger values of $w_{j}$ increase contribution stemming from the delay of given train, and hence the objective function favors solutions with smaller delays for the trains with larger priorities. For the segment of line No. 216, we assume $w_{j}= 1.5$ for all \emph{Inter-City} trains, and the $w_{j}=1.0$ for the regional train. This prioritization coincides with the usual prioritization
-of trains in Poland (and many countries). For the segment of line No. 191, we decided to adopt a slightly more complicated prioritization. For the trains heading toward block 10, we set a lower priority of $w_{j}=0.9$. For the trains heading in the opposite direction, we set $w_{j}=1.5$ and $w_{j}=1.0$ for \emph{Inter-City} and regional trains respectively. This is because the trains heading towards block 1 (Goleszów) also head towards important junctions in Polish railway network (Katowice for regional trains, and capital city of Warsaw for \emph{Inter-city} trains). Our strategy therefore tries to avoid larger delays in this direction to limit further disturbance to the rest of the network.
+where $s^{*} = s_{j,end-1}$. The priorities $w_{j}$ are chosen specifically for
+both networks. One can immediately observe that larger values of $w_{j}$
+increase contribution stemming from the delay of given train, and hence the
+objective function favors solutions with smaller delays for the trains with
+larger priorities. For the segment of line No. 216, we assume $w_{j}= 1.5$ for
+all \emph{Inter-City} trains, and the $w_{j}=1.0$ for the regional train. This
+prioritization coincides with the usual prioritization of trains in Poland (and
+many countries). For the segment of line No. 191, we decided to adopt a
+slightly more complicated prioritization. For the trains heading toward block
+10, we set a lower priority of $w_{j}=0.9$. For the trains heading in the
+opposite direction, we set $w_{j}=1.5$ and $w_{j}=1.0$ for \emph{Inter-City}
+and regional trains respectively. This is because the trains heading towards
+block 1 (Goleszów) also head towards important junctions in Polish railway
+network (Katowice for regional trains, and capital city of Warsaw for
+\emph{Inter-city} trains). Our strategy therefore tries to avoid larger delays
+in this direction to limit further disturbance to the rest of the network.
 
-As for the maximum secondary delay $d_{\max}$, for simplicity, we assume it is the same for all trains. On the one hand, its value cannot be smaller than the one returned by the AMCC heuristics. On the other hand, setting this value too high increases the number of decision variables and complicates the objective function, which is especially undesirable because of the limited number of qubits on D-Wave annealers. For line No. 216, we set $d_{\max}=7$ and for line No. 191 we set $d_{\max}=10$. The total number of decision variables is given by
+As for the maximum secondary delay $d_{\max}$, for simplicity, we assume it is
+the same for all trains. On the one hand, its value cannot be smaller than the
+one returned by the AMCC heuristics. On the other hand, setting this value too
+high increases the number of decision variables and complicates the objective
+function, which is especially undesirable because of the limited number of
+qubits on D-Wave annealers. For line No. 216, we set $d_{\max}=7$ and for line
+No. 191 we set $d_{\max}=10$. The total number of decision variables is given
+by
 \begin{equation}
   \mbox{\#variables} = (\mbox{\#station blocks}-1) \cdot (\mbox{\#number of trains}) \cdot (d_{\max}+1)
 \end{equation}
-We therefore get $2\cdot 3 \cdot 8 = 48$ decision variables for line No. 216 and $3 \cdot 6 \cdot 11 = 198$ variables for line No. 191. Importantly, the moderately low number of variables for line no. 216 allows us to solve it using the brute--force algorithm presented in Chapter \ref{chapter:bruteforce}.
+We therefore get $2\cdot 3 \cdot 8 = 48$ decision variables for line No. 216
+and $3 \cdot 6 \cdot 11 = 198$ variables for line No. 191. Importantly, the
+moderately low number of variables for line no. 216 allows us to solve it using
+the brute--force algorithm presented in Chapter \ref{chapter:bruteforce}.
 
-Lastly, we need to choose values for $p_{pair}$ and $p_{sum}$ penalty weights. This is a very subtle choice. On the one hand, setting it too low may cause some of the infeasible solutions to have the value of the objective function smaller than that of feasible solutions, which is undesirable. On the other hand, if penalty weights are too high, the actual cost function becomes merely a perturbation for the penalty terms, which is also undesirable. To illustrate the difference those weights make to the energy landscape, we computed the low-energy spectrum for the problem defined on line No. 216 for several different values of $p_{pair}$ and $p_{sum}$. The histograms of energies obtained in this way are presented in Fig. \ref{fig:penaltyhistogram}.
+Lastly, we need to choose values for $p_{pair}$ and $p_{sum}$ penalty weights.
+This is a very subtle choice. On the one hand, setting it too low may cause
+some of the infeasible solutions to have the value of the objective function
+smaller than that of feasible solutions, which is undesirable. On the other
+hand, if penalty weights are too high, the actual cost function becomes merely
+a perturbation for the penalty terms, which is also undesirable. To illustrate
+the difference those weights make to the energy landscape, we computed the
+low-energy spectrum for the problem defined on line No. 216 for several
+different values of $p_{pair}$ and $p_{sum}$. The histograms of energies
+obtained in this way are presented in Fig. \ref{fig:penaltyhistogram}.
 
 \begin{figure}
   \includegraphics[width=\textwidth]{figures/railway_histograms_bf}
-  \caption{Energy histogram for feasible (green) and infeasible (red) solutions of QUBO defined for line No. 216 with varying penalty weights. The figure takes into account first 5000 low energy states.}
-  \label{fig:penaltyhistogram}
+  \caption{Energy histogram for feasible (green) and infeasible (red) solutions of QUBO
+    defined for line No. 216 with varying penalty weights. The figure takes into
+    account first 5000 low energy states.} \label{fig:penaltyhistogram}
 \end{figure}
+
+In our experiments, we used several combinations of $p_{pair}$ and $p_{sum}$.
+
+\todo[inline]{Run some more D-Wave stuff to properly illustrate how the penalties affect the results}
+
+\subsubsection{Solutions with classical QUBO solvers}
+
 %%% Local Variables:
 %%% mode: pdflatex
 %%% TeX-master: "../main"
