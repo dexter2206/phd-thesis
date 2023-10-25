@@ -1,0 +1,71 @@
+\usepackage{pgfplots}
+\usetikzlibrary{calc}
+\usepgfplotslibrary{dateplot}
+\usepackage{pgfplotstable}
+
+\pgfplotsset{compat=1.18}
+
+\def\setstationy#1 #2 {
+  \expandafter\def\csname ycoord:#1\endcsname {#2}
+  \expandafter\def\csname invycoord:#2\endcsname {#1}
+}
+
+\def\stationy#1{\expandafter\csname ycoord:#1\endcsname}
+\def\stationfromy#1{\expandafter\csname invycoord:#1\endcsname}
+
+\def\removeleadingzeros#1{\if0#1 \expandafter\else#1\fi}
+
+%based on  https://tex.stackexchange.com/a/288225/194703
+\def\pgfplotslibdateplothour:minutetofloat#1:#2.{
+  \pgfmathparse{\removeleadingzeros#1+\removeleadingzeros#2/60}
+}
+
+\def\pgfplotslibdateplotfloattohour#1.#2{
+  \pgfmathsetmacro\hour{#1}
+  \pgfmathsetmacro\minute{#2*10}
+  \ifnum\hour<10\edef\hour{0\hour}\fi
+  \ifnum\minute<10\edef\minute{0\minute}\fi
+}
+
+\pgfplotsset{
+  /pgfplots/time coordinates in/.code={%
+    \pgfkeysdef{/pgfplots/#1 coord trafo}{%
+      \pgfplotslibdateplothour:minutetofloat##1.
+    }
+    \pgfkeysdef{/pgfplots/#1 coord inv trafo}{
+      \pgfmathsetmacro\hour{int(##1)}
+      \pgfmathsetmacro\minute{int(round(##1*60-\hour*60))}
+      \ifnum\hour<10\edef\hour{0\hour}\fi
+      \ifnum\minute<10\edef\minute{0\minute}\fi
+    }
+  }
+}
+
+\pgfplotsset{
+  /pgfplots/station coordinates in/.code={%
+    \pgfkeysdef{/pgfplots/#1 coord trafo}{
+      \pgfmathparse{\stationy{##1}}
+    }
+    \pgfkeysdef{/pgfplots/#1 coord inv trafo}{
+      \pgfmathparse{int(floor(##1))}
+      \pgfmathsetmacro\station{\stationfromy{\pgfmathresult}}
+    }
+  }
+}
+
+\pgfplotsset{
+  traindiagram/.style={
+    time coordinates in=x,
+    station coordinates in=y,
+    y dir=reverse,
+    xlabel=time,
+    ylabel=station block,
+    ytick=data,
+    every tick label/.append style={font=\tiny},
+    grid=major,
+    xticklabel={\hour:\minute},
+    yticklabel={\station},
+    x tick label style={yshift=-{(mod(\ticknum,2)==1)*0.5em}}
+  },
+  trainpath/.style={thick}
+}

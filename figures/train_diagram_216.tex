@@ -1,0 +1,40 @@
+\documentclass{standalone}
+
+\input{traindiags.tex}
+
+\setstationy 1 0
+\setstationy 3 19
+\setstationy 5 28
+
+\begin{document}
+
+
+\pgfplotstableset{col sep=comma, x=time, y=block}
+\pgfplotstablevertcat{\output}{../data/IC_5320.csv}
+\pgfplotstablevertcat{\output}{../data/IC_3521.csv}
+\pgfplotstablevertcat{\output}{../data/R_90602.csv}
+\pgfplotstablesort[sort key=time, sort cmp = string <]{\output}{\output}
+
+\begin{tikzpicture}
+  \begin{axis}[traindiagram, xtick=data, width=12cm, height=7cm]
+    \addplot [draw=none] table[x=time, y index=0] {\output};
+    \addplot [trainpath, red] table {../data/IC_5320.csv};
+    \addplot [trainpath, red] table {../data/IC_3521.csv};
+    \addplot [trainpath, black] table {../data/R_90602.csv};
+
+    \node at ($(axis cs:13:58,3)!0.5!(axis cs:13:58,5)$)
+    [red,rotate=50, anchor=south]{IC5320};
+    \node at ($(axis cs:14:17.5,3)!0.5!(axis cs:14:17.5,1)$)
+    [red,rotate=52, anchor=south]{IC5320};
+    \node at ($(axis cs:14:00,1)!0.5!(axis cs:14:00,3)$)
+    [red,rotate=-50, anchor=south]{IC3521};
+    \node at ($(axis cs:14:14,5)!0.5!(axis cs:14:14,3)$)
+    [red,rotate=-50, anchor=south]{IC3521};
+    \node at ($(axis cs:14:25,5)!0.5!(axis cs:14:25,3)$)
+    [black,rotate=50, anchor=south]{R90602};
+    \node at ($(axis cs:14:39,1)!0.5!(axis cs:14:39,3)$)
+    [black,rotate=50, anchor=south]{R90602};
+  \end{axis}
+
+\end{tikzpicture}
+\end{document}
