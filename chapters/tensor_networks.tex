@@ -1,10 +1,12 @@
 \chapter{Solving spin-glass problems using tensor networks}
 \label{chapter:tn}
 
+Benchmarking quantum annealers requires more sophisticated algorithms. \todo{write more intro}
+While there exists a plethora of general-purpose optimization algorithms, one might hope to achieve better results by exploiting the topology of the problem's underlying graph and thus locality therein. In this chapter, we describe a recent, tensor network-based algorithm for finding low-energy spectrum of Ising spin-glasses, designed for problems defined on Chimera-like quasi-two-dimensional graphs. The algorithm exploits the sparsity and locality of the Chimera graph by representing the Boltzmann distribution of spin-glass as a tensor network, whose approximate contraction can be used for computing marginal probability distributions. This procedure can then be combined with the well-known branch and bound algorithm to iteratively select the most promising partial solutions, finally producing an approximation of the low-energy spectrum.
+
 \section{Introduction to tensor networks}
 
-Benchmarking quantum annealers requires more sophisticated algorithms. \todo{write more intro}
-While there exists a plethora of general-purpose optimization algorithms, one might hope to achieve better results by exploiting the topology of the problem's underlying graph and thus locality therein. In this chapter we describe a recent, tensor-network based algorithm for finding low-energy spectrum of Ising spin-glasses, designed for problems defined on Chimera-like quasi-two-dimensional graphs. The algorithm exploits sparsity and locality of Chimera graph by representing Boltzmann distribution of spin-glass as a tensor network, whose approximate contraction can be used for computing marginal probability distributions. This procedure can then be combined with the well known branch and bound algorithm to iteratively select the most promising partial solutions, finally producing an approximation of the low-energy spectrum.
+
 
 \todo[inline,color=SkyBlue]{Mention that the algorithm is physics inspired}
 \todo[inline,color=SkyBlue]{Mention the other Chimera-specific algorithm}
