@@ -84,13 +84,21 @@
 		{\large mgr Konrad \textsc{Jałowiecki}}\\
 		Supervisor:\\ dr hab. Bartłomiej Gardas\\
 		\vfill
-		{Gliwice, \today}
+		{Gliwice \today}
 	\end{center}
 \end{titlingpage}
 
-\input{published_work.tex}
+\frontmatter
 
+\tableofcontents*
+
+%\addtocontents{toc}{\setlength{\cftchapterindent}{\cftchapternumwidth}}
+\input{published_work.tex}
+%\addtocontents{toc}{\setlength{\cftchapterindent}{\cftchapternumwidth}}
 \input{chapters/abstract_en.tex}
+
+\mainmatter
+
 \input{chapters/introduction.tex}
 \input{chapters/ising.tex}
 \input{chapters/near-term-technologies.tex}

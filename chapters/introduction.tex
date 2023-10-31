@@ -1,4 +1,4 @@
-\chapter*{Introduction}
+\chapter{Introduction}
 The previous century has witnessed what is now called the digital revolution. The introduction of
 computers dramatically altered multiple aspects of our lives. In particular, almost every area of
 science benefitted hugely from the increasingly available computational power \cite{winsberg}.
@@ -37,31 +37,46 @@ unstructured database search \cite{grover}, offering quadratic speed-up over cla
 
 The invention of specialized quantum algorithms further fuelled interest in the field. In recent years, we observed an unprecedented development of hardware that brings us closer to the quantum revolution. Several implementations of gate--based quantum computers \cite{ionq, bohnet} and quantum annealers \cite{johnson, dattani} were constructed and made publicly available. This allowed scientists to benchmark them and further research their possible applications.
 
-However promising, near-term quantum computers are far from perfect. One could ask whether already
-these noisy devices can be used for simulating the dynamics of quantum systems. In Chapter \ref{chapter:simulating}, we
-are aiming to show that this is indeed the case, and present-day quantum annealers can be used in a
-hybrid, parallel-in-time algorithm simulating small quantum systems. While our algorithm is only a
-proof of concept, it exemplifies possible directions of future research.
+However promising, near-term quantum computers are far from perfect. Can those noisy devices
+already be used to solve some real--world problems? And how does one approach validating if this is
+the case? In this thesis, we try to answer these questions, focusing solely on a specific type of
+quantum computer -- namely, the D-Wave quantum annealers. We begin with an introduction to Ising and QUBO models (collectively known as Binary Quadratic Models)
+in Chapter \ref{chapter:ising}. The chapter lays the neccessary foundations for understanding optimization problems
+that can be, at least in principle, solved using quantum annealers.
+
+In Chapter \ref{chapter:near-term} we introduce technologies and devices used for conducting research
+presented in this thesis. Quite naturally, the first of those devices are quantum annealers. We briefly
+describe the principle of operation of these devices and then move on to discuss currently available models.
+We also describe NVIDIA CUDA, another technology that we used for implementing the brute-force algorithm presented in Chapter \ref{chapter:bruteforce}.
+
+It is widely believed that a noiseless universal quantum computer would be capable of simulating quantum systems.
+But what about the near-term quantum devices? In Chapter \ref{chapter:simulating} we explore the idea of simulating the evolution of dynamical (not necessarily quantum) systems using quantum annealers.
+We describe how to represent the task of simulating the dynamics as a static optimization problem and then
+present experimental results obtained from the D-Wave annealer. We find out that for small systems, the annealer
+is able to faithfully capture the dynamics. We also discuss possible sources of errors for the problem instances
+that the annealers failed to solve. While our algorithm is only a proof of concept, it exemplifies possible directions of future research.
 
 A key component in assessing the performance of current quantum annealers is comparing them to the
 classical algorithms solving the same problems. While there exists a plethora of general heuristic
-methods for finding a ground state of Ising spin--glass, one can ask if it is possible to construct
+methods for finding a ground state of Ising spin-glass, one can ask if it is possible to construct
 a better algorithm tailored for problems defined on the same graph as the physical device.
-In chapter \ref{chapter:tn}, we present a recent, heuristic algorithm for finding the low-energy
-spectrum of an Ising spin--glass based on tensor-networks specifically suited for problems defined
+In Chapter \ref{chapter:tn}, we present a recent, heuristic algorithm for finding the low-energy
+spectrum of an Ising spin-glass based on tensor networks, specifically suited for problems defined
 on Chimera-like graphs.
 
 Chapter \ref{chapter:bruteforce} describes a fast, parallel approach for exhaustively searching for
-low--energy spectrum of Ising spin--glass problems. Our method is suitable for solving small (less
+a low-energy spectrum of Ising spin--glass problems. Our method is suitable for solving small (less
 than 54 spins), but otherwise arbitrary instances. The presented approach can be used for
-benchmarking other algorithms that cannot certify their solution as well as obtaining low-energy
-spectrum of a spin--glass, which can be useful when analyzing energy landscape of the problem.
-We exemplify the usage of our algorithm by benchmarking a recent MPS--based algorithm on a set of
-random spin-glass problems.
+benchmarking other algorithms that cannot certify their solution. Moreover, the possibility of finding
+a low-energy spectrum (instead of a single solution) is extremely useful for analyzing the energy
+landscape of the problem. We exemplify the usage of our algorithm by benchmarking a recent MPS--based
+algorithm on a set of random spin-glass problems. Compared to the original algorithm presented in
+\cite{bruteforce}, the algorithm described in Chapter \ref{chapter:bruteforce} contains several
+new, non-trivial, optimizations further increasing the problem sizes that it can tackle.
 
-Lastly, in chapter \ref{chapter:trains}, we present application of quantum annealing to solving
-certain railway dispatching problems. We discuss how railway dispatching problems can be converted
-to QUBO suitable for running on the annealer. We then report the performance of the current generation
+Lastly, in chapter \ref{chapter:trains}, we present the application of quantum annealing to solving
+certain railway dispatching problems. We discuss how such problems can be converted
+to QUBO problems suitable for running on the annealer. We then report the performance of the current generation
 of quantum annealers on a set of dispatching problems constructed for real Polish railway networks.
 Presented benchmarks extend results presented in \cite{trains} to the newer generation of quantum annealers.
 Compared to \cite{trains}, we also include a more detailed discussion on the influence of penalty terms
