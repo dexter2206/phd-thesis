@@ -3,7 +3,7 @@
 
 Quantum annealers are fundamentally different from classical computers. For
 one, they don't execute programs written as a sequence of instructions in their
-memory. Instead, they are single--purpose devices capable (in principle) of
+memory. Instead, they are single-purpose devices capable (in principle) of
 solving a specific optimization problem. Namely, annealers are designed to find
 the lowest energy configuration (called \emph{ground state}) of the Ising
 spin--glass model, which we introduce in this chapter.
@@ -19,7 +19,7 @@ computers, but there exists a plethora of heuristic, classical algorithms
 capable of finding solutions that are at least ``good enough''. As the next
 point in this chapter, we provide a brief overview of the most popular ones.
 These algorithms will serve as a baseline for comparison with quantum annealing
-and a recent tensor network--based approach discussed later in the thesis.
+and a recent tensor network-based approach discussed later in the thesis.
 
 As the last point in the chapter, we define the Quadratic Unconstrained Binary
 Optimization (QUBO) problem, which is equivalent to the problem of finding the
@@ -41,29 +41,32 @@ Consider a simple\footnote{That is, one that does not contain duplicate edges
   or loops.}, undirected graph $G = (V, E)$ with $N$ nodes labeled by consecutive
 natural numbers. With each node, $i \in V$ we associate a spin variable $s_i
   \in \{-1, 1\}$. To each edge $\{i, j\} \in E$, we assign an interaction
-strength $J_{ij}$ and to each node $i \in V$ we assign a local magnetic field
-$h_i$. Here, all $J_{ij}$ and $h_i$ are real numbers. For such a system, one
-can define the following energy function (Hamiltonian):
-\begin{equation}
-  \label{eq:ising-hamiltonian}
-  H(\mathbf{s}) = \sum_{\langle i, j \rangle} J_{ij} s_i s_j +  \sum_{i=1}^N h_i s_i,
-\end{equation}
-where $\mathbf{s} = (s_i, \ldots, s_N)$ and the first sum runs over all edges exactly once\footnote{
-  In the
-  literature, the Ising Hamiltonian \eqref{eq:ising-hamiltonian} is often negated. However, the
-  definition provided here is consistent with the one used by D-Wave, and thus more suitable for use
+    strength $J_{ij}$ and to each node $i \in V$ we assign a local magnetic field
+  $h_i$. Here, all $J_{ij}$ and $h_i$ are real numbers. For such a system, one
+    can define the following energy function (Hamiltonian):
+    \begin{equation}
+      \label{eq:ising-hamiltonian}
+      H(\mathbf{s}) = \sum_{\langle i, j \rangle} J_{ij} s_i s_j +  \sum_{i=1}^N h_i s_i,
+    \end{equation}
+    where $\mathbf{s} = (s_i, \ldots, s_N)$ and the first sum runs over all edges
+exactly once\footnote{ In the literature, the Ising Hamiltonian
+  \eqref{eq:ising-hamiltonian} is often negated. However, the definition provided
+  here is consistent with the one used by D-Wave, and thus more suitable for use
   in this thesis.}.
 
 For fixed model coefficients, one is typically interested in finding its
 \emph{ground state}, a configuration $\mathbf{s}$ that minimizes $H$. More
-generally, it might be desirable to search for $k \ll 2^N$ configurations with
+    generally, it might be desirable to search for $k \ll 2^N$ configurations with
 the lowest energy, a so-called \emph{low--energy spectrum of size $k$}.
 
 \begin{figure}[H]
   \centering
   \includegraphics{figures/spins.pdf}
-  \caption{Symbolic representation of Ising spin--glass defined on the graph with $N=16$ nodes. Here, $h_i$ is a real number associated with $i$-th node, and $J_{ij}$ denotes coupling strength associated with an edge between $i$-th and $j$-th node. The configuration of each spin is marked by a red arrow pointing upwards (+1) or a blue arrow pointing downwards (-1).}
-  \label{fig:my_label}
+  \caption{Symbolic representation of Ising spin--glass defined on the graph with $N=16$
+    nodes. Here, $h_i$ is a real number associated with $i$-th node, and $J_{ij}$
+        denotes coupling strength associated with an edge between $i$-th and $j$-th
+    node. The configuration of each spin is marked by a red arrow pointing upwards
+    (+1) or a blue arrow pointing downwards (-1).} \label{fig:my_label}
 \end{figure}
 
 \begin{example}
@@ -89,10 +92,13 @@ the lowest energy, a so-called \emph{low--energy spectrum of size $k$}.
       \end{tabular}
     \end{center}
   \end{table}
-  Observe that the lowest attainable energy is -5 and there are 3 states with exactly this energy. Hence, all the configurations $(-1, 1, -1)$, $(-1, 1, 1)$, $(1,
-    -1, -1)$ are ground states. This situation, i.e. when two or more states share the same energy, is called \emph{degeneracy} and the states in question are called \emph{degenerate}. For this instance, a low energy spectrum of size $k=5$ comprises all
-  ground states, the $(-1, -1, -1)$ state with $H(-1, -1, -1) = -1$ and any of the states with
-  $H(\mathbf{s})=3$.
+  Observe that the lowest attainable energy is -5 and there are 3 states with
+  exactly this energy. Hence, all the configurations $(-1, 1, -1)$, $(-1, 1, 1)$,
+  $(1, -1, -1)$ are ground states. This situation, i.e. when two or more states
+  share the same energy, is called \emph{degeneracy} and the states in question
+  are called \emph{degenerate}. For this instance, a low energy spectrum of size
+  $k=5$ comprises all ground states, the $(-1, -1, -1)$ state with $H(-1, -1, -1)
+    = -1$ and any of the states with $H(\mathbf{s})=3$.
 \end{example}
 
 Despite the simple formulation, the problem of finding a ground state of Ising
@@ -169,9 +175,11 @@ that a better algorithm is found shortly after the original one is discovered
 
 \begin{figure}
   \includegraphics[width=\textwidth]{figures/complexity_new.pdf}
-  \caption{Hierarchy of basic complexity classes. Under the assumption of $\textbf{P} \ne \textbf{NP}$ (left), the hierarchy is richer and there exist problems in \textbf{NP}  that are not \textbf{NP}--complete. Under the opposite assumption (right), the hierarchy collapses. Notice that in both cases there exist \textbf{NP}--hard problems that are not in \textbf{NP}
-  }
-  \label{fig:complexity}
+  \caption{Hierarchy of basic complexity classes. Under the assumption of $\textbf{P} \ne
+      \textbf{NP}$ (left), the hierarchy is richer and there exist problems in
+    \textbf{NP} that are not \textbf{NP}--complete. Under the opposite assumption
+    (right), the hierarchy collapses. Notice that in both cases there exist
+    \textbf{NP}--hard problems that are not in \textbf{NP} } \label{fig:complexity}
 \end{figure}
 
 \section{Ising model and complexity}
@@ -180,7 +188,7 @@ Thus far, we only discussed classes of decision problems. How do they relate to
 the problem of finding a ground state of the Ising model? Suppose we are given
 an Ising model instance with hamiltonian $H$ and let $x \in \RR$ be some fixed
 number. Consider the problem of deciding whether there exists $\mathbf{s}$ such
-that $H(\mathbf{s}) \le x$. We will call this problem a \emph{decision version
+    that $H(\mathbf{s}) \le x$. We will call this problem a \emph{decision version
   of the Ising problem}.
 
 If we can minimize $H$, we can also solve the decision problem by simply
@@ -205,9 +213,9 @@ finding the ground state of Ising spin-glass \cite{lucas}.
 As a side note, one might be tempted to think that the \textbf{NP--hard}ness of
 finding Ising model's ground state is trivial, because its enormous state space
 comprises $2^{N}$ states. However, it is important to remember that the size of
-the solution space itself is not enough to reason about the problem's hardness.
-For instance, the number of possible spanning trees in the complete graph of
-$N$ vertices is $N^{(N-2)}$, yet the minimum spanning tree problem is solvable
+    the solution space itself is not enough to reason about the problem's hardness.
+    For instance, the number of possible spanning trees in the complete graph of
+  $N$ vertices is $N^{(N-2)}$, yet the minimum spanning tree problem is solvable
 in polynomial time via several algorithms \cite{clrs}.
 
 \section{Algorithms for solving Ising model}
@@ -215,8 +223,16 @@ in polynomial time via several algorithms \cite{clrs}.
 \begin{figure}
   \centering
   \includegraphics[width=\textwidth]{figures/pt_and_sa.pdf}
-  \caption{Schematic representation of simulated annealing \textbf{(a)} and parallel tempering \textbf{(b)} algorithms. In simulated annealing, a single copy of the system is simulated. The temperature of the system is decreasing with each epoch, thus reducing movement through the state space. In parallel tempering, several copies (replicas) of the system are simulated, each with a fixed temperature. Hotter replicas move through the state space rapidly and less predictably, while colder replicas move conservatively. Between epochs, replicas can exchange states, which helps avoid being stuck at local minima. Exchanging replicas can also be viewed as reseeding of the colder replicas by randomized solutions provided by hotter replicas.}
-  \label{fig:sa}
+  \caption{Schematic representation of simulated annealing \textbf{(a)} and parallel
+    tempering \textbf{(b)} algorithms. In simulated annealing, a single copy of the
+    system is simulated. The temperature of the system is decreasing with each
+    epoch, thus reducing movement through the state space. In parallel tempering,
+    several copies (replicas) of the system are simulated, each with a fixed
+    temperature. Hotter replicas move through the state space rapidly and less
+    predictably, while colder replicas move conservatively. Between epochs,
+    replicas can exchange states, which helps avoid being stuck at local minima.
+    Exchanging replicas can also be viewed as reseeding of the colder replicas by
+    randomized solutions provided by hotter replicas.} \label{fig:sa}
 \end{figure}
 
 As is the case with many \textbf{NP--hard} optimization problems, there are
@@ -247,28 +263,29 @@ Let us now introduce the Quadratic Unconstrained Binary Optimization (QUBO)
 problem, which is essentially the same as the problem of finding the ground
 state of Ising spin--glass, except that in QUBO we use binary variables $q_{i}
   \in \{0, 1\}$ instead of $\pm 1$ spin variables. To distinguish between the two
-problems, we will use symbols $a_{ij}$ and $b_{i}$ to denote respectively
-quadratic and linear coefficients in QUBO, so the energy function to be
-minimized can be written as:
-\begin{equation}
-  \label{eq:qubo}
-  F(q_1, \ldots, q_N) =  \sum_{\langle i, j \rangle} a_{ij} q_i q_j + \sum_{i=1}^N b_iq_i,
-\end{equation}
-where, as in the Ising model, the first sum runs through all the edges of the graph on which
-the problem is defined.
+    problems, we will use symbols $a_{ij}$ and $b_{i}$ to denote respectively
+    quadratic and linear coefficients in QUBO, so the energy function to be
+    minimized can be written as:
+    \begin{equation}
+      \label{eq:qubo}
+      F(q_1, \ldots, q_N) =  \sum_{\langle i, j \rangle} a_{ij} q_i q_j + \sum_{i=1}^N b_iq_i,
+    \end{equation}
+    where, as in the Ising model, the first sum runs through all the edges of the
+    graph on which the problem is defined.
 
-The QUBO and Ising formulations are essentially equivalent. Indeed, it is
-always possible to transform the Ising Hamiltonian into the QUBO cost function
-by a linear substitution of variables $s_i \mapsto 2q_i-1$. Then, one obtains
-the function $F$ like in the equation \eqref{eq:qubo}, with the following
+    The QUBO and Ising formulations are essentially equivalent. Indeed, it is
+    always possible to transform the Ising Hamiltonian into the QUBO cost function
+    by a linear substitution of variables $s_i \mapsto 2q_i-1$. Then, one obtains
+    the function $F$ like in the equation \eqref{eq:qubo}, with the following
 values for $a_{ij}$ and $b_{i}$:
-\begin{equation}
-  \label{eq:toQUBO}
-  a_{ij}= 4J_{ij},
-  \quad
-  b_i= 2h_i - 2 \sum_{\langle i, j \rangle} J_{ij},
-\end{equation}
-where the last sum runs over all neighbors of node $i$. The obtained function $F$ differs from the original $H$ by the constant offset
+    \begin{equation}
+      \label{eq:toQUBO}
+      a_{ij}= 4J_{ij},
+      \quad
+      b_i= 2h_i - 2 \sum_{\langle i, j \rangle} J_{ij},
+    \end{equation}
+    where the last sum runs over all neighbors of node $i$. The obtained function
+  $F$ differs from the original $H$ by the constant offset
 \begin{equation}
   F(\mathbf{q}) - H(\mathbf{s}) =\sum_{i=1}^N h_i - \sum_{\langle i, j \rangle} J_{ij},
 \end{equation}
@@ -288,9 +305,9 @@ which is irrelevant to the optimization process.
   \begin{equation}
     F(q_{1}, q_{2}, q_{3}) = -4q_{1} -4q_{2}+8q_{3}+12q_{1}q_{2}-8q_{2}q_{3}.
   \end{equation}
-  The possible system configurations and their energies are listed in the table below.
-  Observe that all configurations differ from the ones by $1$, which is exactly what we get
-  if we computed the offset explicitly:
+  The possible system configurations and their energies are listed in the table
+  below. Observe that all configurations differ from the ones by $1$, which is
+  exactly what we get if we computed the offset explicitly:
   \begin{equation}
     \mbox{offset} = h_{1} + h_{2} + h_{3} - J_{12} - J_{23} = 1.
   \end{equation}
@@ -317,27 +334,28 @@ We will conclude this chapter by discussing alternative notation for QUBO
 problems when the problem is defined on a complete graph. In such a case, the
 first sum in the equation \eqref{eq:qubo} runs through all the possible pairs
 ${i, j}$, and thus $F$ can be written as:
-\begin{equation}
-  \label{eq:qubocomplete}
-  F(q_1, \ldots, q_N) =  \sum_{i=1}^N \sum_{j=i+1}^N a_{ij} q_i q_j + \sum_{i=1}^N b_iq_i,
-\end{equation}
-One can now define a $n \times n$ real symmetric matrix $Q$ with coefficients
-\begin{equation}
-  Q_{ij} = \begin{cases}
-    b_{i}  & i = j   \\
-    a_{ij} & i \ne j
-  \end{cases}
-\end{equation}
-Having in mind that squaring a binary variable does not change its value, we can again
-rewrite $F$ as
+    \begin{equation}
+      \label{eq:qubocomplete}
+      F(q_1, \ldots, q_N) =  \sum_{i=1}^N \sum_{j=i+1}^N a_{ij} q_i q_j + \sum_{i=1}^N b_iq_i,
+    \end{equation}
+    One can now define a $n \times n$ real symmetric matrix $Q$ with coefficients
+    \begin{equation}
+      Q_{ij} = \begin{cases}
+        b_{i}  & i = j   \\
+        a_{ij} & i \ne j
+      \end{cases}
+    \end{equation}
+    Having in mind that squaring a binary variable does not change its value, we
+    can again rewrite $F$ as
 \begin{equation}
   \label{eq:qubomatrix}
   F(q_{i}, \ldots, q_{N}) = \sum_{i \le j} Q_{ij} q_{i}q_{j} = \sum_{j \le i} Q_{ij} q_{i}q_{j}.
 \end{equation}
-Moreover, since it is always possible to view any given QUBO as a one defined on a complete graph
-(by introducing artificial edges with weights 0), the equation \eqref{eq:qubomatrix} provides
-a one--to--one correspondence between real symmetric matrices and QUBO problems. We will see
-the benefits of representing QUBO models as symmetric matrices when discussing the bruteforce
+Moreover, since it is always possible to view any given QUBO as a one defined
+on a complete graph (by introducing artificial edges with weights 0), the
+equation \eqref{eq:qubomatrix} provides a one--to--one correspondence between
+real symmetric matrices and QUBO problems. We will see the benefits of
+representing QUBO models as symmetric matrices when discussing the bruteforce
 algorithm in chapter \ref{chapter:bruteforce}
 
 %%% Local Variables:
