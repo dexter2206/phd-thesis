@@ -1,27 +1,27 @@
 \chapter{Abstract}
 
 In this thesis, we focus on the problem of validating and benchmarking quantum annealers in a
-practical context. To this end, we propose two algorithms solving real--world problems and test how
+practical context. To this end, we propose two algorithms for solving real-world problems and test how
 well they perform on the current generation of quantum annealers. The first algorithm allows for
-solving dynamics of quantum systems (or, in fact, any dynamical systems). The second of the proposed
+solving the dynamics of quantum systems (or, in fact, any dynamical systems). The second of the proposed
 algorithms is suitable for solving a particular family of railway dispatching problems: the delay
-and conflict management on single--track railway lines. We assess the performance of those
+and conflict management on single-track railway lines. We assess the performance of those
 algorithms on the current generation of D-Wave quantum annealers with the assistance of two novel,
-classical strategies for solving Ising model also presented in the thesis. The first, tensor
-network--based approach is a heuristic algorithm specifically tailored for solving instances defined
-on Chimera--like graphs, thus making it ideal for providing a baseline with which the results from
+classical strategies for solving an Ising model also presented in the thesis. The first, tensor
+network-based approach is a heuristic algorithm specifically tailored for solving instances defined
+on Chimera-like graphs, thus making it ideal for providing a baseline with which the results from
 physical annealers can be compared. The other presented approach is a massively parallel
-implementation of the exhaustive search through the whole solution space, also known as a
-brute--force approach. Although the brute--force approach is limited to moderate instance sizes, it
+implementation of the exhaustive search through the whole solution space, also known as the
+brute-force approach. Although the brute-force approach is limited to moderate instance sizes, it
 has the advantage of being able to compute the low energy spectrum and certify the solutions. Thus,
 it can be used to obtain additional insight into the solution space structure. The results obtained
-in our experiments suggest that already present--day quantum annealers are capable of solving a
-subset of the aforementioned optimization problems. In particular, we show that the D-Wave annalers
-are capable of capturing the dynamics of a simple two--level quantum system in a specific regime of
-parameters, and can be used to obtain good quality solutions for instance of railway conflict
+in our experiments suggest that already present-day quantum annealers are capable of solving a
+subset of the aforementioned optimization problems. In particular, we show that the D-Wave annealers
+are capable of capturing the dynamics of a simple two-level quantum system in a specific regime of
+parameters, and can be used to obtain good-quality solutions for instances of railway conflict
 management problems. Finally, our findings make it clear that the current generation of the D-Wave
 annealers is far from perfect. We discuss problem instances for which the annealers failed to find
-good, or even feasible solution. We also provide, where possible, a plausible explanation of why
+a good or even feasible solution. We also provide, where possible, a plausible explanation of why
 some of the presented problems might be hard for the annealers.
 %%% Local Variables:
 %%% mode: latex
