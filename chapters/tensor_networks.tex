@@ -129,57 +129,6 @@ belonging to the considered cluster. \todo[inline,color=green]{Should we
   mention here, that $H(\mathbf{s_c})$ can be replaced by some approximation
   scheme?}
 
-% Old stuff below!
-\todo[color=red,inline]{The old stuff is below, don't read this}
-\begin{figure}
-  \centering
-  \includegraphics[width=\textwidth]{figures/clustering.pdf}
-  \caption{Example quasi-two-dimensional graph that can be used with tensor networks based
-    algorithm presented here. By grouping several spins (variables) together, we
-    converted the original graph into a two-dimensional lattice. In this view, the
-    green lines represent \emph{inter}cluster edges, whereas the red lines
-    represent \emph{intra}cluster edges.} \label{fig:quasi2d}
-\end{figure}
-We start off by representing the probability distribution $\exp[-\beta
-    H(\mathbf{s})]$ using a PEPS-equivalent tensor network. Contracting the network
-    can give the probability of any full configuration, as well as marginal
-    probabilities
-
-    \begin{equation}
-      p(s_1, s_2, \ldots, s_k) \sim \tr[\mathcal{P}_{(s_1, \ldots, s_k)} e^{-\beta H(\mathbf{s})}]
-    \end{equation}
-    Here, $\mathcal{P}_{(s_1, \ldots, s_k)}$ is a projector on the subspace with a
-    given configuration $(s_1, \ldots, s_k)$. \todo[inline,color=SkyBlue]{Write
-  marginal probability using conditional probability, show that this depends only
-  on the boundary and not the whole searched configuration} To this end, with
-each cluster, we associate a tensor
-\begin{equation}
-  A^{\mathbf{s_c}}_{\mathbf{lrud}} = e^{-\beta H(\mathbf{s_c})} B^{\mathbf{s_c}^l}_\mathbf{l}C^{\mathbf{s_c}^r}_\mathbf{r}B^{\mathbf{s_c}^u}_\mathbf{u}C^{\mathbf{s_c}^d}_\mathbf{d}
-\end{equation}
-Here, $\mathbf{s_c}$ collects all spins in a given cluster, and
-  $\mathbf{s_c}^l$, $\mathbf{s_c}^r$, $\mathbf{s_c}^u$, $\mathbf{s_c}^d$ collect
-spins interacting with it from the left, right, up and down respectively.
-
-\todo[inline,color=SkyBlue]{Fill in tensor network construcion}
-
-\subsection{Branch and bound}
-The state space can be viewed as a tree. In the simplest case, $k$-th level of
-such tree contains all partial configurations $(s_1, \ldots, s_k)$. The basic
-idea of extracting low energy spectrum from such a tree is to use the branch
-and bound algorithm. In such an approach, at each step we keep at most $M$
-states from the $k$-th level of the tree. Those candidate states are then
-branched into $2M$ states from $k+1$ level. Instead of considering a single
-spins, at each tree level one can consider joint configurations of spins in
-$k-th$ cluster, which leads to a shorter but wider tree
-\todo[color=magenta]{This is true, although maybe not necessary to mention
-  here} \todo[inline,color=SkyBlue]{Mention that we shift from ising to factor
-  graph}
-\subsection{Approximate network contraction}
-Cost of exact contraction of the proposed network is prohibitively large,
-therefore, it has to be contracted approximately After visiting every level of
-a tree, one is left with an approximation of $M$ lowest energy states. in
-principle, the algorithm could be used for certifying the solution.
-
 %%% Local Variables:
 %%% mode: latex
 %%% TeX-master: "../main"
