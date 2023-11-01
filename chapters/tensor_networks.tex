@@ -2,7 +2,7 @@
 \label{chapter:tn}
 
 Benchmarking quantum annealers requires more sophisticated algorithms.
-\todo{write more intro} While there exists a plethora of general-purpose
+While there exists a plethora of general-purpose
 optimization algorithms, one might hope to achieve better results by exploiting
 the topology of the problem's underlying graph and thus locality therein. In
 this chapter, we describe a recent, tensor network-based algorithm for finding
@@ -125,10 +125,34 @@ Here, $\mathbf{s_c}$ collects all spins in a given cluster, and
     where $m$ denotes the number of spins in the cluster, and the virtual ones $l,
   r, u, d$ with dimensions depending on the number of inter-cluster edges. Note
     that $H$ in \eqref{eq:peps} is restricted to the graph induced by spins
-belonging to the considered cluster. \todo[inline,color=green]{Should we
-  mention here, that $H(\mathbf{s_c})$ can be replaced by some approximation
-  scheme?}
+belonging to the considered cluster.
 
+\section{Results}
+
+\begin{table}
+\centering
+\begin{tabular}{|l|c|ccc|}
+  \hline
+\rowcolor{theader}  Method & approx. ratio & $N=512$ & $N=1152$ & $N=2048$ \\
+\hline
+  TN & g.s. & 30s& 150s & 450s \\
+  \hline
+\hline
+PT (adaptive) & g.s. & 800s & --- & --- \\
+\hline
+PT (geometric)& $0.01$ & 0.53s & 4.16s & --- \\
+PT (geometric)& $0.005$ & 2.51s & 56.4s & --- \\
+PT (geometric)& $0.001$ & 158.4s & timed-out & --- \\
+PT (geometric)& $0.0001$ & 897.6s & timed-out & --- \\
+\hline
+\hline
+DWave 2000Q$_6$ & $0.01$ & $0.003$s & $0.006$s & $0.02$s \\
+DWave 2000Q$_6$ & $0.005$ & $0.2$s & timed-out & timed-out \\
+DWave 2000Q$_6$ & $0.001$ & timed-out & timed-out  & timed-out \\
+\hline
+\hline
+\end{tabular}
+\end{table}
 %%% Local Variables:
 %%% mode: latex
 %%% TeX-master: "../main"
