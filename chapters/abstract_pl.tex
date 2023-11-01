@@ -1,3 +1,31 @@
-\chapter*{Streszczenie}
+\chapter{Streszczenie}
 
-Streszczenie przetłumaczymy jak streszczenie po angielsku zostanie zaakceptowane.
+W niniejszej pracy skupiamy się na problemie walidowania i benchmarkowania wyżaraczy kwantowych w
+praktycznym kontekście. W tym celu, przedstawiamy dwa algorytmy służące do rozwiązywania rzeczywistych
+problemów, oraz sprawdzamy, jak dobrze sprawdzają się na obecnej generacji wyżaraczy kwantowych.
+Pierwszy z algorytmów pozwala na rozwiązywanie dynamiki kwantowych układów (lub, w gruncie rzeczy,
+dowolnych układów dynamicznych). Drugi z przedstawianych algorytmów może skolei zostać użyty do
+rozwiązywania pewnego podzbioru problemów kolejowych\todo{Ask KD how to translate ``railway dispatching problem''}:
+zarządania opóźnieniami i konfliktami w sieciach kolejowych o jednej linii.
+Oceny działania obu w.w. algorytmów na bieżącej generacji wyżaraczy D-Wave dokonujemy z pomocą dwóch,
+nowatorskich, klasycznych strategii rozwiązywania szkieł spinowych Isinga, które również prezentujemy
+w pracy. Piewrszym z nich, jest opierający się na sieciach tensorowych heurystyczny algorytm
+stworzony specjalnie do rozwiązywania szkieł spinowych zdefiniowanych na grafach przypominających
+topologię Chimera, co sprawia, że idealnie nadaje się do wyznaczania referencyjnych rozwiązań,
+do których można porównać wyniki z fizycznych wyżarzaczy. Drugim z prezentowanych podejść jest masywnie
+równoległa implementacja wyczerpującego przeszukiwania całej przestrzeni rozwiązań, tzw. brute-force.
+Mimo, że użycie algorytmu brute-force jest ograniczone do instancji o niewielkich rozmiarach,
+posiada on tę zaletę, że może wyznaczać niskoenergetyczne spektrum, oraz certyfikować rozwiązaniea.
+W związku z tym, algorytm ten może slużyć do uzyskania dodatkowego wglądu w strukturę przestrzeni rozwiązań.
+Wyniki otrzymane w naszych eksperymentach sugerują, że już współczesne wyżarzacze są w stanie
+uchwycić dynamikę prostych, dwupoziomowych układów kwantowych w specyficznym reżimie parametrów,
+oraz mogą znaleźć dobrej jakości rozwiązania instancji kolejowych problemów. Wreszcie, nasze eksperymenty
+pokazują jasno, że obecna generacja wyżaraczy D-Wave nie jest idealna. Wymieniamy instancje problemów,
+dla których wyżarzanie nie potrafily znaleźść wysokojakościowych, lub nawet dopuszczalnych rozwiązań.
+Tam gdzie to możliwe, omawiamy również możliwe wyjaśnienie dlaczego niektóre z prezentowanych instancji
+mogą być dla wyżaraczy wymagające.
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "../main"
+%%% End:
