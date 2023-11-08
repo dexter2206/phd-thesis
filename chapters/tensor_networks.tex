@@ -145,13 +145,13 @@ benchmarks, testing various metrics quantifying both execution time, as well as
 the quality of the found solutions. We tested our algorithm for sets of
 \emph{droplet} instances specifically designed to be hard for classical
 heuristic solvers, especially ones relying on local updates. We benchmarked our
-algorithm against classical solvers based on Parallel-Tempering and D-Wave
+algorithm against classical solvers based on Parallel-Tempering, and D-Wave
 Quantum annealer DW-2000Q$_6$. As it is hard to directly compare samples
 obtained from the D-Wave annealer with the output of our deterministic
 algorithm, we decided to use time-to-solution as a metric. The time to solution
 $\mbox{TTS}$ is defined as
 \begin{equation}
-  \label{eq;tts}
+  \label{eq:tts}
   \mbox{TTS} = \tau \frac{\log(1 - p_{target})}{\log(1 - p_{succ})},
 \end{equation}
 where $p_{target}$ is the desired probability of obtaining solution, $p_{succ}$
@@ -194,8 +194,41 @@ solution in a shorter time.
   \caption{Comparison of time-to-solution metric for our tensor network based algorithm,
     in-house parallel tempering implementation and D-Wave 2000Q$_{6}$. The
     \emph{adaptive} and \emph{geometric} terms refer to the distribution of inverse
-    temperature in Parallel Tempering replicas.} \label{tab:tnvspt}
+    temperature in Parallel Tempering replicas. Here, we bounded running time of
+    our solver to 30 minutes with bond dimension $\chi = 16$, $\beta=3$ and
+    probability cutoff $\delta_{p} = 10^{-3}$. For PT, the $\tau$ in equation
+    \ref{eq:tts} is inferred from the running time and number of performed MC
+    sweeps. In particular, a single MC sweep took 0.00005s for N=512 and 0.00011s
+    for $N=1024$. For the adaptive PT, we used 12 replicas. For geometric PT, we
+    used 25 replicas with geometrically distributed $\beta$, with
+    $\beta_{\min}=0.0001$ and $\beta_{\max}=10$. For all probabilistic samplers, we
+    used target probability $p_{\mbox{target}}=0.99$. In the case of D-Wave
+    annealers, we modified instances by dropping inactive qubits. To obtain the
+    reference ground state, we once again used our algorithm. We optimized time to
+    solution over annealing times of $5\mu s$, $20\mu s$ and $200\mu s$. As the
+    annealer running time we used only annealing time, i.e. we do not include other
+    factors like readout time, reset time, etc. For each instance and each
+    annealing time, we gathered 1000 samples for $N=512$ and 2500 for other values
+    of $N$. The ``timed-out'' string indicates that the given algorithm could not
+    find solution within given approximation ratio (i.e. $p_{\mbox{succ}}=0$). }
+  \label{tab:tnvspt}
 \end{table}
+
+\begin{figure}
+  \includegraphics[width=\textwidth]{figures/tn-single-state.pdf}
+  \caption{Example result of running our algorithm on a droplet instance with $N=2048$.
+    \textbf{a.} Low energy spectrum found by a single run of our algorithm. Observe
+    consistency between different values of $\beta$. \textbf{b.} Hamming distance
+    of solutions presented in \textbf{a.} from the ground state. \textbf{c.}
+    Probabilities of each configuration found for least numerically stable values
+    of $\beta$. In the depicted example, we can see full consistency between the
+    probabilities obtained from contracting PEPS network $p_{n}$ and the Boltzmann
+    weights calculated from the configuration's energy. \textbf{d.} Comparison of
+    largest discarded probability $p_{d}$ and the ground state probability $p_{1}$.
+    With increasing $\beta$ we were able to achieve $p_{d} < p_{1}$, indicating
+    that the algorithm indeed reached the ground state. }
+  \label{fig:tn-single-state}
+\end{figure}
 %%% Local Variables:
 %%% mode: latex
 %%% TeX-master: "../main"
