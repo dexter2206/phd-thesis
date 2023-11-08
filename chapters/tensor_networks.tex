@@ -73,11 +73,17 @@ Before discussing how probabilities in \eqref{eq:conditional-prob} can be
 computed, let us first extend the above approach to the more general case of a
 quasi-two-dimensional graph, i.e. one in which nodes can be grouped into
 \emph{clusters} forming a two-dimensional square lattice (see Fig.
-\ref{fig:quasi2d} for details). One can easily see, that again we can construct
+\ref{fig:clustering} for details). One can easily see, that again we can construct
 a tree-like structure representing state space, this time considering joint
 configurations of spins in a single cluster. Therefore, for the most of the
 time, we might "forget" the underlying spin-glass structure and consider square
 lattices in which spin clusters act like a higher-dimensional systems.
+
+\begin{figure}
+  \includegraphics[width=\textwidth]{figures/clustering}
+  \caption{Grouping spins into clusters in a Chimera-like graph.}
+  \label{fig:clustering}
+\end{figure}
 
 A central object considered in our algorithm is the probability distribution
 $\exp[-\beta H(\mathbf{s})]$, which we approximate using a PEPS-equivalent
@@ -125,9 +131,23 @@ Here, $\mathbf{s_c}$ collects all spins in a given cluster, and
     where $m$ denotes the number of spins in the cluster, and the virtual ones $l,
   r, u, d$ with dimensions depending on the number of inter-cluster edges. Note
     that $H$ in \eqref{eq:peps} is restricted to the graph induced by spins
-belonging to the considered cluster.
+    belonging to the considered cluster. The construction is depicted in Fig. \ref{fig:tensors}.
+
+    \begin{figure}
+      \includegraphics[width=\textwidth]{figures/peps.pdf}
+      \caption{Construction of PEPS network}
+      \label{fig:tensors}
+    \end{figure}
+
+
 
 \section{Results}
+We benchmarked our algorithm agains classical solvers based on Parallel-Tempering
+and D-Wave Quantum annealer DW-2000Q$_6$. As it is hard to directly compare samples
+obtained form the D-Wave annealer with output of our deterministic algorithm,
+we decided to use time-to-solution as a metric. The results of this benchmarks
+is presented in Table \ref{tab:tnvspt}.
+
 
 \begin{table}
 \centering
@@ -152,6 +172,10 @@ DWave 2000Q$_6$ & $0.001$ & timed-out & timed-out  & timed-out \\
 \hline
 \hline
 \end{tabular}
+\caption{Comparison of time-to-solution metric for our tensor network
+  based algorithm, in-house parallel tempering implementation and
+  D-Wave 2000Q$_{6}$.}
+\label{tab:tnvspt}
 \end{table}
 %%% Local Variables:
 %%% mode: latex
