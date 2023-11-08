@@ -1,18 +1,18 @@
 \chapter{Solving spin-glass problems using tensor networks}
 \label{chapter:tn}
 
-Benchmarking quantum annealers requires more sophisticated algorithms.
-While there exists a plethora of general-purpose
-optimization algorithms, one might hope to achieve better results by exploiting
-the topology of the problem's underlying graph and thus locality therein. In
-this chapter, we describe a recent, tensor network-based algorithm for finding
-low-energy spectrum of Ising spin-glasses, designed for problems defined on
-Chimera-like quasi-two-dimensional graphs. The algorithm exploits the sparsity
-and locality of the Chimera graph by representing the Boltzmann distribution of
-spin-glass as a tensor network, whose approximate contraction can be used for
-computing marginal probability distributions. This procedure can then be
-combined with the well-known branch and bound algorithm to iteratively select
-the most promising partial solutions, finally producing an approximation of the
+Benchmarking quantum annealers requires more sophisticated algorithms. While
+there exists a plethora of general-purpose optimization algorithms, one might
+hope to achieve better results by exploiting the topology of the problem's
+underlying graph and thus locality therein. In this chapter, we describe a
+recent, tensor network-based algorithm for finding low-energy spectrum of Ising
+spin-glasses, designed for problems defined on Chimera-like
+quasi-two-dimensional graphs. The algorithm exploits the sparsity and locality
+of the Chimera graph by representing the Boltzmann distribution of spin-glass
+as a tensor network, whose approximate contraction can be used for computing
+marginal probability distributions. This procedure can then be combined with
+the well-known branch and bound algorithm to iteratively select the most
+promising partial solutions, finally producing an approximation of the
 low-energy spectrum.
 
 \section{Introduction to tensor networks}
@@ -64,7 +64,7 @@ one thus gets
                               & = \frac{e^{-\beta H_X(s_1, \ldots, s_k)}\sum\limits_{(z_{k+2}, \ldots, z_N)} e^{-\beta(H_{\overline{X}}(s_{k+1}, z_{k+2},\ldots,z_N) + H_{X, \overline{X}}(s_1, \ldots, z_N))}}{e^{-\beta H_X(s_1, \ldots, s_k)}\sum\limits_{(z_{k+1}, \ldots, z_N)}e^{ -\beta(H_{\overline{X}}(z_{k+1}, \ldots,z_N) + H_{X, \overline{X}}(s_1, \ldots, z_N))}} \\
                               & = \frac{\sum\limits_{(z_{k+2}, \ldots, z_N)} e^{-\beta(H_{\overline{X}}(s_{k+1}, z_{k+2},\ldots,z_N) + H_{X, \overline{X}}(s_1, \ldots, z_N))}}{\sum\limits_{(z_{k+1}, \ldots, z_N)}e^{ -\beta(H_{\overline{X}}(z_{k+1}, \ldots,z_N) + H_{X, \overline{X}}(s_1, \ldots, z_N))}}
 \end{align}
-Note, both in numerator and denominator spins with indices from $X$ appear
+Note, in both numerator and denominator spins with indices from $X$ appear
 non-trivially only in $H_{X, \overline{X}}$ , i.e. the whole expression depends
 only on those spins in $X$ that directly interact with spins in $\overline{X}$,
 which was to be demonstrated.
@@ -73,16 +73,15 @@ Before discussing how probabilities in \eqref{eq:conditional-prob} can be
 computed, let us first extend the above approach to the more general case of a
 quasi-two-dimensional graph, i.e. one in which nodes can be grouped into
 \emph{clusters} forming a two-dimensional square lattice (see Fig.
-\ref{fig:clustering} for details). One can easily see, that again we can construct
-a tree-like structure representing state space, this time considering joint
-configurations of spins in a single cluster. Therefore, for the most of the
-time, we might "forget" the underlying spin-glass structure and consider square
-lattices in which spin clusters act like a higher-dimensional systems.
+\ref{fig:clustering} for details). One can easily see, that again we can
+construct a tree-like structure representing state space, this time considering
+joint configurations of spins in a single cluster. Therefore, for the most of
+the time, we might "forget" the underlying spin-glass structure and consider
+square lattices in which spin clusters act like higher-dimensional systems.
 
 \begin{figure}
   \includegraphics[width=\textwidth]{figures/clustering}
-  \caption{Grouping spins into clusters in a Chimera-like graph.}
-  \label{fig:clustering}
+  \caption{Grouping spins into clusters in a Chimera-like graph.} \label{fig:clustering}
 \end{figure}
 
 A central object considered in our algorithm is the probability distribution
@@ -130,54 +129,72 @@ spins interacting with it from the left, right, up and down respectively. Each
 such tensor has five legs: the physical one $\mathbf{s_c}$ of dimension $2^m$,
 where $m$ denotes the number of spins in the cluster, and the virtual ones $l,
   r, u, d$ with dimensions depending on the number of inter-cluster edges. Note
+that $H$ in \eqref{eq:peps} is restricted to the graph induced by spins
+belonging to the considered cluster. The construction is depicted in Fig.
+\ref{fig:tensors}.
 
-    that $H$ in \eqref{eq:peps} is restricted to the graph induced by spins
-    belonging to the considered cluster. The construction is depicted in Fig. \ref{fig:tensors}.
-
-    \begin{figure}
-      \includegraphics[width=\textwidth]{figures/peps.pdf}
-      \caption{Construction of PEPS network}
-      \label{fig:tensors}
-    \end{figure}
-
-
-
+\begin{figure}
+  \includegraphics[width=\textwidth]{figures/peps.pdf}
+  \caption{Construction of PEPS network} \label{fig:tensors}
+\end{figure}
 
 \section{Results}
-We benchmarked our algorithm agains classical solvers based on Parallel-Tempering
-and D-Wave Quantum annealer DW-2000Q$_6$. As it is hard to directly compare samples
-obtained form the D-Wave annealer with output of our deterministic algorithm,
-we decided to use time-to-solution as a metric. The results of this benchmarks
-is presented in Table \ref{tab:tnvspt}.
 
-
-\begin{table}
-\centering
-\begin{tabular}{|l|c|ccc|}
-  \hline
-\rowcolor{theader}  Method & approx. ratio & $N=512$ & $N=1152$ & $N=2048$ \\
-\hline
-  TN & g.s. & 30s& 150s & 450s \\
-  \hline
-\hline
-PT (adaptive) & g.s. & 800s & --- & --- \\
-\hline
-PT (geometric)& $0.01$ & 0.53s & 4.16s & --- \\
-PT (geometric)& $0.005$ & 2.51s & 56.4s & --- \\
-PT (geometric)& $0.001$ & 158.4s & timed-out & --- \\
-PT (geometric)& $0.0001$ & 897.6s & timed-out & --- \\
-\hline
-\hline
-DWave 2000Q$_6$ & $0.01$ & $0.003$s & $0.006$s & $0.02$s \\
-DWave 2000Q$_6$ & $0.005$ & $0.2$s & timed-out & timed-out \\
-DWave 2000Q$_6$ & $0.001$ & timed-out & timed-out  & timed-out \\
-\hline
-\hline
-\end{tabular}
-\caption{Comparison of time-to-solution metric for our tensor network
-  based algorithm, in-house parallel tempering implementation and
-  D-Wave 2000Q$_{6}$.}
-\label{tab:tnvspt}
+To fully investigate the performance of our algorithm, we performed several
+benchmarks, testing various metrics quantifying both execution time, as well as
+the quality of the found solutions. We tested our algorithm for sets of
+\emph{droplet} instances specifically designed to be hard for classical
+heuristic solvers, especially ones relying on local updates. We benchmarked our
+algorithm against classical solvers based on Parallel-Tempering and D-Wave
+Quantum annealer DW-2000Q$_6$. As it is hard to directly compare samples
+obtained from the D-Wave annealer with the output of our deterministic
+algorithm, we decided to use time-to-solution as a metric. The time to solution
+$\mbox{TTS}$ is defined as
+\begin{equation}
+  \label{eq;tts}
+  \mbox{TTS} = \tau \frac{\log(1 - p_{target})}{\log(1 - p_{succ})},
+\end{equation}
+where $p_{target}$ is the desired probability of obtaining solution, $p_{succ}$
+is the empirical probability of obtaining solution and $\tau$ is the running
+time of the solver. In addition, for D-Wave annealers we multiply $\mbox{TTS}$
+by the ratio $N/\mbox{num\_qubits}$, to account for the possibility of fitting
+multiple instances of the problem on the device at the same time. Naturally,
+one might consider $\mbox{TTS}$ metric not only for finding a ground state, but
+also for finding a solution approximating a ground state with a given
+approximation ratio ground state (i.e. solution lying in the desired lowest
+fraction of the full energy spectrum). The results of these benchmarks are
+presented in Table \ref{tab:tnvspt}. For all instances, our algorithm was able
+to find the ground state, which was not the case for other solvers. However, if
+one is not necessarily interested in finding the ground state, both D-Wave
+annealers and classical Parallel Tempering solver might find a satisfying
+solution in a shorter time.
+\begin{table}[b]
+  \centering
+  \begin{tabular}{|l|c|ccc|}
+    \hline
+    \rowcolor{theader}  Method & approx. ratio & $N=512$   & $N=1152$  & $N=2048$  \\
+    \hline
+    TN                         & g.s.          & 30s       & 150s      & 450s      \\
+    \hline
+    \hline
+    PT (adaptive)              & g.s.          & 800s      & ---       & ---       \\
+    \hline
+    PT (geometric)             & $0.01$        & 0.53s     & 4.16s     & ---       \\
+    PT (geometric)             & $0.005$       & 2.51s     & 56.4s     & ---       \\
+    PT (geometric)             & $0.001$       & 158.4s    & timed-out & ---       \\
+    PT (geometric)             & $0.0001$      & 897.6s    & timed-out & ---       \\
+    \hline
+    \hline
+    DWave 2000Q$_6$            & $0.01$        & $0.003$s  & $0.006$s  & $0.02$s   \\
+    DWave 2000Q$_6$            & $0.005$       & $0.2$s    & timed-out & timed-out \\
+    DWave 2000Q$_6$            & $0.001$       & timed-out & timed-out & timed-out \\
+    \hline
+    \hline
+  \end{tabular}
+  \caption{Comparison of time-to-solution metric for our tensor network based algorithm,
+    in-house parallel tempering implementation and D-Wave 2000Q$_{6}$. The
+    \emph{adaptive} and \emph{geometric} terms refer to the distribution of inverse
+    temperature in Parallel Tempering replicas.} \label{tab:tnvspt}
 \end{table}
 %%% Local Variables:
 %%% mode: latex
