@@ -49,24 +49,24 @@ We can exploit locality of the problem by observing that conditional
 probability in \eqref{eq:conditional-prob} of configuration in the region $X =
   (1, 2, \ldots, k)$ depends only on configuration on the border $\partial X$ consisting of those spins, that directly interact with the region
 $\overline{X} = (k+1, 2, \ldots N)$. To see that, denote by $H_X$ the usual
-Hamiltonian $H$ restricted to the graph induced by vertices in $X$. Further,
-let $H_{X, \overline{X}} = H - H_X - H_{\overline{X}}$. Notice that $H_{X,
+    Hamiltonian $H$ restricted to the graph induced by vertices in $X$. Further,
+    let $H_{X, \overline{X}} = H - H_X - H_{\overline{X}}$. Notice that $H_{X,
     \overline{X}}$ contains only quadratic terms $J_{ij} s_i s_j$ such that $i \in
   X$ and $j \in \overline{X}$. Slightly abusing the notation, one may thus write
-\begin{equation}
-  H(s_1, \ldots, s_N) = H_X(s_1, \ldots, s_k) + H_{\overline{X}}(s_{k+1}, \ldots, s_N) + H_{X, \overline{X}}(s_1, \ldots, s_N)
-\end{equation}
-Using definition of conditional probability applied to Boltzmann distribution,
-one thus gets
-\begin{align}
-  p(s_{k+1}|s_1, \ldots, s_k) & = \frac{\sum\limits_{(z_{k+2}, \ldots, z_N)}e^{-\beta H(s_1, \ldots, s_{k+1}, z_{k+2},\ldots,z_N)}}{\sum\limits_{(z_{k+1}, \ldots, z_N)}e^{-\beta H(s_1, \ldots, s_k, z_{k+1},\ldots,z_N)}}                                                                                                                                                     \\
-                              & = \frac{\sum\limits_{(z_{k+2}, \ldots, z_N)}e^{-\beta (H_X(s_1, \ldots, s_k) + H_{\overline{X}}(s_{k+1}, z_{k+2},\ldots,z_N) + H_{X, \overline{X}}(s_1, \ldots, z_N))}}{\sum\limits_{(z_{k+1}, \ldots, z_N)}e^{-\beta (H_X(s_1, \ldots, s_k) + H_{\overline{X}}(z_{k+1}, \ldots,z_N) + H_{X, \overline{X}}(s_1, \ldots, z_N))}}                 \\
-                              & = \frac{e^{-\beta H_X(s_1, \ldots, s_k)}\sum\limits_{(z_{k+2}, \ldots, z_N)} e^{-\beta(H_{\overline{X}}(s_{k+1}, z_{k+2},\ldots,z_N) + H_{X, \overline{X}}(s_1, \ldots, z_N))}}{e^{-\beta H_X(s_1, \ldots, s_k)}\sum\limits_{(z_{k+1}, \ldots, z_N)}e^{ -\beta(H_{\overline{X}}(z_{k+1}, \ldots,z_N) + H_{X, \overline{X}}(s_1, \ldots, z_N))}} \\
-                              & = \frac{\sum\limits_{(z_{k+2}, \ldots, z_N)} e^{-\beta(H_{\overline{X}}(s_{k+1}, z_{k+2},\ldots,z_N) + H_{X, \overline{X}}(s_1, \ldots, z_N))}}{\sum\limits_{(z_{k+1}, \ldots, z_N)}e^{ -\beta(H_{\overline{X}}(z_{k+1}, \ldots,z_N) + H_{X, \overline{X}}(s_1, \ldots, z_N))}}
-\end{align}
-Note, in both numerator and denominator spins with indices from $X$ appear
-non-trivially only in $H_{X, \overline{X}}$ , i.e. the whole expression depends
-only on those spins in $X$ that directly interact with spins in $\overline{X}$,
+    \begin{equation}
+      H(s_1, \ldots, s_N) = H_X(s_1, \ldots, s_k) + H_{\overline{X}}(s_{k+1}, \ldots, s_N) + H_{X, \overline{X}}(s_1, \ldots, s_N)
+    \end{equation}
+    Using definition of conditional probability applied to Boltzmann distribution,
+    one thus gets
+    \begin{align}
+      p(s_{k+1}|s_1, \ldots, s_k) & = \frac{\sum\limits_{(z_{k+2}, \ldots, z_N)}e^{-\beta H(s_1, \ldots, s_{k+1}, z_{k+2},\ldots,z_N)}}{\sum\limits_{(z_{k+1}, \ldots, z_N)}e^{-\beta H(s_1, \ldots, s_k, z_{k+1},\ldots,z_N)}}                                                                                                                                                     \\
+                                  & = \frac{\sum\limits_{(z_{k+2}, \ldots, z_N)}e^{-\beta (H_X(s_1, \ldots, s_k) + H_{\overline{X}}(s_{k+1}, z_{k+2},\ldots,z_N) + H_{X, \overline{X}}(s_1, \ldots, z_N))}}{\sum\limits_{(z_{k+1}, \ldots, z_N)}e^{-\beta (H_X(s_1, \ldots, s_k) + H_{\overline{X}}(z_{k+1}, \ldots,z_N) + H_{X, \overline{X}}(s_1, \ldots, z_N))}}                 \\
+                                  & = \frac{e^{-\beta H_X(s_1, \ldots, s_k)}\sum\limits_{(z_{k+2}, \ldots, z_N)} e^{-\beta(H_{\overline{X}}(s_{k+1}, z_{k+2},\ldots,z_N) + H_{X, \overline{X}}(s_1, \ldots, z_N))}}{e^{-\beta H_X(s_1, \ldots, s_k)}\sum\limits_{(z_{k+1}, \ldots, z_N)}e^{ -\beta(H_{\overline{X}}(z_{k+1}, \ldots,z_N) + H_{X, \overline{X}}(s_1, \ldots, z_N))}} \\
+                                  & = \frac{\sum\limits_{(z_{k+2}, \ldots, z_N)} e^{-\beta(H_{\overline{X}}(s_{k+1}, z_{k+2},\ldots,z_N) + H_{X, \overline{X}}(s_1, \ldots, z_N))}}{\sum\limits_{(z_{k+1}, \ldots, z_N)}e^{ -\beta(H_{\overline{X}}(z_{k+1}, \ldots,z_N) + H_{X, \overline{X}}(s_1, \ldots, z_N))}}
+    \end{align}
+    Note, in both numerator and denominator spins with indices from $X$ appear
+    non-trivially only in $H_{X, \overline{X}}$ , i.e. the whole expression depends
+    only on those spins in $X$ that directly interact with spins in $\overline{X}$,
 which was to be demonstrated.
 
 Before discussing how probabilities in \eqref{eq:conditional-prob} can be
@@ -124,12 +124,12 @@ affects numerical stability. Next, with each cluster we associate a PEPS tensor
   A^{\mathbf{s_c}}_{\mathbf{lrud}} = e^{-\beta H(\mathbf{s_c})} B^{\mathbf{s_c}^l}_\mathbf{l}C^{\mathbf{s_c}^r}_\mathbf{r}B^{\mathbf{s_c}^u}_\mathbf{u}C^{\mathbf{s_c}^d}_\mathbf{d}
 \end{equation}
 Here, $\mathbf{s_c}$ collects all spins in a given cluster, and
-$\mathbf{s_c}^l$, $\mathbf{s_c}^r$, $\mathbf{s_c}^u$, $\mathbf{s_c}^d$ collect
-spins interacting with it from the left, right, up and down respectively. Each
-such tensor has five legs: the physical one $\mathbf{s_c}$ of dimension $2^m$,
-where $m$ denotes the number of spins in the cluster, and the virtual ones $l,
+  $\mathbf{s_c}^l$, $\mathbf{s_c}^r$, $\mathbf{s_c}^u$, $\mathbf{s_c}^d$ collect
+    spins interacting with it from the left, right, up and down respectively. Each
+    such tensor has five legs: the physical one $\mathbf{s_c}$ of dimension $2^m$,
+    where $m$ denotes the number of spins in the cluster, and the virtual ones $l,
   r, u, d$ with dimensions depending on the number of inter-cluster edges. Note
-that $H$ in \eqref{eq:peps} is restricted to the graph induced by spins
+    that $H$ in \eqref{eq:peps} is restricted to the graph induced by spins
 belonging to the considered cluster. The construction is depicted in Fig.
 \ref{fig:tensors}.
 
@@ -150,16 +150,16 @@ Quantum annealer DW-2000Q$_6$. As it is hard to directly compare samples
 obtained from the D-Wave annealer with the output of our deterministic
 algorithm, we decided to use time-to-solution as a metric. The time to solution
 $\mbox{TTS}$ is defined as
-\begin{equation}
-  \label{eq:tts}
-  \mbox{TTS} = \tau \frac{\log(1 - p_{target})}{\log(1 - p_{succ})},
-\end{equation}
-where $p_{target}$ is the desired probability of obtaining solution, $p_{succ}$
-is the empirical probability of obtaining solution and $\tau$ is the running
-time of the solver. In addition, for D-Wave annealers we multiply $\mbox{TTS}$
-by the ratio $N/\mbox{num\_qubits}$, to account for the possibility of fitting
-multiple instances of the problem on the device at the same time. Naturally,
-one might consider $\mbox{TTS}$ metric not only for finding a ground state, but
+    \begin{equation}
+      \label{eq:tts}
+      \mbox{TTS} = \tau \frac{\log(1 - p_{target})}{\log(1 - p_{succ})},
+    \end{equation}
+    where $p_{target}$ is the desired probability of obtaining solution, $p_{succ}$
+    is the empirical probability of obtaining solution and $\tau$ is the running
+    time of the solver. In addition, for D-Wave annealers we multiply $\mbox{TTS}$
+    by the ratio $N/\mbox{num\_qubits}$, to account for the possibility of fitting
+    multiple instances of the problem on the device at the same time. Naturally,
+    one might consider $\mbox{TTS}$ metric not only for finding a ground state, but
 also for finding a solution approximating a ground state with a given
 approximation ratio ground state (i.e. solution lying in the desired lowest
 fraction of the full energy spectrum). The results of these benchmarks are
@@ -202,15 +202,15 @@ solution in a shorter time.
     for $N=1024$. For the adaptive PT, we used 12 replicas. For geometric PT, we
     used 25 replicas with geometrically distributed $\beta$, with
     $\beta_{\min}=0.0001$ and $\beta_{\max}=10$. For all probabilistic samplers, we
-    used target probability $p_{\mbox{target}}=0.99$. In the case of D-Wave
-    annealers, we modified instances by dropping inactive qubits. To obtain the
-    reference ground state, we once again used our algorithm. We optimized time to
-    solution over annealing times of $5\mu s$, $20\mu s$ and $200\mu s$. As the
-    annealer running time we used only annealing time, i.e. we do not include other
-    factors like readout time, reset time, etc. For each instance and each
-    annealing time, we gathered 1000 samples for $N=512$ and 2500 for other values
-    of $N$. The ``timed-out'' string indicates that the given algorithm could not
-    find solution within given approximation ratio (i.e. $p_{\mbox{succ}}=0$). }
+        used target probability $p_{\mbox{target}}=0.99$. In the case of D-Wave
+        annealers, we modified instances by dropping inactive qubits. To obtain the
+        reference ground state, we once again used our algorithm. We optimized time to
+        solution over annealing times of $5\mu s$, $20\mu s$ and $200\mu s$. As the
+        annealer running time we used only annealing time, i.e. we do not include other
+        factors like readout time, reset time, etc. For each instance and each
+        annealing time, we gathered 1000 samples for $N=512$ and 2500 for other values
+        of $N$. The ``timed-out'' string indicates that the given algorithm could not
+        find solution within given approximation ratio (i.e. $p_{\mbox{succ}}=0$). }
   \label{tab:tnvspt}
 \end{table}
 
@@ -225,9 +225,17 @@ solution in a shorter time.
     probabilities obtained from contracting PEPS network $p_{n}$ and the Boltzmann
     weights calculated from the configuration's energy. \textbf{d.} Comparison of
     largest discarded probability $p_{d}$ and the ground state probability $p_{1}$.
-    With increasing $\beta$ we were able to achieve $p_{d} < p_{1}$, indicating
+        With increasing $\beta$ we were able to achieve $p_{d} < p_{1}$, indicating
     that the algorithm indeed reached the ground state. }
   \label{fig:tn-single-state}
+\end{figure}
+
+\begin{figure}
+  \includegraphics[width=\textwidth]{figures/tn-ground-degeneracy.pdf}
+  \caption{Histogram of ground state degeneracy found by our algorithm fore test instances constructed by
+    drawing couplings $J_{ij}$ uniformly from a set $\{\pm 1, \pm 2, \pm 4\}$ and
+    setting all local fields $h_{i} = 0$.}
+  \label{fig:ground-degeneracy}
 \end{figure}
 %%% Local Variables:
 %%% mode: latex
