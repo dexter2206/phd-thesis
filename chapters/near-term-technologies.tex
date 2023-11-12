@@ -279,19 +279,20 @@ with an unique optimal solution $\mathbf{s} = (-1, -1, -1)$. Suppose we want to 
 with $C_1$ topology, using the minor embedding presented in Example \ref{ex:minor-embedding}. The
 problem submitted to the annealer will have the following Hamiltonian:
 \begin{equation}
-H'(z_0, z_3, z_4, z_5) = \underbrace{z_3 + z_5}_{s_1 + s_3} + \underbrace{0.5(z_0 + z_4)}_{s_2} - \underbrace{z_3z_4}_{s_2s_1} - \underbrace{z_0z_5}_{s_2s_3} + \underbrace{P(z_0, z_4)}_{\text{penalty}},
+  H'(z_0, z_3, z_4, z_5) = \underbrace{z_3 + z_5}_{s_1 + s_3} + \underbrace{0.5(z_0 + z_4)}_{s_2} - \underbrace{z_3z_4}_{s_2s_1} - \underbrace{z_0z_5}_{s_2s_3} + \underbrace{P(z_0, z_4)}_{\text{penalty}},
+  \label{eq:embeddedexample}
 \end{equation}
 where $z_i$ is a spin variable associated to $i$-th qubit and $P(z_0, z_4)$ is a \emph{penalty term}
 for chain comprising qubits 0 and 4. The penalty is of the form $P(z_0, z_4) = -\alpha z_0z_4$ where
 $alpha$ is a large positive constant. Let us examine all possible configurations of $(z_0, z_3, z_4,
 z_5)$ and observe how the penalty term influences their energy:
-
-\begin{center}
+\begin{table}[h]
+\centering
 \begin{tabular}{|c|c|c|c|}
 \hline
-\multicolumn{2}{|c|}{feasible solutions} & \multicolumn{2}{c|}{infeasible solutions} \\
+\rowcolor{theader} \multicolumn{2}{|c|}{feasible solutions} & \multicolumn{2}{c|}{infeasible solutions} \\
 \hline
-$z_0, z_3, z_4, z_5$ & energy & $z_0, z_3, z_4, z_5$ & energy\\
+\rowcolor{tsubheader} $z_0, z_3, z_4, z_5$ & energy & $z_0, z_3, z_4, z_5$ & energy\\
 \hline
 -1, -1,-1, -1 & $-5.0 -\alpha$ & 1, 1,1, -1 & $1.0 + \alpha$\\
 -1, 1,1, -1 & $-2.0 -\alpha$ & 1, -1,1, -1 & $1.0 + \alpha$\\
@@ -303,11 +304,13 @@ $z_0, z_3, z_4, z_5$ & energy & $z_0, z_3, z_4, z_5$ & energy\\
 1, 1,1, 1 & $1.0  -\alpha$ & -1, 1,-1, 1 & $3.0 + \alpha$\\
 \hline
 \end{tabular}
-\end{center}
+\caption{All possible configurations for the instance from the equation \eqref{eq:embeddedexample}.}
+\label{tab:embedded}
+\end{table}
 
 If $\alpha$ is large enough, e.g. $\alpha=2$, all feasible solutions (left part of the table) have
 energy lower than any solution in which qubits $z_0$ and $z_4$ are misaligned (right part of the
-table), which increases a chance of sampling them on a physical device.On the other hand, if
+table), which increases a chance of sampling them on a physical device. On the other hand, if
 $\alpha=1$, the feasible solution $(1,1,1,1)$ has higher energy than the infeasible solution $(1,
 -1, -1, -1)$.
 \end{example}
@@ -375,8 +378,8 @@ these devices, which later became known as Graphics Processing Units (GPUs), off
 functionalities. Increasing demand for performance in the gaming industry and professional graphics
 processing drove the evolution of GPUs, which quickly became highly sophisticated devices supporting
 advanced 2D and 3D image manipulation. Performing such arithmetically intensive operations requires
-enormous computational power, and it was only a matter of time until it was realised that the
-power of these devices can be harnessed for the general purpose computations (so called GPGPU -
+enormous computational power, and it was only a matter of time until it was realized that the
+power of these devices can be harnessed for the general purpose computations (so-called GPGPU -
 General Purpose computing on GPU).
 
 Early efforts in the development of GPGPU required framing of computational problems in terms of
@@ -521,23 +524,19 @@ Lastly, C/C++ uses zero--based indexing, whereas Fortran uses one--based indexin
 This affects how the thread id, stored in \texttt{tid} variable, is computed.
 
 
-\lstinputlisting[
-    frame=tlrb,
-    basicstyle=\footnotesize,
-    language=fortran,
-    label=lst:cuda_fortran,
-    caption={Example code in CUDA Fortran implementing parallel addition of vectors on GPU.},
-    captionpos=b
-]{code/cuda_fortran.cuf}
+\begin{listing}
+  \inputminted{fortran}{code/cuda_fortran.cuf}
+  \caption{Example code in CUDA Fortran implementing parallel addition of vectors on GPU.}
+  \label{lst:cuda_fortran}
+\end{listing}
 
-\lstinputlisting[
-    frame=tlrb,
-    basicstyle=\footnotesize,
-    language=C++,
-    label=lst:cuda_c,
-    caption={Example code in CUDA C/C++ implementing parallel addition of vectors on GPU.},
-    captionpos=b
-]{code/cuda_c.cu}
+
+\begin{listing}
+  \inputminted{cuda}{code/cuda_c.cu}
+  \caption{Example code in CUDA C/C++ implementing parallel addition of vectors on GPU.},
+  \label{lst:cuda_c}
+\end{listing}
+
 
 \begin{figure}
   \includegraphics[width=\textwidth]{figures/gpu_scheduling}

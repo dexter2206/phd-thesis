@@ -8,9 +8,7 @@ void addVec(float* x, float* y, float* res, int n) {
    int tid = blockIdx.x * blockDim.x + threadIdx.x;
    int gridsize = blockDim.x * gridDim.x;
 
-   for(int i = tid; i < n; i += gridsize) {
-      res[i] = x[i] + y[i];
-   }
+   for(int i = tid; i < n; i += gridsize) { res[i] = x[i] + y[i]; }
 }
 
 int main() {
@@ -35,15 +33,11 @@ int main() {
 
    addVec<<<nBlocks, nThreads>>>(x_d, y_d, res_d, N);
 
-   cudaMemcpy(
-      &res[0], res_d, nBytes, cudaMemcpyDeviceToHost
-   );
+   cudaMemcpy(&res[0], res_d, nBytes, cudaMemcpyDeviceToHost);
 
-   std::cout <<
-      "Max error: " <<
-      std::abs(res - (x + y)).max() <<
-      std::endl;
-
+   std::cout << "Max error: "
+             << std::abs(res - (x + y)).max()
+             << std::endl;
    cudaFree(x_d);
    cudaFree(y_d);
    cudaFree(res_d);
