@@ -22,73 +22,80 @@
 \usepackage{multirow}
 \usepackage{makecell}
 
+% ================================================================================
+% Configuration of subfigures
+% ================================================================================
 \DeclareCaptionLabelFormat{subfigure}{\textbf{#2.}}
-
 \captionsetup[subfigure]{
   font={bf}, skip=1pt, singlelinecheck=false, labelformat=subfigure, subrefformat=parens
 }
 \captionsetup{subrefformat=subfigure}
 
-
+% ================================================================================
+% Colors for table headers
+% ================================================================================
 \colorlet{theader}{ProcessBlue!30}
 \colorlet{tsubheader}{ProcessBlue!20}
 
-\addbibresource{my_papers_others.bib}
 \addbibresource{my_papers_phd.bib}
 \addbibresource{ref.bib}
 
+
+% ================================================================================
+% Theorem environments
+% ================================================================================
 \theoremstyle{definition}
 \newtheorem{example}{Example}[chapter]
+\newtheorem{lemma}{Lemma}
+\newtheorem{theorem}{Theorem}
 
+
+% ================================================================================
+% Symbols to be used in figures' captions, they correspond to the markers
+% ================================================================================
 \DeclareRobustCommand\tikzdot{\tikz[overlay,yshift=0.5ex] \fill[blue!90] (0.ex,0.ex) circle (0.3ex);}
 \DeclareRobustCommand\tikzcircle{\tikz[overlay,yshift=0.5ex] \draw[red,thick] (0.ex,0.ex) circle (0.4ex);}
 \DeclareRobustCommand\tikzquad{\tikz[overlay,yshift=0.ex,xshift=0.1ex] \draw[green,thick] (0.ex,0.ex) rectangle (1ex,1ex);}
 
-%\title{Simulating quantum systems with near-term technologies}
-\title{
-    Validation and benchmarking of quantum annealing technology
-}
-
-\newcommand{\bg}[1]{\textcolor{red}{bg: #1}}
-
-\newtheorem{lemma}{Lemma}
-\newtheorem{theorem}{Theorem}
-
-\include{definitions}
-
-% Styles
-\linespread{1.15}
-
-
+% ================================================================================
+% Title page info
+% ================================================================================
+\title{Validation and benchmarking of quantum annealing technology}
 \author{Konrad Jałowiecki}
 \date{January 2022}
+
+
+% ================================================================================
+% Styles and definitions
+% ================================================================================
+\include{definitions}
+\linespread{1.15}
 
 \begin{document}
 
 \begin{titlingpage}
-	\begin{center}
-		\includegraphics[width=0.4\textwidth]{figures/iitis_logo}\\
-		\vspace{0.5em}
-		\textsc{\large Institute of Theoretical and Applied Informatics, Polish
-			Academy of Sciences}
-		\vspace*{1in}
-		\hrule
-		\vspace*{0.5em}
-		\textsc{\huge Validation and benchmarking of quantum annealing technology}
-		\vspace*{0.5em}
-		\hrule
-		\vspace*{1em}
-		\textsc{\large Doctoral dissertation}
-		\par
-		\vspace{1.5in}
-		{\large mgr Konrad \textsc{Jałowiecki}}\\
-		\vspace{0.25in}
-		Supervisor:\\ dr hab. Bartłomiej Gardas\\
-		\vspace{0.25in}
-		Co-supervisor:\\ dr hab. Łukasz Pawela\\
-		\vfill
-		{Gliwice \today}
-	\end{center}
+  \begin{center}
+    \includegraphics[width=0.4\textwidth]{figures/iitis_logo}\\
+    \vspace{0.5em}
+    \textsc{\large Institute of Theoretical and Applied Informatics, Polish Academy of Sciences}
+    \vspace*{1in}
+    \hrule
+    \vspace*{0.5em}
+    \textsc{\huge Validation and benchmarking of quantum annealing technology}
+    \vspace*{0.5em}
+    \hrule
+    \vspace*{1em}
+    \textsc{\large Doctoral dissertation}
+    \par
+    \vspace{1.5in}
+    {\large mgr Konrad \textsc{Jałowiecki}}\\
+    \vspace{0.25in}
+    Supervisor:\\ dr hab. Bartłomiej Gardas\\
+    \vspace{0.25in}
+    Co-supervisor:\\ dr hab. inż. Łukasz Pawela\\
+    \vfill
+    {Gliwice, \today}
+  \end{center}
 \end{titlingpage}
 
 \frontmatter
