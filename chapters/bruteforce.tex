@@ -455,7 +455,7 @@ Now that we know how to construct a correct sequence of bit flips, it is time
 we design parallelization strategy, which is what we will do next.
 
 \subsection{Parallelization using GPU}
-The algorithm presented in \ref{lst:gray} is fully serial. Our task is now to
+The algorithm presented in \ref{lst:grayserial} is fully serial. Our task is now to
 parallelize it so that it can be executed on GPU. Unsurprisingly, we will once
 again employ the strategy of dividing each state into a suffix and a prefix
 part. This time, however, it is the suffix that will stay fixed between
@@ -550,7 +550,7 @@ commonly--occuring bit flips, where $K$ is a user--controlled parameter.
 
 \subsection{Performance evaluation of the optimized algorithm}
 
-We performed a preliminary performance evaluation of the Gray code--based algorithm for finding the ground state. For our benchmarks, we used several setups with different Nvidia GPUs. Some setups were equipped with more than one copy of the same GPU. The summary of test setups, as well as capabilities of the used GPUs is presented in table \ref{tab:setups2}.
+We performed a preliminary performance evaluation of the Gray code--based algorithm for finding the ground state. For our benchmarks, we used several setups with different Nvidia GPUs. Some setups were equipped with more than one copy of the same GPU. The summary of test setups, as well as capabilities of the used GPUs is presented in table \ref{tab:bruteforce-gs-only-table}.
 
 Since each of the test setups was available to us only for a limited amount of time, we were only able to measure
 execution times for a very limited subset of parameters, and we needed to make some educated guesses. We decided to

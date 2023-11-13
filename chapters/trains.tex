@@ -215,7 +215,7 @@ account the relative importance of the trains, as we will describe later when
 introducing the real railway sections considered in our research.
 
 \section{Dispatching conditions}
-The cost function \eqref{eq:cost} together with constraint
+The cost function \eqref{eq:qubo:cost} together with constraint
 \eqref{eq:onehotconstraint} is not enough to construct a meaningful
 optimization problem. We also have to take into account other constraints
 stemming from dispatching conditions. For instance, we cannot allow a schedule
@@ -379,7 +379,7 @@ cost function, effectively penalizing the infeasible solutions. More generally,
 one might multiply the sum by some constant $p_{pair} \ge 1$, to further
 increase the value of the cost function for the infeasible solutions.
 
-The same reasoning cannot be applied e.g. to the constraint \eqref{eq:onehot},
+The same reasoning cannot be applied e.g. to the constraint \eqref{eq:onehotconstraint},
 which comprises equations of the form
 \begin{equation}
   \label{eq:linearpenalty}
@@ -574,7 +574,7 @@ of maximum secondary delays $d_{\max}(j)$, which we will use when constructing
 QUBO.
 
 For the case of Nidzica--Olsztynek line, all heuristics returned the same
-solution, depicted in Fig. \ref{fig:smallheurresolution}. The conflict is
+solution, depicted in Fig. \ref{resolution}. The conflict is
 avoided by delaying IC3521 by another 3-minutes, and allowing R9062 to enter
 the block not earlier than 14:25, i.e. 4 minutes later than in the conflicted
 timetable. In this case, the additional 4 minutes constitute the maximum
@@ -713,6 +713,7 @@ of variables before and after the embedding are presented in Table \ref{tab:numq
     \hline
   \end{tabular}
   \caption{Number of variables in each Problem}
+  \label{tab:numqubits}
 \end{table}
 
 %%% Local Variables:
