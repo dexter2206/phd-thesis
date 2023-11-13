@@ -250,6 +250,57 @@ our benchmarks are are presented in Fig. \ref{fig:benchmark_results}.
     obtained for smaller system sizes.} \label{fig:benchmark_results}
 \end{figure}
 
+\section{Example application: verifying MPS-based optimization algorithm}
+
+As an example application, in this section, we use our brute-force-based approach with
+heuristic algorithm based on Matrix Product States (MPS). The detailed description of this
+algorithm is outside the scope of this thesis, and we refer the interested reader to the
+Supplementary Material in \cite{tn}. Nevertheless, before we outline how the algorithm works.
+
+Similarly to the algorithm presented in chapter \ref{chapter:tn}, in the MPS--based approach
+one explores the probability distribution (as opposed to exploring the energy landscape directly). The basic idea behind  is to approximate Boltzmann distribution as
+\begin{equation}
+e^{-\beta H(\mathbf{s})/2} \approx A^{s_1} A^{s_2} \ldots A^{s_L} = |\Psi(\beta) \rangle,
+\label{eq:mps}
+\end{equation}
+for large enough $\beta$. Here, $A^{s_{i}}$ are real matrices of limited dimension $\le D$.
+In this context, the parameter $D$ is referred to as the \emph{bond dimension}. Fig. \ref{fig:mps:boltzmann}
+shows a pictorial representation of such approximation. At each bond, the system is split into two halves.
+An exact decomposition would require bond $D$ of exponential (w.r.t. number of spins) size. Limiting $D$
+effectively limits the amount of entanglement related to given bipartition \cite{Wall18}.
+Once the approximation in the equation \eqref{eq:mps} is constructed, it is possible to effectively
+compute any marginal or conditional probability, and then systematically search for the most probable
+(and thus, ones with lowest energy) classical configurations using branch-and-bound procedure, constructing
+tree of most probable spin configurations one variable at the time.
+
+The search starts with $\beta=0$, for which the MPS decomposition is trivial. Then, the algorithm subsequently simulates the imaginary time evolution by applying the sequence of gates:
+\begin{equation}
+\label{eq:gate}
+U_i(d\beta) = e^{-d\beta s_i (\sum_{j>i}J_{ij}  s_j+h_i)/2},
+\end{equation}
+which totals to $\prod_{i=1}^N U_i(d\beta) = e^{-d \beta H(\mathbf{s})/2}$.
+One can observe that applying each gate results in the doubling of the bond dimension.
+Hence, at each step, one has to systematically find an approximation maintaining
+the fixed $D$. The whole procedure is depicted in Fig. \ref{fig:mps:compress}.
+
+\begin{figure}
+  \begin{subfigure}[t]{0.45\textwidth}
+    \caption{}\label{fig:mps:boltzmann}
+    \includegraphics[width=\textwidth]{figures/mps}
+  \end{subfigure}\hfill
+  \begin{subfigure}[t]{0.45\textwidth}
+    \caption{}\label{fig:mps:compress}
+    \includegraphics[width=\textwidth]{figures/mps_compress}
+  \end{subfigure}
+  \caption{\subref{fig:mps:boltzmann} Approximation of the Boltzmann distribution using the MPS ansatz. \subref{fig:mps:compress} Compression scheme used in the MPS algorithm.}
+  \label{fig:mps}
+\end{figure}
+
+
+By construction, the MPS-based ansatz outlined above is one-dimensional. Hence,
+the question is to what end can it be used to find low energy solutions of spin-glasses
+defined on a complete graph?
+
 \section{Improving the algorithm using Gray Code}
 
 The algorithm presented in the previous chapter and its GPU--enabled
@@ -495,6 +546,7 @@ commonly--occuring bit flips, where $K$ is a user--controlled parameter.
   \includegraphics[width=\textwidth]{figures/bruteforcegray2}
   \caption{Implementation of the strided loop for kernel in fig \ref{fig:bruteforcegray}.}
 \end{figure}
+
 
 \subsection{Performance evaluation of the optimized algorithm}
 
