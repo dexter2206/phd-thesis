@@ -23,11 +23,11 @@ can? In the 1980s, Richard Feynman and Paul Benioff put forward the idea that
 quantum devices can be used to carry simulations of quantum systems
 \cite{feynman.82,benioff.80}. This idea led to the development of several
 quantum computation models. In 1985 David Deutsch described a universal,
-gate--based quantum computer \cite{deutsch}, a device capable of simulating any
-other quantum computer with at most polynomial slowdown. The 1990s and early
-2000s saw the emergence of another model of quantum computation, Adiabatic
-Quantum Computing (AQC) \cite{kadowaki,farhi}. Interestingly, AQC was later
-proven to be equivalent to the standard gate-based model \cite{aharonov}.
+gate-based quantum computer \cite{deutsch}, a device capable of simulating any
+other quantum computer with at most polynomial slowdown. The 1990s and the
+early 2000s saw the emergence of another model of quantum computation,
+Adiabatic Quantum Computing (AQC) \cite{kadowaki,farhi}. Interestingly, AQC was
+later proven to be equivalent to the standard gate-based model \cite{aharonov}.
 
 Just like a classical computer, a quantum computer needs software to run. And
 software is based on algorithms, describing how the computation should be
@@ -44,22 +44,21 @@ presented a quantum algorithm for unstructured database search \cite{grover},
 offering quadratic speed-up over classical approaches.
 
 The invention of specialized quantum algorithms further fuelled interest in the
-field. In recent years, we observed an unprecedented development of hardware
-that brings us closer to the quantum revolution. Several implementations of
-gate--based quantum computers \cite{ionq, bohnet} and quantum annealers
-\cite{johnson, dattani} were constructed and made publicly available. This
-allowed scientists to benchmark them and further research their possible
-applications.
+field. In recent years, we observed the development of hardware that brings us
+closer to the quantum revolution. Several implementations of gate--based
+quantum computers \cite{ionq, bohnet} and quantum annealers \cite{johnson,
+  dattani} were constructed and made publicly available. This allowed scientists
+to benchmark them and further research their possible applications.
 
-However promising, near-term quantum computers are far from perfect. Can those
-noisy devices already be used to solve some real-world problems? And how does
-one approach validating if this is the case? In this thesis, we try to answer
-these questions, focusing solely on a specific type of quantum computer --
-namely, the D-Wave quantum annealers. We begin with an introduction to Ising
-and QUBO models (collectively known as Binary Quadratic Models) in Chapter
-\ref{chapter:ising}. The chapter lays the neccessary foundations for
-understanding optimization problems that can be, at least in principle, solved
-using quantum annealers.
+However promising, current quantum computers are far from perfect
+\cite{pitfalls,preskill}. Can those noisy devices already be used to solve some
+real-world problems? And how does one approach validating if this is the case?
+In this thesis, we try to answer these questions, focusing solely on a specific
+type of quantum computer -- namely, the D-Wave quantum annealers. We begin the
+thesis with an introduction to Ising and QUBO models (collectively known as
+Binary Quadratic Models) in Chapter \ref{chapter:ising}. This chapter's purpose
+is to lay the necessary foundations for understanding optimization problems
+that can be, at least in principle, solved using quantum annealers.
 
 In Chapter \ref{chapter:near-term} we introduce technologies and devices used
 for conducting research presented in this thesis. Quite naturally, the first of
@@ -91,17 +90,17 @@ for finding the low-energy spectrum of an Ising spin-glass based on tensor
 networks, specifically suited for problems defined on Chimera-like graphs.
 
 Chapter \ref{chapter:bruteforce} describes a fast, parallel approach for
-exhaustively searching for a low-energy spectrum of Ising spin--glass problems.
+exhaustively searching for a low-energy spectrum of Ising spin-glass problems.
 Our method is suitable for solving small (less than 54 spins), but otherwise
 arbitrary instances. The presented approach can be used for benchmarking other
 algorithms that cannot certify their solution. Moreover, the possibility of
 finding a low-energy spectrum (instead of a single solution) is extremely
-useful for analyzing the energy landscape of the problem. We exemplify the
-usage of our algorithm by benchmarking a recent MPS-based algorithm on a set of
-random spin-glass problems. Compared to the original algorithm presented in
-\cite{bruteforce}, the algorithm described in Chapter \ref{chapter:bruteforce}
-contains several new, non-trivial optimizations further increasing the problem
-sizes that it can tackle.
+useful for analyzing the structure of the energy landscape of the problem. We
+exemplify the usage of our algorithm by conducting benchmarks of a recent
+MPS-based algorithm on a set of random spin-glass problems. Compared to the
+original algorithm presented in \cite{bruteforce}, the algorithm described in
+Chapter \ref{chapter:bruteforce} contains several new, non-trivial
+optimizations further increasing the problem sizes that it can tackle.
 
 Lastly, in chapter \ref{chapter:trains}, we present the application of quantum
 annealing to solving certain railway dispatching problems. We discuss how such
