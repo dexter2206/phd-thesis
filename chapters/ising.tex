@@ -5,8 +5,8 @@ Quantum annealers are fundamentally different from classical computers. For
 one, they don't execute programs written as a sequence of instructions in their
 memory. Instead, they are single-purpose devices capable (in principle) of
 solving a specific optimization problem. Namely, annealers are designed to find
-the lowest energy configuration (called \emph{ground state}) of the Ising
-spin--glass model, which we introduce in this chapter.
+the lowest energy configuration (called \emph{ground state}) of instances of
+the Ising spin--glass model, which we introduce in this chapter.
 
 The potential usefulness of quantum annealers stems from the fact that the
 optimization problem they are supposed to solve is hard for classical
@@ -17,9 +17,10 @@ second point of this chapter.
 Finding a ground state of the Ising spin--glass model may be hard for classical
 computers, but there exists a plethora of heuristic, classical algorithms
 capable of finding solutions that are at least ``good enough''. As the next
-point in this chapter, we provide a brief overview of the most popular ones.
-These algorithms will serve as a baseline for comparison with quantum annealing
-and a recent tensor network-based approach discussed later in the thesis.
+point in this chapter, we provide a brief overview of the most popular
+classical algorithms for solving the Ising spin-glass problems. These
+algorithms will serve as a baseline for comparison with quantum annealing and a
+recent tensor network-based approach discussed later in the thesis.
 
 As the last point in the chapter, we define the Quadratic Unconstrained Binary
 Optimization (QUBO) problem, which is equivalent to the problem of finding the
@@ -40,7 +41,7 @@ particular optimization problem.
 Consider a simple\footnote{That is, one that does not contain duplicate edges
   or loops.}, undirected graph $G = (V, E)$ with $N$ nodes labeled by consecutive
 natural numbers. With each node $i \in V$ we associate a spin variable $s_i \in
-  \{-1, 1\}$. To each edge $\{i, j\} \in E$, we assign an interaction strength
+  \{-1, 1\}$. To each edge $\{i, j\} \in E$ we assign an interaction strength
 $J_{ij}$ and to each node $i \in V$ we assign a local magnetic field $h_i$.
 Here, all $J_{ij}$ and $h_i$ are real numbers. For such a system, one can
 define the following energy function (Hamiltonian):
@@ -118,17 +119,17 @@ hardly surprising that some problems might be solved in more than one way, i.e.
 there might exist different algorithms performing essentially the same task.
 Different algorithms solving the same problems might vastly differ in their
 demand on various resources, like memory or time needed to execute them. In
-practice, execution time (and usage of other resources) of a given algorithm
-might also vary between its implementations, depending on factors like
-programming language or libraries used and the hardware it is executed on.
-Moreover, measuring execution time can only tell us how the given algorithm's
+practice, the execution time (and usage of other resources) of a given
+algorithm might also vary between its implementations, depending on factors
+like programming language or libraries used and the hardware it is executed on.
+Moreover, measuring execution time can only tell us how the given
 implementation performs on a specific problem. But if we increase the problem
 size tenfold, will the execution time be 10 times slower? Or maybe 100 times
 slower? Or maybe it will remain unchanged? Clearly, measuring execution times
 is useful, but cannot be used for comparing algorithms (instead of their
-implementations). Instead, it is more useful to characterize algorithms based
-on how their execution time scales asymptotically with increasing problem size
-\cite{arora}. For instance, given an algorithm with execution time roughly
+implementations). Instead, it is more informative to characterize algorithms
+based on how their execution time scales asymptotically with increasing problem
+size \cite{arora}. For instance, given an algorithm with execution time roughly
 proportional to the input size $N$, one might suspect that for problem
 instances large enough, it will perform better than the one with execution time
 proportional to $N^{2}$. This characteristic, known as computational
@@ -139,44 +140,46 @@ description). Using this notation, the algorithms from the above example would
 be classified as $O(N)$ and $O(N^{2})$ respectively.
 
 \section{Complexity classes}
-Although there might exist multiple algorithms for solving a given
-computational problem, one might consider the minimal time complexity required
-to do so. More generally, one might group computational problems based on their
-demand on resources. In this view, sets of similar problems are called
-\emph{complexity classes} \cite{arora}. The definition of some complexity
-classes might also be restricted to specific types of problems. For instance,
-one might consider only decision problems, i.e. problems to which the answer is
-yes or no \cite{arora}.
+Although there might exist more than one algorithm for solving a particular
+problem, one might consider the smallest time complexity needed to do so.
+Consequently , one might group computational problems based on their demand on
+resources. In this view, sets of similar problems are called \emph{complexity
+  classes} \cite{arora}. The definition of some complexity classes might also be
+restricted to specific types of problems. For instance, one might consider only
+decision problems, i.e. problems to which the answer is yes or no \cite{arora}.
+Finally, to define any complexity class one has to assume some model of
+computation. In many cases, this model is assumed to be a Turing Machine
+\cite{arora}, a theoretical device manipulating symbols on a tape using some
+table of rules, or its non-deterministic variant.
 
 One of the fundamental complexity classes is \textbf{P}, a class of decision
 problems solvable in polynomial time on a deterministic Turing Machine
 \cite{arora}. Another class, \textbf{NP}, comprises all decision problems whose
 solution can be verified in polynomial time using a deterministic Turing
-Machine \cite{arora}. One can immediately see that \textbf{P} $\subset$
+Machine \cite{arora}. Immediately, one can see that \textbf{P} $\subset$
 \textbf{NP}. Indeed, if a problem is solvable in polynomial time, then it is
 also trivially verifiable in polynomial time. However, it is not immediately
-obvious if the inclusion is strict, and whether \textbf{P} $\ne$ \textbf{NP} is
-one of the most important, yet unsolved problems in theoretical computer
-science \cite{fortnow}. The class of \textbf{NP--hard} problems comprises all
-the problems that are at least as hard as every problem in \textbf{NP}. More
-formally, given decision problem $S$ is \textbf{NP--hard} if and only if
-solving every problem in \textbf{NP} can be reduced to solving $S$ a polynomial
-number of times \cite{arora}. A particular subclass of \textbf{NP--hard}
-problems, \textbf{NP--complete}, is an intersection of \textbf{NP} and
-\textbf{NP--hard} \cite{arora}. Figure \ref{fig:complexity} shows the
-relationship between the discussed complexity classes, both under assumptions
-\textbf{P} = \textbf{NP} and \textbf{P} $\ne$ \textbf{NP}.
+obvious if the inclusion is strict, and the question of whether \textbf{P}
+$\ne$ \textbf{NP} is one of the most important, yet unsolved problems in
+theoretical computer science \cite{fortnow}. The class of \textbf{NP--hard}
+problems comprises all the problems that are at least as hard as every problem
+in \textbf{NP}. More formally, a decision problem $S$ is \textbf{NP--hard} if
+and only if solving every problem in \textbf{NP} can be reduced to solving $S$
+a polynomial number of times \cite{arora}. A particular subclass of
+\textbf{NP--hard} problems, \textbf{NP--complete}, is an intersection of
+\textbf{NP} and \textbf{NP--hard} \cite{arora}. Figure \ref{fig:complexity}
+shows the relationship between the discussed complexity classes, both under
+assumptions \textbf{P} = \textbf{NP} and \textbf{P} $\ne$ \textbf{NP}.
 
 Problems in the complexity class \textbf{P} are often considered tractable, or
 efficiently solvable, whereas problems not in \textbf{P} are perceived as hard
 and computationally demanding, a statement known as the Cobham's thesis
-\cite{cobham, arora}. At first, one might find it strange and unintuitive.
-After all, a decision problem for which the best known algorithm runs in
-$O(N^{10^5})$ time is definitely in \textbf{P}, but can hardly be called
-efficiently solvable. However, such large polynomial complexities are rarely
-encountered in practice. Furthermore, even in such cases, it is not uncommon
-that a better algorithm is found shortly after the original one is discovered
-\cite{arora}.
+\cite{cobham, arora}. At first, one might find it strange and unintuitive - a
+decision problem for which the best-known algorithm runs in $O(N^{10^5})$ time
+is definitely in \textbf{P}, but can hardly be called efficiently solvable.
+However, such large polynomial complexities are rarely encountered in practice.
+Furthermore, even in such cases, it is not uncommon that a better algorithm is
+found shortly after the original one is discovered \cite{arora}.
 
 \begin{figure}
   \includegraphics[width=\textwidth]{figures/complexity_new.pdf}
@@ -225,12 +228,35 @@ in polynomial time via several algorithms \cite{clrs}.
 
 \section{Algorithms for solving Ising model}
 
-\begin{figure}
+As is the case with many \textbf{NP--hard} optimization problems, there are
+many heuristic approaches for solving the Ising model. One family of such
+algorithms relies on the Metropolis-Hastings \cite{beichl} algorithm for
+sampling configurations from the underlying Boltzmann distribution. In
+\emph{simulated annealing} \cite{cook, isakov}, one samples states from the
+system while lowering the temperature over time. Thus, the chance of accepting
+a locally worse solution is greater at the start of the algorithm, which helps
+avoid getting stuck in a local minimum, and decreases with each iteration. In
+another approach from the same family, \emph{parallel tempering}, one simulates
+several replicas of the system, each of them in a different temperature.
+Neighboring replicas are allowed to exchange states, with exchange probability
+depending on their energy and temperature difference \cite{swendsen}. Replicas
+with higher temperatures explore state space rapidly (thus reseeding the
+algorithm), while ones with lower temperatures refine the best solutions found
+so far. Various modifications of the aforementioned algorithms exist. For
+instance, one could employ isoenergetic cluster moves \cite{zhu} or adaptive
+choosing of the number of sweeps performed between replica exchanges
+\cite{bittner}. Population annealing is yet another Monte Carlo method, sharing
+similarities with simulated annealing and parallel tempering \cite{wang}. Other
+approaches for solving Ising spin--glasses include methods involving
+branch--and--bound framework \cite{rendl}, its chordal extensions
+\cite{baccari} or methods based on simulating dynamical systems \cite{sheldon}.
+
+\begin{figure}[bh]
   \centering
-  \includegraphics[width=\textwidth]{figures/pt_and_sa.pdf}
-  \caption{Schematic representation of simulated annealing \textbf{(a)} and parallel
-    tempering \textbf{(b)} algorithms. In simulated annealing, a single copy of the
-    system is simulated. The temperature of the system is decreasing with each
+  \includegraphics[width=0.91\textwidth]{figures/pt_and_sa.pdf}
+  \caption{\textbf{a.} Schematic representation of the simulated annealing algorithm.
+    \textbf{b.} Schematic representation of the Parallel tempering algorithms. In simulated annealing, a single copy of the
+    system is simulated. The temperature of the system is decreased with each
     epoch, thus reducing movement through the state space. In parallel tempering,
     several copies (replicas) of the system are simulated, each with a fixed
     temperature. Hotter replicas move through the state space rapidly and less
@@ -240,33 +266,11 @@ in polynomial time via several algorithms \cite{clrs}.
     randomized solutions provided by hotter replicas.} \label{fig:sa}
 \end{figure}
 
-As is the case with many \textbf{NP--hard} optimization problems, there are
-many heuristic approaches for solving the Ising model. One family of such
-algorithms relies on the Metropolis-Hastings \cite{beichl} algorithm for
-sampling from the underlying Boltzmann distribution. In \emph{simulated
-  annealing} \cite{cook, isakov}, one lowers the temperature over time. Thus, the
-chance of accepting a locally worse solution is greater at the start of the
-algorithm and decreases with each iteration, which helps avoid getting stuck in
-a local minimum. In another approach from the same family, \emph{parallel
-  tempering}, one simulates several replicas of the system, each of them in a
-different temperature. Neighboring replicas are allowed to exchange states,
-with exchange probability depending on their energy and temperature difference
-\cite{swendsen}. Replicas with higher temperatures explore state space rapidly
-(thus reseeding the algorithm), while ones with lower temperatures refine the
-best solutions found so far. Various modifications of the aforementioned
-algorithms exist. For instance, one could employ isoenergetic cluster moves
-\cite{zhu} or adaptive choosing the number of sweeps performed between replica
-exchanges \cite{bittner}. Population annealing is another Monte Carlo method,
-sharing similarities with simulated annealing and parallel tempering
-\cite{wang}. Other approaches for solving Ising spin--glasses include methods
-involving branch--and--bound framework \cite{rendl}, its chordal extensions
-\cite{baccari} or methods based on simulating dynamical systems \cite{sheldon}.
-
 \section{Quadratic Unconstrained Binary Optimization}
 
-Let us now introduce \emph{QUBO} -- the Quadratic Unconstrained Binary
+Let us now shift our attention to \emph{QUBO} -- the Quadratic Unconstrained Binary
 Optimization problem. QUBO is essentially the same as the problem of finding
-the ground state of Ising spin--glass, except that in QUBO we use binary
+the ground state of Ising spin--glass, except that in QUBO one uses binary
 variables $q_{i} \in \{0, 1\}$ instead of $\pm 1$ spin variables. To
 distinguish between the two problems, we will use symbols $a_{ij}$ and $b_{i}$
 to denote respectively quadratic and linear coefficients in QUBO, so the energy
@@ -334,7 +338,7 @@ which is irrelevant to the optimization process.
         (0, 1, 1)                    & -4 & (1, 1, 1) & 4  \\ \hline
       \end{tabular}
     \end{center}
-    \caption{QUBO configurations for example QUBO from the equation \eqref{eq:quboexample}.}
+    \caption{All configurations for example QUBO from the equation \eqref{eq:quboexample}.}
     \label{tab:quboexample}
   \end{table}
 
@@ -367,7 +371,7 @@ on a complete graph (by introducing artificial edges with weights 0), the
 equation \eqref{eq:qubomatrix} provides a one--to--one correspondence between
 real symmetric matrices and QUBO problems. We will see the benefits of
 representing QUBO models as symmetric matrices when discussing the bruteforce
-algorithm in chapter \ref{chapter:bruteforce}
+algorithm in chapter \ref{chapter:bruteforce}.
 
 %%% Local Variables:
 %%% mode: latex

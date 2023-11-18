@@ -222,7 +222,7 @@
         yshift=0.3cm
     ] {temperature};
 
-\path (-1.5, 0, 5) pic{
+\path (-1.5, 0, 4) pic{
         statespace={
             heights={
                 0.3cm, 
@@ -243,7 +243,7 @@
             }
         } 
     }
-          (1.5, 0, 5) pic{
+          (1.5, 0, 4) pic{
         statespace={
             heights={0.6cm, 0.1cm, 0.3cm, 0.2cm, 0.2cm, 0.3cm},
             states={
@@ -257,7 +257,7 @@
             }
         }
     }
-    (4.5, 0, 5) pic{
+    (4.5, 0, 4) pic{
         statespace={
             heights={0.1cm, 0.5cm, 0.3cm, 0.2cm, 0.3cm, 0.1cm},
             states={
@@ -274,10 +274,10 @@
     ;
 
 \draw[-latex,semithick] 
-    (-2.7, 0, 3.5) -- (6, 0, 3.5) 
+    (-2.7, 0, 2.5) -- (6, 0, 2.5)
     node[midway, below, font=\scriptsize] {epochs};
 \draw[-latex,semithick] 
-    (-2.7, 0, 3.5) -- (-2.7, 0, 6) 
+    (-2.7, 0, 2.5) -- (-2.7, 0, 5)
     node[
         midway, 
         left, 
@@ -287,11 +287,11 @@
         yshift=0.3cm
     ] {temperature};
 
-\draw[scale=1, domain=-2.7:6, smooth, variable=\x, blue] plot ({\x}, 0, {3.7+exp(-\x-2.7)});
+\draw[scale=1, domain=-2.7:6, smooth, variable=\x, blue] plot ({\x}, 0, {2.7+exp(-\x-2.7)});
 
 % Finally, some labels
 
-\node[font=\bfseries\scriptsize] at (-3, 0, 6.5) {(a)};
-\node[font=\bfseries\scriptsize] at (-3, 0, 2.5) {(b)};
+\node[font=\bfseries\scriptsize] at (-3, 0, 5.0) {a.};
+\node[font=\bfseries\scriptsize] at (-3, 0, 2.0) {b.};
 \end{tikzpicture}
 \end{document}
