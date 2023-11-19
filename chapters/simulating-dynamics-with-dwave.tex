@@ -215,8 +215,11 @@ The results we discuss here were originally reported in \cite{parallelintime}.
 \section{Parallel-in-time simulations with quantum annealer}
 Before discussing the results of our experiments, let us focus first on its
 design. To exemplify our approach, we chose to simulate the dynamics of a
-two--level system with an initial state $\ket{0}$ and a hamiltonian $$ H =
-  \frac{\pi}{2}\sigma_y, $$ where $\sigma_y$ is a Pauli spin operator in the
+two-level system with an initial state $\ket{0}$ and a Hamiltonian
+\begin{equation}
+  H = \frac{\pi}{2}\sigma_y,
+\end{equation}
+where $\sigma_y$ is a Pauli spin operator in the
 $y$-direction. This particular choice of Hamiltonian and initial state makes
 the system suitable for implementation on present-day quantum annealers for
 several reasons. One can easily see that the evolution of the system is real
@@ -237,11 +240,21 @@ coefficient, which further reduces the number of needed variables.
   }
   \label{fig:energy-hist}
 \end{figure}
-\todo{Add units to annealing time}
-We simulated the above system using values of $R=2, 3$ and for several numbers of time points $N$. We used annealing time $\tau$ spanning several orders of magnitude, namely $\tau=20\mu s, 200 \mu s, 2000 \mu s$. Since the resulting graphs were dense, we decided to use standard embedding of the complete graph $K_n$ on Chimera. To assess the quality of solutions obtained from the annealer, we sampled each problem $10^4$ times on DW-2000Q\_{2.1} devices as well as its low-noise version, DW-2000Q\_{5}. Energy distributions of samples obtained for $N=6$ are depicted in Fig. \ref{fig:energy-hist}. The same figure also illustrates the dynamics of the expected value of $\sigma_z$ for the lowest energy sample obtained for a given annealing time. Note that to present a physical meaning of the decoded solution, it was normed before plotting.
+
+We simulated the above system using values of $R=2, 3$ and for several numbers
+of time points $N$. We used annealing time $\tau$ spanning several orders of
+magnitude, namely $\tau=20\mu s, 200 \mu s, 2000 \mu s$. Since the resulting
+graphs were dense, we decided to use standard embedding of the complete graph
+$K_n$ on Chimera. To assess the quality of solutions obtained from the
+annealer, we sampled each problem $10^4$ times on DW-2000Q\_{2.1} devices as
+well as its low-noise version, DW-2000Q\_{5}. Energy distributions of samples
+obtained for $N=6$ are depicted in Fig. \ref{fig:energy-hist}. The same figure
+also illustrates the dynamics of the expected value of $\sigma_z$ for the
+lowest energy sample obtained for a given annealing time. Note that to present
+a physical meaning of the decoded solution, it was normed before plotting.
 
 For comparison with the low-noise annealer, we also solved the resulting
-optimization problems using CPLEX and a recent Tensor Networks--based sampler.
+optimization problems using CPLEX and a recent tensor networks-based sampler.
 The results of this comparison are depicted in Fig. \ref{fig:cplex_tn_dwave}.
 
 Results depicted in figures \ref{fig:energy-hist} and \ref{fig:cplex_tn_dwave}
