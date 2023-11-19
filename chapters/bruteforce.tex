@@ -1,7 +1,7 @@
 %\chaptermark{}ter{Finding low--energy spectrum of spin glass using CUDA}
 \chapter[Brute--forcing spin--glass problems]{Brute--forcing spin--glass problems with CUDA}
 \label{chapter:bruteforce}
-In chapter \ref{chapter:tn} we presented a tensor network--based heuristic algorithm specifically
+In chapter \ref{chapter:tn} we presented a tensor network--based heuristic algorithm
 tailored for Ising spin--glass problems defined on Chimera graphs. In stark contrast, in this
 chapter we will shift our attention to a deterministic algorithm capable of solving problems defined
 on arbitrary (but relatively small) graphs.
@@ -24,10 +24,10 @@ parallel CUDA architecture. We start by outlining the basic version of the
 algorithm and then discuss its recent optimizations for cases when the goal is
 to find only the ground state (as opposed to finding a low energy spectrum).
 Our implementation is capable of finding the ground state of instances of size
-$N=50$ in an hour using a commodity GPU and achieving the same task in less
-than 5 minutes on a server--grade NVIDIA DGX H100. Lastly, we present a
-possible application of our algorithm, which is validating a recent MPS--based
-algorithm for solving Ising spin--glasses.
+$N=54$ in an hour using a commodity GPU and achieving the same task in less
+than 5 minutes on a server-grade NVIDIA DGX H100. Lastly, we present a possible
+application of our algorithm, which is validating a recent MPS--based algorithm
+for solving Ising spin--glasses.
 
 % Optimization problems play an important role in modern society, especially in current volatile times. Instances of such problems can be found in numerous areas of industry and applied sciences. One could mention logistic issues, such as vehicle routing problem together with its variants, and the famous protein folding problem or job shop scheduling to name just a few. It is often the case where many of the aforementioned problems fall into the so called NP--hard complexity class. This fact alone renders hard to solve, making the entire operational research a challenging endeavour requiring enormous amount of computational resources.
 
@@ -62,13 +62,12 @@ so, we introduce the following assumptions:
 \end{enumerate}
 As an added benefit of our assumptions, we decouple the grid size from the
 problem size. The number of thread blocks and block size become parameters of
-our algorithm, which facilitates further fine-tuning of kernel execution
+our algorithm, which facilitates further fine-tuning of the kernel execution
 parameters.
 
 The algorithm will keep track of $k$ lowest--energy states computed so far.
-
 This information will be updated after each new chunk is processed. The
-downside of this approach is that the size of the low--energy spectrum we can
+downside of this approach is that the size of the low-energy spectrum we can
 compute is limited by the chunk size. However, this limitation is not as severe
 as it seems, because in a typical scenario, we have $k \ll 2^{N}$.
 
@@ -133,11 +132,11 @@ detail.
     \begin{tabular}{|c|c|c|c|c|c|}
       \hline
       \rowcolor{theader}
-      \multicolumn{2}{|c|}{Chunk}       &
+      \multicolumn{2}{|c|}{Chunk}      &
       \multicolumn{2}{c|}{First state} &
-      \multicolumn{2}{c|}{Last state}                                                                         \\
+      \multicolumn{2}{c|}{Last state}                                                                        \\
       \hline
-      \rowcolor{tsubheader} Index                            &  Binary    & Decimal & Binary           & Decimal & Binary           \\
+      \rowcolor{tsubheader} Index      & Binary    & Decimal & Binary           & Decimal & Binary           \\
       \hline
       0                                & $(000)_2$ & 0       & $(00000000)_{2}$ & 31      & $(00011111)_{2}$ \\
       1                                & $(001)_2$ & 32      & $(00100000)_{2}$ & 63      & $(00111111)_{2}$ \\
@@ -157,8 +156,6 @@ detail.
 
   \end{table}
 \end{example}
-
-\subsection{Performance benchmarks}
 
 \subsection{Implementation details}
 
@@ -188,7 +185,7 @@ extracting $k$-lowest energy configurations from the first $2k$ configurations.
 The whole procedure is depicted in Fig. \ref{fig:bruteforce}.
 
 Lastly, we would like to note that the algorithm we just described can also be
-implemented on homogenous, CPU--only architectures using any of the available
+implemented on homogenous, CPU-only architectures using any of the available
 parallelization approaches. In our implementation, we used the
 OpenMP\cite{openmp} for a CPU--only version.
 
@@ -196,16 +193,16 @@ OpenMP\cite{openmp} for a CPU--only version.
   \includegraphics[width=\textwidth]{figures/bruteforce}
   \caption{
     Detailed representation of brute force algorithm for finding $k$-lowest energy
-    states of a QUBO. The algorithm iterates over the set of all possbile states in
-    chunks of size $2^{M}$, where $M$ is a user--defined parameter. Throughout the
+    states of a QUBO. The algorithm iterates over the set of all possible states in
+    chunks of size $2^{M}$, where $M$ is a user-defined parameter. Throughout the
     algorithm execution, we maintain arrays of states and corresponding energies.
     The first part of those arrays stores the $k$ best configurations encountered
     so far, and the second part stores configurations belonging to the currently
-    processed chunk. In the first phase of the iteration, an energy--computing
+    processed chunk. In the first phase of the iteration, an energy-computing
     kernel is launched. Then, the $k$--lowest energy configurations from the given
     chunk are selected and moved towards the part of the array with the current
     best solutions. Finally, the best $k$ states are selected from the first $2k$
-    configurations and the algorithm proceeds to the next chunk, or terminates if
+    configurations and the algorithm proceeds to the next chunk or terminates if
     all the chunks have been iterated over. } \label{fig:bruteforce}
 \end{figure}
 
@@ -226,19 +223,19 @@ using the following hardware:
       $12$GB HBM$2$ global memory, $5120$ CUDA Cores}.
 \end{itemize}
 
-For conducting our benchmarks we generated $100$ spinglass instances for each
-$N=24, 26, \ldots, 30, 32$. Additionally we generated $100$ instances of size
+For conducting our benchmarks we generated $100$ spin-glass instances for each
+$N=24, 26, \ldots, 30, 32$. Additionally, we generated $100$ instances of size
 $N=40$ and single instances of sizes $N=48, 50$ that were feasible to solve
-with Titan V GPU. Coefficients of each spinglass were drawn randomly from
-uniform distributions on the intervals $[-2, 2]$ and $[-1, 1]$ for magnetic
-fields and couplings respectively. For each instance, we computed low energy
-spectrum of $k=100$ states with our algorithm. We used maximum chunk size of
-$2^{29}$ for Titan V and CPU and chunk size of $2^{27}$ for GTX 1080.
-
-As already mentioned, larger instances $(N > 32)$ were solved only using Titan
-V GPU. For GTX 1080 and CPU implementation, the expected time to solve those
-instances was estimated based on the timings for smaller $N$. The results of
-our benchmarks are are presented in Fig. \ref{fig:benchmark_results}.
+with Titan V GPU (which was the most powerful card available to us at the time
+of performing the benchmarks). Coefficients of each spin-glass were drawn
+randomly from uniform distributions on the intervals $[-2, 2]$ and $[-1, 1]$
+for magnetic fields and couplings respectively. For each instance, we computed
+the low energy spectrum of $k=100$ states with our algorithm. We used a maximum
+chunk size of $2^{29}$ for Titan V and CPU and the chunk size of $2^{27}$ for
+GTX 1080. As already mentioned, larger instances $(N > 32)$ were solved only
+using Titan V GPU. For GTX 1080 and CPU implementation, the expected time to
+solve those instances was estimated based on the timings for smaller $N$. The
+results of our benchmarks are presented in Fig. \ref{fig:benchmark_results}.
 
 \begin{figure}
   \centering
@@ -250,38 +247,47 @@ our benchmarks are are presented in Fig. \ref{fig:benchmark_results}.
     obtained for smaller system sizes.} \label{fig:benchmark_results}
 \end{figure}
 
-\section{Example application: verifying MPS-based optimization algorithm}
+\section[Example application]{Example application: verifying MPS-based optimization algorithm}
 
-As an example application, in this section, we use our brute-force-based approach with
-heuristic algorithm based on Matrix Product States (MPS). The detailed description of this
-algorithm is outside the scope of this thesis, and we refer the interested reader to the
-Supplementary Material in \cite{tn}. Nevertheless, before we outline how the algorithm works.
+As an example application, in this section, we use our brute-force-based
+approach with heuristic algorithm based on Matrix Product States (MPS). The
+detailed description of this algorithm is outside the scope of this thesis, and
+we refer the interested reader to the Supplementary Material in \cite{tn}.
+Nevertheless, before we outline how the algorithm works.
 
-Similarly to the algorithm presented in chapter \ref{chapter:tn}, in the MPS--based approach
-one explores the probability distribution (as opposed to exploring the energy landscape directly). The basic idea behind  is to approximate Boltzmann distribution as
+Similarly to the algorithm presented in chapter \ref{chapter:tn}, in the
+MPS--based approach one explores the probability distribution (as opposed to
+exploring the energy landscape directly). The basic idea behind is to
+approximate Boltzmann distribution as
 \begin{equation}
-e^{-\beta H(\mathbf{s})/2} \approx A^{s_1} A^{s_2} \ldots A^{s_L} = |\Psi(\beta) \rangle,
-\label{eq:mps}
+  e^{-\beta H(\mathbf{s})/2} \approx A^{s_1} A^{s_2} \ldots A^{s_L} = |\Psi(\beta) \rangle,
+  \label{eq:mps}
 \end{equation}
-for large enough $\beta$. Here, $A^{s_{i}}$ are real matrices of limited dimension $\le D$.
-In this context, the parameter $D$ is referred to as the \emph{bond dimension}. Fig. \ref{fig:mps:boltzmann}
-shows a pictorial representation of such approximation. At each bond, the system is split into two halves.
-An exact decomposition would require bond $D$ of exponential (w.r.t. number of spins) size. Limiting $D$
-effectively limits the amount of entanglement related to given bipartition \cite{Wall18}.
-Once the approximation in the equation \eqref{eq:mps} is constructed, it is possible to effectively
-compute any marginal or conditional probability, and then systematically search for the most probable
-(and thus, ones with lowest energy) classical configurations using branch-and-bound procedure, constructing
-tree of most probable spin configurations one variable at the time.
+for large enough $\beta$. Here, $A^{s_{i}}$ are real matrices of limited
+dimension $\le D$. In this context, the parameter $D$ is referred to as the
+\emph{bond dimension}. Fig. \ref{fig:mps:boltzmann} shows a pictorial
+representation of such approximation. At each bond, the system is split into
+two halves. An exact decomposition would require bond $D$ of exponential
+(w.r.t. number of spins) size. Limiting $D$ effectively limits the amount of
+entanglement related to given bipartition \cite{Wall18}. Once the approximation
+in the equation \eqref{eq:mps} is constructed, it is possible to effectively
+compute any marginal or conditional probability, and then systematically search
+for the most probable (and thus, ones with lowest energy) classical
+configurations using branch-and-bound procedure, constructing tree of most
+probable spin configurations one variable at the time.
 
-The search starts with $\beta=0$, for which the MPS decomposition is trivial. Then, the algorithm subsequently simulates the imaginary time evolution by applying the sequence of gates:
+The search starts with $\beta=0$, for which the MPS decomposition is trivial.
+Then, the algorithm subsequently simulates the imaginary time evolution by
+applying the sequence of gates:
 \begin{equation}
-\label{eq:gate}
-U_i(d\beta) = e^{-d\beta s_i (\sum_{j>i}J_{ij}  s_j+h_i)/2},
+  \label{eq:gate}
+  U_i(d\beta) = e^{-d\beta s_i (\sum_{j>i}J_{ij}  s_j+h_i)/2},
 \end{equation}
-which totals to $\prod_{i=1}^N U_i(d\beta) = e^{-d \beta H(\mathbf{s})/2}$.
-One can observe that applying each gate results in the doubling of the bond dimension.
-Hence, at each step, one has to systematically find an approximation maintaining
-the fixed $D$. The whole procedure is depicted in Fig. \ref{fig:mps:compress}.
+which totals to $\prod_{i=1}^N U_i(d\beta) = e^{-d \beta H(\mathbf{s})/2}$. One
+can observe that applying each gate results in the doubling of the bond
+dimension. Hence, at each step, one has to systematically find an approximation
+maintaining the fixed $D$. The whole procedure is depicted in Fig.
+\ref{fig:mps:compress}.
 
 \begin{figure}
   \begin{subfigure}[t]{0.45\textwidth}
@@ -296,21 +302,40 @@ the fixed $D$. The whole procedure is depicted in Fig. \ref{fig:mps:compress}.
   \label{fig:mps}
 \end{figure}
 
-
 By construction, the MPS-based ansatz outlined above is one-dimensional. Hence,
-the question is to what end can it be used to find low-energy solutions of spin-glasses
-defined on a complete graph?
+the question is to what end can it be used to find low-energy solutions of
+spin-glasses defined on a complete graph? To answer this question, we ran the
+MPS-based algorithm on 100 instances of different sizes and then compared the
+results to the output of our brute-force algorithm. Instances were drawn at
+random using the same procedure as described in the previous section. The
+results of these tests are depicted in Fig. \ref{fig:mpsbench}. One can observe
+that bond dimension $D=128$ and inverse temperature $\beta=1$ are already
+sufficient to find the ground state of all the test instances, and recover most
+of the $k=1000$ lowest energy states. The results also demonstrate the
+significance of setting the time-step parameter $d\beta$ to small enough value.
+As the last conclusion from our benchmarks, we would like to point out the
+magnitude of compression of the relevant information in the MPS representation.
+Indeed, an exact MPS decomposition would require the bond dimension $D=2^{N/2}
+\gg 128$.
+
+\begin{figure}[th]
+  \includegraphics[width=\textwidth]{figures/mps_benchmark}
+  \caption{Results of the MPS benchmarks. In both panels $\beta=1$. \textbf{a.} Success
+    rate, defined as a fraction of instances (out of 100) for which the MPS
+    algorithm found the ground state. \textbf{b.} Normalized histogram showing the
+    number of instances for which the MPS algorithm was able to find the given
+    fraction of lowest $k=1000$ states.} \label{fig:mpsbench}
+\end{figure}
 
 \section{Improving the algorithm using Gray Code}
 
-The algorithm presented in the previous chapter and its GPU--enabled
-implementation are already highly performant. However, we can still improve
+The algorithm presented in the previous chapter is already highly performant. However, we can still improve
 upon it by altering the order in which we enumerate the integral representation
 of states used by our algorithm.
 
 \subsection{Single bit--energy difference}
 Suppose we are given a QUBO with $F(q_{1},\ldots,q_{N})$ as in the equation
-\ref{eq:qubo}. Consider two states, say $\bq{1} = (\q{1}_{1},\ldots,\q{1}_{N})$
+\eqref{eq:qubo}. Consider two states, say $\bq{1} = (\q{1}_{1},\ldots,\q{1}_{N})$
 and $\bq{2}=(\q{2}_{1},\ldots,\q{2}_{N})$ such that they only differ in the
 $k$-th bit, i.e. $\q{2}_{k}=1-\q{1}_{k}$ and $\q{2}_{i}=\q{1}_{i}$ for $i \ne
   k$. The energy difference $F(\bq{2})-F(\bq{1})$ can be easily computed and the
@@ -324,7 +349,7 @@ formula reads
   \end{split}
 \end{align}
 Interestingly, computing the difference in equation \eqref{eq:energydiff1}
-requires only $N$ multiplications. But how can this be used to improve the
+requires only $O(N)$ multiplications. But how can this be used to improve the
 performance of the exhaustive search through QUBO state space?
 
 Moving $F(\bq{1})$ to the right-hand side, we obtain a formula for $F(\bq{2})$,
@@ -353,14 +378,8 @@ $\diff_{F}(\mathbf{q},k)$ is
 The pseudocode for a serial algorithm for solving a QUBO problem using our
 observations is outlined in listing \ref{lst:grayserial}. Before we can
 implement it on GPU though, we need to answer the following questions:
-\begin{lstlisting}[
-  language=Python,
-  caption={Pseudocode for algorithm solving the QUBO problem using energy differences and bit flips.},
-  captionpos=b,
-  label=lst:grayserial,
-  float,
-  floatplacement=H
-]
+\begin{listing}
+\begin{minted}{python}
 def solve_qubo(F, q):
     q = [0] * N # Start with all bits set to 0
     best_state = current_state = q
@@ -374,13 +393,16 @@ def solve_qubo(F, q):
             best_energy = current_energy
             best_state = current_state
     return best_state, best_energy
-\end{lstlisting}
+\end{minted}
+\caption{Pseudocode for algorithm solving the QUBO problem using energy differences and bit flips.}
+\label{lst:grayserial}
+\end{listing}
 \begin{enumerate}
   \item How to produce a sequence of $2^{N}-1$ bits such that executing them enumerates
-   a rll possible states?
+    a rll possible states?
   \item How to divide work among CUDA threads?
 \end{enumerate}
-The answer to the first question is well--known and involves enumerating
+The answer to the first question is well-known and involves enumerating
 integers using the Gray code, which we will describe now.
 
 \subsection{Gray code}
@@ -392,26 +414,26 @@ next state, corresponding to $4$ is encoded by the string $(100)_{2}$, which
 differs in all three bits.
 
 Instead of using the positional system, we might utilize an encoding called
-Gray code, or Reflected Binary Code (RBC), which is primarily used to improve
-the robustness of electromechanical switches and in error correction protocols.
+Gray code, or Reflected Binary Code (RBC) \cite{gray,lucal1959}, which is primarily used to improve
+the robustness of electromechanical switches and in the error correction protocols.
 In this code, encoding of two successive integers always differs by at most one
 bit, which makes it suitable for application in our algorithm.
 
-The conceptual construction of Gray code is straightforward. For Gray Code of
+The conceptual construction of the Gray code is straightforward. For Gray code of
 length $1$ we have two binary strings: $0$ and $1$. To obtain all Gray codes
 for a given length $N > 1$, we first construct an ordered list of codes of
-length $N-1$ and call it $L$. Then, we reverse the list of codes, and call it
+length $N-1$ and call it $L$. Then, we reverse the list of codes and call it
 $H$, an operation called \emph{reflection}. Finally, we prepend $0$ to all
 elements of $L$ and prepend $1$ to all elements of $H$. The concatenation of
 $L$ and $H$ forms the $N$--bit Gray Code. The process is illustrated in Fig.
-\ref{fig:gray} .One useful consequence of the construction is that the shorter
-Gray Codes might be viewed as initial parts of the larger ones prepended with
-enough zeros. Thus, statements as ``$n$-th Gray code'' make sense and are
+\ref{fig:gray}. One useful consequence of the construction is that the shorter
+Gray code might be viewed as an initial part of the larger one prepended with
+enough zeros. Thus, statements like ``$n$-th Gray code'' make sense and are
 unambiguous.
 
 \begin{figure}
   \includegraphics[width=\textwidth]{figures/gray.pdf}
-  \caption{Reflection--based construction of Gray Code. The length of the code is denoted
+  \caption{Reflection--based construction of Gray code. The length of the code is denoted
     by $N$. For $N=1$, the code comprises two binary strings, $0$ and $1$. To
     construct the code of length $N>1$, the code of length $N-1$ and its vertical
     reflection are stacked. Then, the first, unreflected half is prepended with $0$
@@ -419,11 +441,11 @@ unambiguous.
 \end{figure}
 
 An important thing to observe is that in our algorithm we need at most two Gray
-Code--encoded numbers at the time to determine the bit to be flipped. The
+code-encoded numbers at the time to determine the bit to be flipped. The
 reflection--based construction outlined so far would require precomputing a
 large part (if not all) of the encodings at once. Considering the size of the
 state space, this is clearly infeasible. However, there exists an explicit
-formula for computing $n$-th Gray code, which reads:
+formula for computing $n$-th Gray code, which reads \cite{grayalgo}:
 \begin{equation}
   \mbox{gray}(n) = n \oplus (n >> 1),
 \end{equation}
@@ -432,33 +454,30 @@ where $\oplus$ denotes the bitwise xor operation and $>>$ is right bitshift.
 To compute which bit differs between consecutive Gray codes, we can xor them,
 and then find the position of the only set bit in the resulting integer. One
 can easily implement a function that finds the first set bit in a 64-bit
-integer, or use one of the available library or compiler-builtin functions. For
+integer, or use one of the available library or compiler built-in functions. For
 instance, POSIX--compatible C standard libraries include \texttt{ffsll}
-function. In CUDA, there is a \texttt{\_\_ffsll} function available. For both
+function \cite{ffs}. In CUDA, there is a \texttt{\_\_ffsll} function available \cite{CUDAguide}. For both
 of the above cases, the function counts bits from $1$. Using this convention,
 we can write a pseudocode for a function \texttt{find\_bit\_to\_flip} from
-listing \ref{lst:grayserial} like in the listing \ref{lst:findbit}
+listing \ref{lst:grayserial} like in the listing~\ref{lst:findbit}.
 
-\begin{lstlisting}[
-  language=Python,
-  caption={Pseudocode for a function generating bit flips for Gray code construction},
-  captionpos=b,
-  label=lst:findbit,
-  float,
-  floatplacement=H
-]
+\begin{listing}
+\begin{minted}{python}
 def find_bit_to_flip(i): # i starts from 0
     return ffs(gray(i) ^ gray(i+1))
-\end{lstlisting}
+\end{minted}
+\caption{Pseudocode for a function generating bit flips for Gray code construction}
+\label{lst:findbit}
+\end{listing}
 
 Now that we know how to construct a correct sequence of bit flips, it is time
 we design a parallelization strategy, which is what we will do next.
 
 \subsection{Parallelization using GPU}
-The algorithm presented in \ref{lst:grayserial} is fully serial. Our task is now to
-parallelize it so that it can be executed on GPU. Unsurprisingly, we will once
-again employ the strategy of dividing each state into a suffix and a prefix
-part. This time, however, it is the suffix that will stay fixed between
+The algorithm presented in \ref{lst:grayserial} is fully serial. Our task is
+now to parallelize it so that it can be executed on GPU. Unsurprisingly, we
+will once again employ the strategy of dividing each state into a suffix and a
+prefix part. This time, however, it is the suffix that will stay fixed between
 iterations. The prefix part will be updated in each iteration by flipping a
 single bit in Gray code order. The process is illustrated in Fig.
 \ref{fig:grayparallel}.
@@ -466,10 +485,10 @@ single bit in Gray code order. The process is illustrated in Fig.
 \begin{figure}
   \includegraphics[width=\textwidth]{figures/grayparallel}
   \caption{
-    Parallel processing of $N$--variable QUBO configurations in Gray code order. In
+    Parallel processing of $N=5$--variable QUBO configurations in Gray code order. In
     our example, suffix length $M=2$, and hence $2^{M}=4$ states are processed in
     each iteration. Consequently, there are $2^{N-M}=8$ iterations. For this
-    example, we consider a kernel that computes two iterations per kernel
+    example, we consider a kernel that processes two iterations per kernel
     invocation, resulting in $2^{N-M}/2 = 4$ kernel invocations total. }
   \label{fig:grayparallel}
 \end{figure}
@@ -499,7 +518,7 @@ require us to split the algorithm into several kernel invocations.
 \subsection{Further optimizing parallel execution}
 
 There are two optimizations we can make to further reduce the number of
-operations performed in each iteration. Let us first notice, that the only bit
+operations performed in each iteration. Let us first notice that the only bit
 flips that can happen, do so in the prefix part. Going back to the equation
 \eqref{eq:energydiff1}, we can rewrite the expression for $F(\bq{2})-F(\bq{1})$
 into a sum of two parts:
@@ -537,9 +556,7 @@ commonly--occuring bit flips, where $K$ is a user--controlled parameter.
   \includegraphics[width=\textwidth]{figures/bruteforcegray}
   \caption{
     Schematic representation of the GPU--enabled brute force algorithm for finding
-    ground state of a QUBO problem using Gray codes.
-  }
-  \label{fig:bruteforcegray}
+    ground state of a QUBO problem using Gray codes. } \label{fig:bruteforcegray}
 \end{figure}
 
 \begin{figure}
@@ -547,59 +564,78 @@ commonly--occuring bit flips, where $K$ is a user--controlled parameter.
   \caption{Implementation of the strided loop for kernel in fig \ref{fig:bruteforcegray}.}
 \end{figure}
 
-
 \subsection{Performance evaluation of the optimized algorithm}
 
-We performed a preliminary performance evaluation of the Gray code--based algorithm for finding the ground state. For our benchmarks, we used several setups with different Nvidia GPUs. Some setups were equipped with more than one copy of the same GPU. The summary of test setups, as well as capabilities of the used GPUs is presented in table \ref{tab:bruteforce-gs-only-table}.
-
-Since each of the test setups was available to us only for a limited amount of time, we were only able to measure
-execution times for a very limited subset of parameters, and we needed to make some educated guesses. We decided to
-use a constant depth of the prefix differences buffer equal to 10. Depending on the available memory size, we used suffix sizes of 27, 28 and 29. The tested kernel executions grids included blocks of 256, 512 or 1024 threads, and 4096 or 8192 blocks per grid. We also considered 2048, 4096 and 8192 algorithm steps per single kernel execution. The best parameters found for each setup are presented in table \ref{tab:bruteforce-gs-only-table}. We would like to stress out,  however, that such a coarse--grained process of parameter tuning does not guarantee their global optimality. Further
-parameter tuning could be achieved by searching through a finer grid of parameters, possibly combined with profiling.
-Lastly, for multi-GPU setups, we solved each instance by distributing the work equally between GPUs by splitting the problem into chunks of equal size. The splitting was done by constructing new QUBOs by fixing the values of $l$ variables, resulting in $2^{l}$ total subproblems.
-
-The figure Fig. \ref{fig:bruteforce-gsonly-benchmarks} shows the results of our benchmarks. Observe that for multi-GPU setups and system sizes $N \le 40$, the execution time is almost constant. This is because the time presented on the graph factors in the time of scattering work among GPUs and gathering the results, which for small system sizes dominates the actual solver execution times. Aside from these plateaus, as expected, the graphs of measured solution times
-resemble exponential curves. On the setup with eight DGX H100 GPUs, the optimized code was able to find the ground state of instances with system size $N=50$ in less than 5 minutes.
+We performed a preliminary performance evaluation of the Gray code--based
+algorithm for finding the ground state. For our benchmarks, we used several
+setups with different Nvidia GPUs. Some setups were equipped with more than one
+copy of the same GPU. The summary of test setups, as well as capabilities of
+the used GPUs is presented in table \ref{tab:bruteforce-gs-only-table}.
 
 \begin{table}[!ht]
   \footnotesize
   \begin{tabular}{|l|c|c|c|c|c|}
     \hline
-    \cellcolor{theader}  & \multicolumn{2}{c|}{\cellcolor{theader} Kernel launch parameters} & \multicolumn{2}{c|}{\cellcolor{theader}Algorithm parameters} & \cellcolor{theader}\\
+    \cellcolor{theader}                                              & \multicolumn{2}{c|}{\cellcolor{theader} Kernel launch parameters} & \multicolumn{2}{c|}{\cellcolor{theader}Algorithm parameters} & \cellcolor{theader}                                                                      \\
     \hhline{~----~}
-     \cellcolor{theader} \multirow{-2}{*}{\cellcolor{theader} GPU(s)}& \cellcolor{tsubheader} Block size & \cellcolor{tsubheader} Grid size & \cellcolor{tsubheader} Suffix size & \cellcolor{tsubheader} \makecell{\# Steps per \\ kernel launch} & \multirow{-2}{*}{\cellcolor{theader} \makecell{\# Fixed \\ variables}}\\
+    \cellcolor{theader} \multirow{-2}{*}{\cellcolor{theader} GPU(s)} & \cellcolor{tsubheader} Block size                                 & \cellcolor{tsubheader} Grid size                             & \cellcolor{tsubheader} Suffix size & \cellcolor{tsubheader} \makecell{\# Steps per       \\ kernel launch} & \multirow{-2}{*}{\cellcolor{theader} \makecell{\# Fixed \\ variables}}\\
     \hline
-    A10& 512 & 4096 & 27 & 4096 & N/A\\
+    A10                                                              & 512                                                               & 4096                                                         & 27                                 & 4096                                          & N/A \\
     \hline
-    A100& 512 & 4096 & 27 & 4096 & N/A\\
+    A100                                                             & 512                                                               & 4096                                                         & 27                                 & 4096                                          & N/A \\
     \hline
-    A6000 & 1024 & 4096 & 27 & 4096 & N/A\\
+    A6000                                                            & 1024                                                              & 4096                                                         & 27                                 & 4096                                          & N/A \\
     \hline
-    V100 x8 & 1024 & 4096 & 27 & 4096 & 3\\
+    V100 x8                                                          & 1024                                                              & 4096                                                         & 27                                 & 4096                                          & 3   \\
     \hline
-    DGX H100 x8 & 1024 & 8192 & 29 & 8192 & 3\\
+    DGX H100 x8                                                      & 1024                                                              & 8192                                                         & 29                                 & 8192                                          & 3   \\
     \hline
-    RTX 4090 x8 & 512 & 4096 & 28 & 4096 & 1\\
+    RTX 4090 x8                                                      & 512                                                               & 4096                                                         & 28                                 & 4096                                          & 1   \\
     \hline
   \end{tabular}
-  \caption{Parameters used for benchmarking}
-  \label{tab:bruteforce-gs-only-table}
+  \caption{Parameters used for benchmarking} \label{tab:bruteforce-gs-only-table}
 \end{table}
+
+Since each of the test setups was available to us only for a limited amount of
+time, we were only able to measure execution times for a very limited subset of
+parameters, and we needed to make some educated guesses. We decided to use a
+constant depth of the prefix differences buffer equal to 10. Depending on the
+available memory size, we used suffix sizes of 27, 28 and 29. The tested kernel
+executions grids included blocks of 256, 512 or 1024 threads, and 4096 or 8192
+blocks per grid. We also considered 2048, 4096 and 8192 algorithm steps per
+single kernel execution. The best parameters found for each setup are presented
+in table \ref{tab:bruteforce-gs-only-table}. We would like to stress out,
+however, that such a coarse--grained process of parameter tuning does not
+guarantee their global optimality. Further parameter tuning could be achieved
+by searching through a finer grid of parameters, possibly combined with
+profiling. Lastly, for multi-GPU setups, we solved each instance by
+distributing the work equally between GPUs by splitting the problem into chunks
+of equal size. The splitting was done by constructing new QUBOs by fixing the
+values of $l$ variables, resulting in $2^{l}$ total subproblems.
+
+The figure Fig. \ref{fig:bruteforce-gsonly-benchmarks} shows the results of our
+benchmarks. Observe that for multi-GPU setups and system sizes $N \le 40$, the
+execution time is almost constant. This is because the time presented on the
+graph factors in the time of scattering work among GPUs and gathering the
+results, which for small system sizes dominates the actual solver execution
+times. Aside from these plateaus, as expected, the graphs of measured solution
+times resemble exponential curves. On the setup with eight DGX H100 GPUs, the
+optimized code was able to find the ground state of instances with system size
+$N=50$ in less than 5 minutes.
 
 \begin{figure}
   \includegraphics[width=\textwidth]{figures/bf_benchmarks_initial}
   \caption{
-    Benchmarking results for Gray code--based brute force algorithm for finding a ground state
-    of Ising model. The dashed lines between data points are provided for visual guidance. For each
-    system size $N$, the solution times were averaged over 20 different instances with known ground
-    states. Observe that for setups with multiple GPUs and small system sizes, the solution time
-    remains virtually constant. This is because, for small system sizes, the execution time is
-    dominated by tasks related to distributing work and gathering results. The parameters used for
-    benchmarking in each setup are summarized in table \ref{tab:bruteforce-gs-only-table}.
-  }
-  \label{fig:bruteforce-gsonly-benchmarks}
+    Benchmarking results for Gray code--based brute force algorithm for finding a
+    ground state of Ising model. The dashed lines between data points are provided
+    for visual guidance. For each system size $N$, the solution times were averaged
+    over 20 different instances with known ground states. Observe that for setups
+    with multiple GPUs and small system sizes, the solution time remains virtually
+    constant. This is because, for small system sizes, the execution time is
+    dominated by tasks related to distributing work and gathering results. The
+    parameters used for benchmarking in each setup are summarized in table
+    \ref{tab:bruteforce-gs-only-table}. } \label{fig:bruteforce-gsonly-benchmarks}
 \end{figure}
-
 
 %%% Local Variables:
 %%% mode: latex
