@@ -85,21 +85,23 @@ moments of time
   \ket{\Psi} = \sum_{n=0}^{N-1} \ket{n} \otimes \ket{\psi(t_n)}.
 \end{equation}
 Consider now the following \emph{clock operator} $\clockop$
-\begin{eqnarray}
+\begin{equation}
   \label{eq:clock2}
+  \begin{split}
   \clockop
-  & =
+  =
   \sum_{n=0}^{N-2}
-  \ketbra{n+1}{n+1} \otimes I - \ketbra{n+1}{n} \otimes U_n + \\
+  &\ketbra{n+1}{n+1} \otimes I - \ketbra{n+1}{n} \otimes U_n + \\
   &\ketbra{n}{n} \otimes I - \ketbra{n}{n+1}\otimes U_{n}^{\dagger}.
-\end{eqnarray}
+  \end{split}
+\end{equation}
 One can see that $\ket{\Psi}$ is a solution (although not unique) to the
 eigenequation
 \begin{equation}
   \label{eq:clock-eigenequation}
   \clockop \ket{\mathbf{x}} = 0.
 \end{equation}
-The non--uniqueness of the solution of \ref{eq:clock-eigenequation} follows
+The non--uniqueness of the solution of \eqref{eq:clock-eigenequation} follows
 from the fact that the definition of the clock operator $\clockop$ does not
 depend on the initial state. We can fix this problem by adding a \emph{penalty}
 term $\clockop_0 = \ketbra{0}{0}\otimes(I-\ketbra{\psi_0}{\psi_0})$ to the
@@ -109,7 +111,7 @@ left-hand side. The equation to solve becomes then:
   (\clockop + \clockop_0) \ket{\mathbf{x}} = 0.
 \end{equation}
 If one puts $\coefmatrix=\clockop + \ketbra{0}{0} \otimes I$ and $\ket{\Phi} =
-  \ket{0}\otimes \ket{\psi_0}$, the equation \ref{eq:clock-eigenequation2}
+  \ket{0}\otimes \ket{\psi_0}$, the equation \eqref{eq:clock-eigenequation2}
 becomes:
 \begin{equation}
   \label{eq:gsys}
@@ -119,7 +121,7 @@ Thus, using an approximation of evolution operators, we constructed a system of
 linear equations encoding the solution to the equation
 \eqref{eq:dynamical-system} under the given initial condition. At this point,
 however, it is not possible to solve it using a quantum annealer yet. To do so,
-one first needs to convert this system into an optimization problem with binary
+one first needs to convert this system into an optimization problem with dychotomous
 variables, which is what we will deal with next.
 \section{Solving systems of linear equations as an optimization problem}
 There is a straightforward way of converting equation \eqref{eq:gsys} into an
