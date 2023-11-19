@@ -88,11 +88,11 @@ Consider now the following \emph{clock operator} $\clockop$
 \begin{equation}
   \label{eq:clock2}
   \begin{split}
-  \clockop
-  =
-  \sum_{n=0}^{N-2}
-  &\ketbra{n+1}{n+1} \otimes I - \ketbra{n+1}{n} \otimes U_n + \\
-  &\ketbra{n}{n} \otimes I - \ketbra{n}{n+1}\otimes U_{n}^{\dagger}.
+    \clockop
+    =
+    \sum_{n=0}^{N-2}
+    &\ketbra{n+1}{n+1} \otimes I - \ketbra{n+1}{n} \otimes U_n + \\
+    &\ketbra{n}{n} \otimes I - \ketbra{n}{n+1}\otimes U_{n}^{\dagger}.
   \end{split}
 \end{equation}
 One can see that $\ket{\Psi}$ is a solution (although not unique) to the
@@ -121,8 +121,8 @@ Thus, using an approximation of evolution operators, we constructed a system of
 linear equations encoding the solution to the equation
 \eqref{eq:dynamical-system} under the given initial condition. At this point,
 however, it is not possible to solve it using a quantum annealer yet. To do so,
-one first needs to convert this system into an optimization problem with dychotomous
-variables, which is what we will deal with next.
+one first needs to convert this system into an optimization problem with
+dichotomous variables, which is what we will deal with next.
 \section{Solving systems of linear equations as an optimization problem}
 There is a straightforward way of converting equation \eqref{eq:gsys} into an
 optimization problem. One can observe that the solution minimizes the norm
@@ -141,7 +141,7 @@ following function $h$ instead
   h(\mathbf{x})=\frac{1}{2}\bra{\mathbf{x}}\coefmatrix\ket{\mathbf{x}} -
   \braket{\mathbf{x}}{\Phi}.
 \end{equation}
-It is easy to verify that solution to \eqref{eq:gsys} also minimizes $h$ by
+Indeed, one can verify that solution to \eqref{eq:gsys} also minimizes $h$ by
 computing its gradient and Hessian
 \begin{equation}
   \nabla h(\mathbf{x}) = \coefmatrix\ket{\mathbf{x}}-\ket{\Phi}, \quad \nabla^2 h({\mathbf
@@ -154,7 +154,8 @@ Since hessian is positive and $\ket{\Psi}$ is the only vector at which $\nabla
 Thus far, we have been working with continuous variables. The next necessary
 step before solving optimization problems \eqref{eq:optimize_1} and
 \eqref{eq:optimize_2} using annealer is converting them in such a way that all
-unknowns are dichotomous. The idea is to express each of the unknown
+unknowns are dichotomous. To this end, we will follow a strategy presented in
+\cite{fixedpoint,chang}. The idea is to express each of the unknown
 coefficients of $\ket{\mathbf{x}} = $[$x_1, \ldots, x_{LN}]^T$ in fixed-point
 approximation. If one assumes (binary) order of magnitude of coefficients of
 $\mathbf x$ to be $D$ (i.e. $x_i \in [-2^D, 2^D]$ for each $i$), then it can be
@@ -175,7 +176,7 @@ optimization problems of the form
   \argmin_{\mathbf{q}} h(\mathbf{q}) = \argmin_{\mathbf{q}} \sum_{i,\alpha} a_i^{\alpha} q_i^r + \sum_{i,j,\alpha,\beta} b_{ij}^{\alpha\beta} q_i^{\alpha} q_j^{\beta} + h_0.
 \end{align}
 Coefficients in equations \eqref{eq:qubo_f} and \eqref{eq:qubo_h} can be
-straightforwardly computed by an appropriate substitutions into equations
+straightforwardly computed by appropriate substitutions into equations
 \eqref{eq:optimize_1} and \eqref{eq:optimize_2}. For brevity, here we present
 only the formulas for the equation \eqref{eq:qubo_h}, which reads
 \begin{eqnarray}
@@ -203,13 +204,13 @@ the graph of size $N \cdot R \cdot L$. The number of edges (i.e. non-zero
 quadratic terms) depends on the number of non-zero off-diagonal elements of the
 matrix $\coefmatrix$. It is interesting to note that the overall density of the
 graph is an increasing function of $R$ (bigger precision requires a denser
-graph) while, on the other hand, it is a decreasing function of $L$ (larger
-systems require sparser graphs).
+graph) while, on the other hand, it tends to decrease with increasing $L$.
 
 We converted the original problem of finding the dynamics of the system into a
 binary optimization problem suitable for input to the quantum annealer. In the
 next section, we will discuss experiments that we performed using D-Wave
-2000Q\_2\_1 and D-Wave 2000Q\_5 machines to test the above-described approach.
+2000Q$_{2.1}$ and D-Wave 2000Q$_5$ machines to test the approach we described.
+The results we discuss here were originally reported in \cite{parallelintime}.
 
 \section{Parallel-in-time simulations with quantum annealer}
 Before discussing the results of our experiments, let us focus first on its
