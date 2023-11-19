@@ -49,9 +49,10 @@ the system into its state at time $t$ and is given by
   \label{eq:propagator}
   U(t, t_0) = \mathcal{T} \exp \left( \int_{t_0}^t K(\tau)d\tau \right).
 \end{equation}
-Here, $\mathcal{T}$ denotes the time-ordering operation. Note that in the case
-when $K(t)$ commutes with $K(t')$ for every $t' \ne t$, the time-ordering can
-be omitted. In particular, this is the case if $K$ is time-independent.
+Here, $\mathcal{T}$ denotes the time-ordering operation \cite{chronological}.
+Note that in the case when $K(t)$ commutes with $K(t')$ for every $t' \ne t$,
+the time-ordering can be omitted. In particular, this is the case if $K$ is
+time-independent.
 
 Given the initial state, we are interested in finding the state of the system
 at some time $t > t_0$. Numerical methods for solving this problem usually
@@ -67,7 +68,9 @@ where $U_i$ is a shorthand notation for $U(t_i, t_{i-1})$. This is purely a
 rearrangement of computations, which by itself gives no benefit over applying
 $U(t, t_0)$ directly. However, shortening the interval allows for a more
 efficient approximation of propagators, which can be done using a variety of
-methods (e.g. via Suzuki-Trotter approximation).
+methods, including Suzuki-Trotter approximation \cite{suzuki}, commutator-free
+expansion \cite{commutatorfree} or tensor-networks based approaches
+\cite{dmrg}.
 
 This procedure, common to many sequential methods, gives a starting point for a
 class of the so-called parallel in--time methods based on the Feynman clock
