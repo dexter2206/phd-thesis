@@ -212,7 +212,7 @@ next section, we will discuss experiments that we performed using D-Wave
 2000Q$_{2.1}$ and D-Wave 2000Q$_5$ machines to test the approach we described.
 The results we discuss here were originally reported in \cite{parallelintime}.
 
-\section{Parallel-in-time simulations with quantum annealer}
+\section[Parallel-in-time simulations]{Parallel-in-time simulations with quantum annealer}
 Before discussing the results of our experiments, let us focus first on its
 design. To exemplify our approach, we chose to simulate the dynamics of a
 two-level system with an initial state $\ket{0}$ and a Hamiltonian
@@ -232,64 +232,60 @@ coefficient, which further reduces the number of needed variables.
   \centering
   \includegraphics{figures/fig2.pdf}
   \caption{(a)--(b) Energy distribution of samples obtained from D-Wave annealers for different annealing times $\tau$. Notice a slight shift of distributions towards the ground state for the 2000Q\_{5} device. (c)--(d) Rabi oscillations of the simulated system. The obtained samples were normed before plotting. As can be seen in panel (d), the low-noise device was able to faithfully capture oscillations for $\tau=200, 2000$.
-    The annealing time ($\tau=$
-    \tikzquad\,\,\, -- 20,
-    \,\tikzcircle\,\,\,-- 200,
-    \,\tikzdot\,\,-- 2000)
-    is measured in microseconds.
+    The annealing time is color-coded: $\tau=$
+    \tikzquad\,\,\, -- 20\textmu{}s,
+    \,\tikzcircle\,\,\,-- 200\textmu{}s,
+    \,\tikzdot\,\,-- 2000\textmu{}s.
   }
   \label{fig:energy-hist}
 \end{figure}
 
 We simulated the above system using values of $R=2, 3$ and for several numbers
 of time points $N$. We used annealing time $\tau$ spanning several orders of
-magnitude, namely $\tau=20\mu s, 200 \mu s, 2000 \mu s$. Since the resulting
+magnitude, namely $\tau=20\mu s$, $200 \mu s$ and $2000 \mu s$. Since the resulting
 graphs were dense, we decided to use standard embedding of the complete graph
-$K_n$ on Chimera. To assess the quality of solutions obtained from the
-annealer, we sampled each problem $10^4$ times on DW-2000Q\_{2.1} devices as
-well as its low-noise version, DW-2000Q\_{5}. Energy distributions of samples
+$K_n$ on Chimera \cite{chimeraclique}. To assess the quality of solutions obtained from the
+annealer, we sampled each problem $10^4$ times on DW-2000Q$_{2.1}$ device as
+well as its low-noise version, DW-2000Q$_{5}$. Energy distributions of samples
 obtained for $N=6$ are depicted in Fig. \ref{fig:energy-hist}. The same figure
 also illustrates the dynamics of the expected value of $\sigma_z$ for the
-lowest energy sample obtained for a given annealing time. Note that to present
-a physical meaning of the decoded solution, it was normed before plotting.
+lowest energy sample obtained for a given annealing time. Note that to preserve
+the physical meaning of the decoded solution, the state vector was normed before
+plotting.
 
-For comparison with the low-noise annealer, we also solved the resulting
-optimization problems using CPLEX and a recent tensor networks-based sampler.
+To put these results into context, we also compare them to the ones obtained
+using two purely classical methods: CPLEX optimizer and recently developed
+tensor network-based algorithm (which we describe later in chapter
+\ref{chapter:tn}.
 The results of this comparison are depicted in Fig. \ref{fig:cplex_tn_dwave}.
-
-Results depicted in figures \ref{fig:energy-hist} and \ref{fig:cplex_tn_dwave}
-show, that the DW-2000Q\_{5} was able to faithfully capture dynamics of qubit
-if the state of the system was encoded using $R=2$ bits of precision per
-coefficient when the annealing time $\tau=200$ was used. For larger values of
-$N$ and $R$ one can observe that the quality of solution degrades.
 
 \begin{figure}
   \centering
   \includegraphics[width=\textwidth]{figures/fig34_merge.pdf}
-  \caption{ (a)--(b) Performance of the two state of the art heuristic
-    algorithms: the CPLEX optimizer (CP) and a recent solver based on tensor
-    networks (TN) in comparison to the D-Wave $2000$Q quantum annealer (DW),
-    cf. Fig~\ref{fig:energy-hist}. The corresponding QUBO instances (encoded
-    using double numerical precision) had total of $|V|=360$ and $|V|=624$
-    spin variables for (a), and (b) respectively. The annealing time was set
+  \caption{ (a)--(b) Performance of the two state-of-the-art heuristic
+    algorithms: the CPLEX optimizer (CP) and a tensor networks-based (TN) solver
+	(see chapter \ref{chapter:tn}) in comparison to the D-Wave $2000$Q quantum annealer (DW),
+    cf. Fig~\ref{fig:energy-hist}. The graphs on which the problems were defined
+	had respectively $|V|=360$ (a) and $|V|=624$ (b) vertices. The annealing time was set
     to $\tau=200$\textmu{}s. The numerical precision of the solution vector is
-    denoted as $R$.%\\
-    (c)--(h) Degradation of the solution quality resulting from the truncation
-    of the problem coefficients, cf. Eq.~(\ref{eq:coeff}), to a given
-    numerical precision denoted as $r$. The numerical results were obtained by
-    finding the ground state with tensor networks (TN). As a reference point,
-    we included experimental data from the D-Wave $2000$Q quantum annealer
-    (DW). This effect is expected to be predominant for the current quantum
-    annealing technology. It is already visible on
-    Fig.~\ref{fig:energy-hist}(c)--(f), Fig.~\ref{fig:cplex_tn_dwave}(a)--(b)
-    and it further increases with the increasing graph size $V$. }
+    denoted as $R$. %\\
+    (c)--(h) Degradation of the solution quality resulting from perturbing the
+    problem by truncating its coefficients to a given
+    numerical precision denoted as $r$. The reference ground state obtained
+    with tensor networks (TN) is compared to the  experimental data from the
+	D-Wave $2000$Q quantum annealer (DW). This effect, expected to be predominant
+	in the current quantum annealing technology, is already visible on
+    Fig.~\ref{fig:energy-hist}(a)--(d) and Fig.~\ref{fig:cplex_tn_dwave}(a)--(b).
+    }
   \label{fig:cplex_tn_dwave}
 \end{figure}
 
-To put these results into context, we also compare them to the ones obtained
-using two purely classical methods: CPLEX optimizer and recently developed
-tensor--network based algorithm (which we describe later in chapter
-\ref{chapter:tn}. In our experiment, both of those solvers outperformed D-Wave
+Results depicted in figures \ref{fig:energy-hist} and \ref{fig:cplex_tn_dwave}
+show that the DW-2000Q$_{5}$ was able to faithfully capture dynamics of qubit
+if the state of the system was encoded using $R=2$ bits of precision per
+coefficient when the annealing time $\tau=200$ was used. For larger values of
+$N$ and $R$ one can observe that the quality of solution degrades.
+Both CPLEX and tensor networks-based solvers outperformed D-Wave
 annealers in terms of the quality of solutions. The differences were especially
 noticeable for problem instances with larger graph sizes, i.e. ones with higher
 precision ($R \ge 3, N=6)$), or with extra time points ($N > 6, R = 2$). The
@@ -300,16 +296,16 @@ see e.g. \cite{Hamerly2019}.
 \subsection{Discussion of error sources}
 
 The poor performance of D-Wave annealer is something certainly to be expected
-from such early--stage device. Annealers are prone to errors stemming from
-multiple sources, and it is hard to judge which of those sources contributed
-most to the lackluster performance for a particular problem or its instance.
+from such early-stage devices. Annealers are prone to errors stemming from
+multiple sources \cite{dwavedocs}, and it is hard to judge which of those sources contributed
+most to the lackluster performance of a particular problem instance.
 One of the possible sources of errors is DAC quantization, which essentially
 limits the precision of both the quadratic and linear coefficients passed to
 the annealer. As a result, the problem that the annealer physically solves is
 slightly different than the problem the programmer intended to solve.
 
 One can see that such quantization errors would mostly affect problems with
-coefficients laying in close proximity to one another. Indeed, suppose that DAC
+coefficients lying in close proximity to one another. Indeed, suppose that DAC
 quantization errors limit the precision of the linear coefficients to $d$
 decimal digits. Then any two coefficients, say $h_{i}, h_{{j}}$ lying closer to
 each other than $d$, i.e. $|h_{i} - h {j}| < 10^{-d}$, become physically
@@ -317,7 +313,7 @@ undistinguishable to the annealer. The issue also affects coefficients that are
 further apart, by possibly diminishing their relative differences.
 
 While it is hard to pinpoint which source contributed the most to the errors in
-case of the optimization problems discussed in this chapter, we argue that in
+the case of the optimization problems discussed in this chapter, we argue that in
 our case the poor performance of the annealer can be largely explained by DAC
 quantization. Indeed, looking at the \eqref{eq:coeff} one can immediately see
 that the optimization problem can contain coefficients arbitrarily close to
