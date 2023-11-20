@@ -667,12 +667,7 @@ obtained in this way are presented in Fig. \ref{fig:penaltyhistogram}.
     defined for line No. 216 with varying penalty weights. The figure takes into
     account first 5000 low energy states.} \label{fig:penaltyhistogram}
 \end{figure}
-
 In our experiments, we used several combinations of $p_{pair}$ and $p_{sum}$.
-
-\todo[inline]{Run some more D-Wave stuff to properly illustrate how the penalties affect the results}
-
-\subsubsection{Solutions using classical QUBO solvers}
 
 \subsubsection{Solutions using the D-Wave annealer}
 
@@ -681,40 +676,7 @@ to the number of qubits available in the current generation of the annealers. Th
 the graphs, defined as the number of edges relative to the number of edges in a full graph with
 the same number of vertices, is also relatively low. Nevertheless, the problem graphs are not
 compatible with the topology of the current generation of the annealers and hence had to be
-embedded. For all our embeddings we used the chain strength scale (css) of 2.0. The detailed numbers
-of variables before and after the embedding are presented in Table \ref{tab:numqubits}
-
-\begin{table}
-    \centering
-  \begin{tabular}{ccccccc}
-    {\multirow{2}{*}{Features} } & line 216 & \multicolumn{5}{ c }{line
-    191}
-    \\
-    \cline{2-7}
-           & & case $1$ & case $2$ & case $3$ & case $4$ & enlarged \\
-    \hline
-     problem size ($\#$ logical bits) & $48$ & $198$ & $198$ & $198$ &
-     $198$  &
-    $594$ \\
-    \hline
-    $\#$ edges & $395$ & $1851$ & $2038$ & $2180$ & $1831
-    $   & $5552$ \\
-    \hline
-    density (vs. full graph) & $0.35$ & $0.095$ & $0.104$ & $0.111$ &
-    $0.094$ & $0.032$ \\
-    \hline{3}
-    embedding into & Chimera & Chimera & Chimera & Ideal Chimera &
-    Chimera  & Pegasus \\
-    \hline
-    approximate $\#$ physical bits & $373$ & $< 2048$ & $< 2048$ & $
-    \approx
-    2048$ &
-    $< 2048$  & $< 5760$ \\
-    \hline
-  \end{tabular}
-  \caption{Number of variables in each Problem}
-  \label{tab:numqubits}
-\end{table}
+embedded. We used several chain strengths in our experiments.
 
 %%% Local Variables:
 %%% mode: pdflatex
