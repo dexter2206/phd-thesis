@@ -7,7 +7,6 @@
 \usepackage{todonotes}
 \usepackage{graphicx}
 \usepackage{tikz}
-\usepackage[colorlinks=true, linkcolor=blue]{hyperref}
 \usepackage{hhline}
 \usepackage{physics}
 \usepackage{mathtools}
@@ -16,13 +15,14 @@
 \usepackage[linesnumbered,ruled]{algorithm2e}
 \usepackage{listings}
 \usepackage{float}
-\usepackage[bibstyle=nature,maxbibnames=10,backend=bibtex,sorting=none]{biblatex}
+\usepackage[url=false,style=phys,biblabel=brackets,maxbibnames=10,backend=bibtex,sorting=none]{biblatex}
 \usepackage{subcaption}
 \usepackage[font={small}]{caption}
 \usepackage{xfrac}
 \usepackage{multirow}
 \usepackage{makecell}
 \usepackage[chapter]{minted}
+\usepackage[colorlinks=true, linkcolor=blue]{hyperref}
 
 % ================================================================================
 % Configuration of subfigures
@@ -79,10 +79,9 @@
 \AtBeginBibliography{\small}
 
 \ExecuteBibliographyOptions{doi=false}
-\newbibmacro{string+doi}[1]{
-  \iffieldundef{url}{#1}{\href{\thefield{url}{#1}}}}
-\DeclareFieldFormat{title}{\usebibmacro{string+doi}{\mkbibemph{#1}}}
-\DeclareFieldFormat[article]{title}{\usebibmacro{string+doi}{#1}}
+
+\DeclareFieldFormat{title}{#1}
+\DeclareFieldFormat[article]{title}{{\itshape #1}}
 
 \allowdisplaybreaks[4]
 
