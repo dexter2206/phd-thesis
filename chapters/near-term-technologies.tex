@@ -9,7 +9,8 @@ quantum annealing. The second part of the chapter is devoted to Nvidia CUDA, a
 technology allowing massively parallel computations on general-purpose graphics
 processing units (GPUs).
 
-\section[AQC and quantum annealing]{Adiabatic quantum computation and quantum annealing}
+\section{Adiabatic quantum computation and quantum annealing}
+\sectionmark{AQC and quantum annealing}
 
 \subsection{Adiabatic Quantum Computation}
 One of the possible models of quantum computing is Adiabatic Quantum
@@ -37,10 +38,10 @@ between its ground energy and the energy of the first excited state, and is
 evolved slowly enough, it will stay in the ground state during the whole
 evolution. Knowing this we can finally discuss how AQC works. First, an
 optimization problem to be solved is encoded as a ground state of some
-Hamiltonian $H_{target}$. Then, a physical system is prepared in a ground state
-of some simpler Hamiltonian, $H_{initial}$. After that, the system is driven
-slowly from $H_{initial}$ to $H_{target}$. By adiabatic theorem, the system
-ends up in a ground state of $H_{target}$, and after the measurement is
+Hamiltonian $\HH_{target}$. Then, a physical system is prepared in a ground state
+of some simpler Hamiltonian, $\HH_{initial}$. After that, the system is driven
+slowly from $\HH_{initial}$ to $\HH_{target}$. By adiabatic theorem, the system
+ends up in a ground state of $\HH_{target}$, and after the measurement is
 performed the solution to the original problem can be decoded.
 
 In Quantum Annealing (QA), one follows essentially the same procedure as in
@@ -66,7 +67,7 @@ end of the annealing process, the (quantum) Hamiltonian of the annealer has to
 correspond to the classical Ising Hamiltonian of the spin--glass instance being
 solved, i.e.
 \begin{equation}
-  H_{target} = \sum_{i=1}^N h_i \ssigma^{(i)}_z + \sum_{<i, j>} J_{ij} \ssigma^{(i)}_z \ssigma^{(j)}_z,
+  \HH_{target} = \sum_{i=1}^N h_i \ssigma^{(i)}_z + \sum_{<i, j>} J_{ij} \ssigma^{(i)}_z \ssigma^{(j)}_z,
 \end{equation}
 where $N$, as previously, is the number of spins, $\ssigma^{(i)}_x$,
 $\ssigma^{(i)}_z$ denote Pauli operators acting on $i$-th qubit, and $h_i,
@@ -74,7 +75,7 @@ $\ssigma^{(i)}_z$ denote Pauli operators acting on $i$-th qubit, and $h_i,
 time-dependent Hamiltonian implemented by the D-Wave devices is of the form:
 \begin{equation}
   \label{eq:dwaveham}
-  \mathcal{H}(t) =  -\frac{A(t)}{2}\sum_{i=1}^N \ssigma^{(i)}_x + \frac{B(t)}{2}\left(\sum_{i=1}^N h_i \ssigma^{(i)}_z + \sum_{<i, j>} J_{ij} \ssigma^{(i)}_z \ssigma^{(j)}_z\right).
+  \HH(t) =  -\frac{A(t)}{2}\sum_{i=1}^N \ssigma^{(i)}_x + \frac{B(t)}{2}\left(\sum_{i=1}^N h_i \ssigma^{(i)}_z + \sum_{<i, j>} J_{ij} \ssigma^{(i)}_z \ssigma^{(j)}_z\right).
 \end{equation}
 where $t \in [0, \tau]$ \cite{dwavedocs}. The tunneling energy curve $A(t)$ is
 monotonically decreasing and it vanishes as $t$ approaches $\tau$. Similarly

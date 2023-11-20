@@ -1,6 +1,7 @@
 %\chaptermark{}ter{Finding low--energy spectrum of spin glass using CUDA}
-\chapter[Brute--forcing spin--glass problems]{Brute--forcing spin--glass problems with CUDA}
+\chapter{Brute--forcing spin--glass problems with CUDA}
 \label{chapter:bruteforce}
+\chaptermark{Brute--forcing spin--glass problems}
 In chapter \ref{chapter:tn} we presented a tensor network--based heuristic algorithm
 tailored for Ising spin--glass problems defined on Chimera graphs. In stark contrast, in this
 chapter we will shift our attention to a deterministic algorithm capable of solving problems defined
@@ -47,29 +48,29 @@ Naturally, an attempt to implement such an algorithm on real hardware is doomed
 to fail. To exemplify this, consider a problem with $N=40$ variables. Assuming
 we use 32-bit floating point numbers, one would need an enormous amount of
 $2^{40}\cdot 4B = 4398046511104\mbox{B}$, or $4\mbox{TB}$ of working memory to
-store the computed energies. For $N=50$, this number grows to $4096\mbox{TB}$.
-Clearly, such an amount of needed memory is prohibitively large, and that is
-even before we consider some form of storage for system states. Moreover, no
-current hardware can execute $2^{40}$ threads in parallel. Fortunately, we can
-adapt our algorithm to take into account limited memory and parallelism. To do
-so, we introduce the following assumptions:
-\begin{enumerate}
-  \item We will process the solution space in \emph{chunks} that can fit into GPU
-    memory.
-  \item Number of states in a chunk can be larger than the total number of threads.
-    Should this be the case, the threads will process the chunk using a
-    grid--stride loop pattern.
-\end{enumerate}
-As an added benefit of our assumptions, we decouple the grid size from the
-problem size. The number of thread blocks and block size become parameters of
-our algorithm, which facilitates further fine-tuning of the kernel execution
-parameters.
+    store the computed energies. For $N=50$, this number grows to $4096\mbox{TB}$.
+    Clearly, such an amount of needed memory is prohibitively large, and that is
+    even before we consider some form of storage for system states. Moreover, no
+    current hardware can execute $2^{40}$ threads in parallel. Fortunately, we can
+    adapt our algorithm to take into account limited memory and parallelism. To do
+    so, we introduce the following assumptions:
+    \begin{enumerate}
+      \item We will process the solution space in \emph{chunks} that can fit into GPU
+        memory.
+      \item Number of states in a chunk can be larger than the total number of threads.
+        Should this be the case, the threads will process the chunk using a
+        grid--stride loop pattern.
+    \end{enumerate}
+    As an added benefit of our assumptions, we decouple the grid size from the
+    problem size. The number of thread blocks and block size become parameters of
+    our algorithm, which facilitates further fine-tuning of the kernel execution
+    parameters.
 
-The algorithm will keep track of $k$ lowest--energy states computed so far.
-This information will be updated after each new chunk is processed. The
-downside of this approach is that the size of the low-energy spectrum we can
-compute is limited by the chunk size. However, this limitation is not as severe
-as it seems, because in a typical scenario, we have $k \ll 2^{N}$.
+    The algorithm will keep track of $k$ lowest--energy states computed so far.
+    This information will be updated after each new chunk is processed. The
+    downside of this approach is that the size of the low-energy spectrum we can
+    compute is limited by the chunk size. However, this limitation is not as severe
+    as it seems, because in a typical scenario, we have $k \ll 2^{N}$.
 
 In the next section, we discuss another important aspect of our algorithm,
 which is efficient storage and representation of system states.
@@ -105,16 +106,16 @@ importantly, it allows GPU threads to identify the system state they have to
 process using their index and additional offset designating the chunk. In our
 implementation, we restrict ourselves to chunk sizes being power of two, i.e.
 chunk size $=2^{M}$ for some $M < N$. We conceptually split each configuration
-into two parts:
-\begin{enumerate}
-  \item A \emph{local} part comprising least significant $M$ bits. This is part is
-    \emph{different} for each state in the chunk.
-  \item A \emph{suffix} comprising the most significant $N-M$ bits. This part is
-    \emph{the same} for each state in the chunk.
-\end{enumerate}
-Now, since there are $2^{N-M}$ chunks, we can identify each chunk with a $N-M$
-bit number. Finally we arrive for a formula for an integer representation
-$\mathbf{q}_{i}^{j}$ of an $i$-th configuration in $j$-th chunk:
+    into two parts:
+    \begin{enumerate}
+      \item A \emph{local} part comprising least significant $M$ bits. This is part is
+        \emph{different} for each state in the chunk.
+      \item A \emph{suffix} comprising the most significant $N-M$ bits. This part is
+        \emph{the same} for each state in the chunk.
+    \end{enumerate}
+    Now, since there are $2^{N-M}$ chunks, we can identify each chunk with a $N-M$
+    bit number. Finally we arrive for a formula for an integer representation
+  $\mathbf{q}_{i}^{j}$ of an $i$-th configuration in $j$-th chunk:
 \begin{equation}
   \mathbf{q}_{i}^{j} = i + 2^{M}\cdot j,\qquad i=0,\ldots,2^{M}-1, \; j=0,\ldots,2^{N-M}-1
 \end{equation}
@@ -124,8 +125,8 @@ detail.
   Consider QUBO with $N=8$ variables. We decide to use $M=5$. Hence, there are
   $2^{M}=32$ states in each chunk and a total of $2^{N-M}=8$ chunks. The
   \emph{local} part of the first state in each chunk is $0$, or $(00000000)_{2}$
-  in binary. The local part of the last state in each chunk is $31$, or
-  $(00011111)_{2}$. The table \ref{tab:chunks} below enumerates ranges of
+      in binary. The local part of the last state in each chunk is $31$, or
+    $(00011111)_{2}$. The table \ref{tab:chunks} below enumerates ranges of
   combined integer representation of states in each chunk.
   \begin{table}[ht!]
     \centering
@@ -161,17 +162,17 @@ detail.
 
 In our approach we decided to store states and their corresponding energies in
 arrays of size $k+2^{M}$, where $k$ is the desired size of the low energy
-spectrum and $2^{M}$ is the chunk size. The arrays are always synchronized,
-i.e. at all times $i$-th state corresponds to $i$-th energy. The first $k$
-elements store the lowest energies and corresponding configurations found so
-far. When a new chunk is being processed, the second part of the arrays is
-populated with new states and energies by the energy--computing kernel. Next,
-the best $k$ states from the current chunk are selected and moved into indices
-$k, k+1,\ldots,2k-1$. In this way, the global best solutions from previous
-chunks and the lowest energy states from the current chunk in a continuous
-space in memory, which facilitates updating the best configurations.
+    spectrum and $2^{M}$ is the chunk size. The arrays are always synchronized,
+    i.e. at all times $i$-th state corresponds to $i$-th energy. The first $k$
+    elements store the lowest energies and corresponding configurations found so
+    far. When a new chunk is being processed, the second part of the arrays is
+    populated with new states and energies by the energy--computing kernel. Next,
+    the best $k$ states from the current chunk are selected and moved into indices
+  $k, k+1,\ldots,2k-1$. In this way, the global best solutions from previous
+    chunks and the lowest energy states from the current chunk in a continuous
+    space in memory, which facilitates updating the best configurations.
 
-One could use a parallel sorting procedure for extracting the $k$
+    One could use a parallel sorting procedure for extracting the $k$
 lowest--energy states at each step. However, for improved performance, we
 decided to use a combination of the \texttt{bucketSelect} \cite{bucketselect}
 algorithm in tandem with \texttt{thrust::partition\_by\_key} \cite{thrust}. The
@@ -195,13 +196,13 @@ OpenMP\cite{openmp} for a CPU--only version.
     Detailed representation of brute force algorithm for finding $k$-lowest energy
     states of a QUBO. The algorithm iterates over the set of all possible states in
     chunks of size $2^{M}$, where $M$ is a user-defined parameter. Throughout the
-    algorithm execution, we maintain arrays of states and corresponding energies.
-    The first part of those arrays stores the $k$ best configurations encountered
-    so far, and the second part stores configurations belonging to the currently
-    processed chunk. In the first phase of the iteration, an energy-computing
-    kernel is launched. Then, the $k$--lowest energy configurations from the given
-    chunk are selected and moved towards the part of the array with the current
-    best solutions. Finally, the best $k$ states are selected from the first $2k$
+        algorithm execution, we maintain arrays of states and corresponding energies.
+        The first part of those arrays stores the $k$ best configurations encountered
+        so far, and the second part stores configurations belonging to the currently
+        processed chunk. In the first phase of the iteration, an energy-computing
+        kernel is launched. Then, the $k$--lowest energy configurations from the given
+        chunk are selected and moved towards the part of the array with the current
+        best solutions. Finally, the best $k$ states are selected from the first $2k$
     configurations and the algorithm proceeds to the next chunk or terminates if
     all the chunks have been iterated over. } \label{fig:bruteforce}
 \end{figure}
@@ -232,9 +233,9 @@ randomly from uniform distributions on the intervals $[-2, 2]$ and $[-1, 1]$
 for magnetic fields and couplings respectively. For each instance, we computed
 the low energy spectrum of $k=100$ states with our algorithm. We used a maximum
 chunk size of $2^{29}$ for Titan V and CPU and the chunk size of $2^{27}$ for
-GTX 1080. As already mentioned, larger instances $(N > 32)$ were solved only
-using Titan V GPU. For GTX 1080 and CPU implementation, the expected time to
-solve those instances was estimated based on the timings for smaller $N$. The
+    GTX 1080. As already mentioned, larger instances $(N > 32)$ were solved only
+    using Titan V GPU. For GTX 1080 and CPU implementation, the expected time to
+    solve those instances was estimated based on the timings for smaller $N$. The
 results of our benchmarks are presented in Fig. \ref{fig:benchmark_results}.
 
 \begin{figure}
@@ -247,13 +248,14 @@ results of our benchmarks are presented in Fig. \ref{fig:benchmark_results}.
     obtained for smaller system sizes.} \label{fig:benchmark_results}
 \end{figure}
 
-\section[Example application]{Example application: verifying MPS-based optimization algorithm}
+\section{Example application: verifying MPS-based optimization algorithm}
+\sectionmark{Example application}
 
 As an example application, in this section, we use our brute-force-based
-approach with heuristic algorithm based on Matrix Product States (MPS). The
-detailed description of this algorithm is outside the scope of this thesis, and
-we refer the interested reader to the Supplementary Material in \cite{tn}.
-Nevertheless, before we outline how the algorithm works.
+approach to verify the performance of a heuristic algorithm based on Matrix
+Product States (MPS). The detailed description of this algorithm is outside the
+scope of this thesis, and we refer the interested reader to the Supplementary
+Material in \cite{tn}. Nevertheless, before we outline how the algorithm works.
 
 Similarly to the algorithm presented in chapter \ref{chapter:tn}, in the
 MPS--based approach one explores the probability distribution (as opposed to
@@ -264,7 +266,7 @@ approximate Boltzmann distribution as
   \label{eq:mps}
 \end{equation}
 for large enough $\beta$. Here, $A^{s_{i}}$ are real matrices of limited
-dimension $\le D$. In this context, the parameter $D$ is referred to as the
+    dimension $\le D$. In this context, the parameter $D$ is referred to as the
 \emph{bond dimension}. Fig. \ref{fig:mps:boltzmann} shows a pictorial
 representation of such approximation. At each bond, the system is split into
 two halves. An exact decomposition would require bond $D$ of exponential
@@ -284,9 +286,9 @@ applying the sequence of gates:
   U_i(d\beta) = e^{-d\beta s_i (\sum_{j>i}J_{ij}  s_j+h_i)/2},
 \end{equation}
 which totals to $\prod_{i=1}^N U_i(d\beta) = e^{-d \beta H(\mathbf{s})/2}$. One
-can observe that applying each gate results in the doubling of the bond
-dimension. Hence, at each step, one has to systematically find an approximation
-maintaining the fixed $D$. The whole procedure is depicted in Fig.
+    can observe that applying each gate results in the doubling of the bond
+    dimension. Hence, at each step, one has to systematically find an approximation
+    maintaining the fixed $D$. The whole procedure is depicted in Fig.
 \ref{fig:mps:compress}.
 
 \begin{figure}
@@ -316,7 +318,7 @@ significance of setting the time-step parameter $d\beta$ to small enough value.
 As the last conclusion from our benchmarks, we would like to point out the
 magnitude of compression of the relevant information in the MPS representation.
 Indeed, an exact MPS decomposition would require the bond dimension $D=2^{N/2}
-\gg 128$.
+  \gg 128$.
 
 \begin{figure}[th]
   \includegraphics[width=\textwidth]{figures/mps_benchmark}
@@ -329,17 +331,17 @@ Indeed, an exact MPS decomposition would require the bond dimension $D=2^{N/2}
 
 \section{Improving the algorithm using Gray Code}
 
-The algorithm presented in the previous chapter is already highly performant. However, we can still improve
-upon it by altering the order in which we enumerate the integral representation
-of states used by our algorithm.
+The algorithm presented in the previous chapter is already highly performant.
+However, we can still improve upon it by altering the order in which we
+enumerate the integral representation of states used by our algorithm.
 
 \subsection{Single bit--energy difference}
 Suppose we are given a QUBO with $F(q_{1},\ldots,q_{N})$ as in the equation
-\eqref{eq:qubo}. Consider two states, say $\bq{1} = (\q{1}_{1},\ldots,\q{1}_{N})$
-and $\bq{2}=(\q{2}_{1},\ldots,\q{2}_{N})$ such that they only differ in the
-$k$-th bit, i.e. $\q{2}_{k}=1-\q{1}_{k}$ and $\q{2}_{i}=\q{1}_{i}$ for $i \ne
-  k$. The energy difference $F(\bq{2})-F(\bq{1})$ can be easily computed and the
-formula reads
+\eqref{eq:qubo}. Consider two states, say $\bq{1} =
+  (\q{1}_{1},\ldots,\q{1}_{N})$ and $\bq{2}=(\q{2}_{1},\ldots,\q{2}_{N})$ such
+    that they only differ in the $k$-th bit, i.e. $\q{2}_{k}=1-\q{1}_{k}$ and
+  $\q{2}_{i}=\q{1}_{i}$ for $i \ne k$. The energy difference
+  $F(\bq{2})-F(\bq{1})$ can be easily computed and the formula reads
 \begin{align}
   \begin{split}
     \label{eq:energydiff1}
@@ -353,21 +355,21 @@ requires only $O(N)$ multiplications. But how can this be used to improve the
 performance of the exhaustive search through QUBO state space?
 
 Moving $F(\bq{1})$ to the right-hand side, we obtain a formula for $F(\bq{2})$,
-which allows for computing it with only $N+1$ instead of maximum of $N(N+1)/2$
-multiplications, provided that $F(\bq{1})$ is known. Remember that this is only
-possible because $\bq{1}$ and $\bq{2}$ differ only by a single bit. If we could
-enumerate states in such a fashion that every consecutive two states differ
-only by a single bit, we could leverage the above formula instead of
-recomputing energy for each state from scratch. Before we describe how the
-procedure works and how to implement this on GPU, let us first introduce the
-necessary notation. Given a state $\mathbf{q} = (q_{1},\ldots,q_{N})$, by
-$\flip{\mathbf{q}}{k}$ we will denote a state resulting from flipping $k$-th
-bit of $\mathbf{q}$, i.e.
-\begin{equation}
-  \flip{\mathbf{q}}{k} \coloneq (q_{1}, \ldots, q_{k-1}, 1-q_{k}, q_{k+1}, \ldots, q_{N})
-\end{equation}
-and by $\diff_{F}(\mathbf{q},k)$ we will denote the difference between the
-energies of $\flip{\mathbf{q}}{k}$ and $\mathbf{q}$. Using the equation
+    which allows for computing it with only $N+1$ instead of maximum of $N(N+1)/2$
+    multiplications, provided that $F(\bq{1})$ is known. Remember that this is only
+    possible because $\bq{1}$ and $\bq{2}$ differ only by a single bit. If we could
+    enumerate states in such a fashion that every consecutive two states differ
+    only by a single bit, we could leverage the above formula instead of
+    recomputing energy for each state from scratch. Before we describe how the
+    procedure works and how to implement this on GPU, let us first introduce the
+    necessary notation. Given a state $\mathbf{q} = (q_{1},\ldots,q_{N})$, by
+  $\flip{\mathbf{q}}{k}$ we will denote a state resulting from flipping $k$-th
+    bit of $\mathbf{q}$, i.e.
+    \begin{equation}
+      \flip{\mathbf{q}}{k} \coloneq (q_{1}, \ldots, q_{k-1}, 1-q_{k}, q_{k+1}, \ldots, q_{N})
+    \end{equation}
+    and by $\diff_{F}(\mathbf{q},k)$ we will denote the difference between the
+    energies of $\flip{\mathbf{q}}{k}$ and $\mathbf{q}$. Using the equation
 \eqref{eq:energydiff1}, we see that the expression for
 $\diff_{F}(\mathbf{q},k)$ is
 \begin{align}
@@ -379,7 +381,7 @@ The pseudocode for a serial algorithm for solving a QUBO problem using our
 observations is outlined in listing \ref{lst:grayserial}. Before we can
 implement it on GPU though, we need to answer the following questions:
 \begin{listing}
-\begin{minted}{python}
+  \begin{minted}{python}
 def solve_qubo(F, q):
     q = [0] * N # Start with all bits set to 0
     best_state = current_state = q
@@ -394,8 +396,8 @@ def solve_qubo(F, q):
             best_state = current_state
     return best_state, best_energy
 \end{minted}
-\caption{Pseudocode for algorithm solving the QUBO problem using energy differences and bit flips.}
-\label{lst:grayserial}
+  \caption{Pseudocode for algorithm solving the QUBO problem using energy differences and
+    bit flips.} \label{lst:grayserial}
 \end{listing}
 \begin{enumerate}
   \item How to produce a sequence of $2^{N}-1$ bits such that executing them enumerates
@@ -410,17 +412,18 @@ When one talks about a binary encoding of integers, the first thing that comes
 to mind is a usual positional base-2 system. This encoding certainly does not
 fit our purpose. Indeed, suppose $N=3$ and we are currently processing state
 corresponding to number $3$, whose representation in binary is $(011)_{2}$. The
-next state, corresponding to $4$ is encoded by the string $(100)_{2}$, which
+    next state, corresponding to $4$ is encoded by the string $(100)_{2}$, which
 differs in all three bits.
 
 Instead of using the positional system, we might utilize an encoding called
-Gray code, or Reflected Binary Code (RBC) \cite{gray,lucal1959}, which is primarily used to improve
-the robustness of electromechanical switches and in the error correction protocols.
-In this code, encoding of two successive integers always differs by at most one
-bit, which makes it suitable for application in our algorithm.
+Gray code, or Reflected Binary Code (RBC) \cite{gray,lucal1959}, which is
+primarily used to improve the robustness of electromechanical switches and in
+the error correction protocols. In this code, encoding of two successive
+integers always differs by at most one bit, which makes it suitable for
+application in our algorithm.
 
-The conceptual construction of the Gray code is straightforward. For Gray code of
-length $1$ we have two binary strings: $0$ and $1$. To obtain all Gray codes
+The conceptual construction of the Gray code is straightforward. For Gray code
+of length $1$ we have two binary strings: $0$ and $1$. To obtain all Gray codes
 for a given length $N > 1$, we first construct an ordered list of codes of
 length $N-1$ and call it $L$. Then, we reverse the list of codes and call it
 $H$, an operation called \emph{reflection}. Finally, we prepend $0$ to all
@@ -454,20 +457,21 @@ where $\oplus$ denotes the bitwise xor operation and $>>$ is right bitshift.
 To compute which bit differs between consecutive Gray codes, we can xor them,
 and then find the position of the only set bit in the resulting integer. One
 can easily implement a function that finds the first set bit in a 64-bit
-integer, or use one of the available library or compiler built-in functions. For
-instance, POSIX--compatible C standard libraries include \texttt{ffsll}
-function \cite{ffs}. In CUDA, there is a \texttt{\_\_ffsll} function available \cite{CUDAguide}. For both
-of the above cases, the function counts bits from $1$. Using this convention,
-we can write a pseudocode for a function \texttt{find\_bit\_to\_flip} from
-listing \ref{lst:grayserial} like in the listing~\ref{lst:findbit}.
+integer, or use one of the available library or compiler built-in functions.
+For instance, POSIX--compatible C standard libraries include \texttt{ffsll}
+function \cite{ffs}. In CUDA, there is a \texttt{\_\_ffsll} function available
+\cite{CUDAguide}. For both of the above cases, the function counts bits from
+$1$. Using this convention, we can write a pseudocode for a function
+\texttt{find\_bit\_to\_flip} from listing \ref{lst:grayserial} like in the
+listing~\ref{lst:findbit}.
 
 \begin{listing}
-\begin{minted}{python}
+  \begin{minted}{python}
 def find_bit_to_flip(i): # i starts from 0
     return ffs(gray(i) ^ gray(i+1))
 \end{minted}
-\caption{Pseudocode for a function generating bit flips for Gray code construction}
-\label{lst:findbit}
+  \caption{Pseudocode for a function generating bit flips for Gray code construction}
+  \label{lst:findbit}
 \end{listing}
 
 Now that we know how to construct a correct sequence of bit flips, it is time
@@ -485,11 +489,11 @@ single bit in Gray code order. The process is illustrated in Fig.
 \begin{figure}
   \includegraphics[width=\textwidth]{figures/grayparallel}
   \caption{
-    Parallel processing of $N=5$--variable QUBO configurations in Gray code order. In
-    our example, suffix length $M=2$, and hence $2^{M}=4$ states are processed in
-    each iteration. Consequently, there are $2^{N-M}=8$ iterations. For this
-    example, we consider a kernel that processes two iterations per kernel
-    invocation, resulting in $2^{N-M}/2 = 4$ kernel invocations total. }
+    Parallel processing of $N=5$--variable QUBO configurations in Gray code order.
+    In our example, suffix length $M=2$, and hence $2^{M}=4$ states are processed
+        in each iteration. Consequently, there are $2^{N-M}=8$ iterations. For this
+        example, we consider a kernel that processes two iterations per kernel
+        invocation, resulting in $2^{N-M}/2 = 4$ kernel invocations total. }
   \label{fig:grayparallel}
 \end{figure}
 
@@ -547,8 +551,8 @@ construction (c.f. Fig. \ref{fig:gray}) reveals that the least significant bit
 flips half of times and the second least significant bit flips a quarter of
 times. Generally, for $k=0,\ldots,N-M-1$ the $k$-th bit flips constitutes
 approximately \footnote{Approximately, because there is an odd number of
-  $2^{N-M}$ -1 flips performed, because we do not perform last bit flip which
-  would take us back to $(0,\ldots,0)_2$ prefix.} $1/2^{k+1}$ of times.
+$2^{N-M}$ -1 flips performed, because we do not perform last bit flip which
+    would take us back to $(0,\ldots,0)_2$ prefix.} $1/2^{k+1}$ of times.
 Therefore, we can cache the value of \eqref{eq:energydiff3} for the $K$ most
 commonly--occuring bit flips, where $K$ is a user--controlled parameter.
 
