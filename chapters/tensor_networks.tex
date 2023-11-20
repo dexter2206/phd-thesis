@@ -22,22 +22,22 @@ in the probability space rather than in the energy space. This physics-inspired
 approach is closely tied to the quantum computing paradigm. To explain why, let
 us begin by replacing classical Ising Hamiltonian $H(s)$ with its quantum
 counterpart $\mathcal{H} = H(\boldsymbol{\sigma}^{z})$ (i.e. replacing each
-variable $s_{i}$ with a Pauli operator $\sigma_{a}$ acting on the $i$-th spin.
-Naturally, there exists a one-to-one correspondence between the eigenstates of
-$\mathcal{H}$ and the possible classical configurations. If one now wishes to
-find the low-energy spectrum of size $k \ll 2^{N}$, the task is equivalent to
-finding the $k$ most probable states according to the Gibbs distribution $\rho
+    variable $s_{i}$ with a Pauli operator $\sigma_{a}$ acting on the $i$-th spin.
+    Naturally, there exists a one-to-one correspondence between the eigenstates of
+  $\mathcal{H}$ and the possible classical configurations. If one now wishes to
+    find the low-energy spectrum of size $k \ll 2^{N}$, the task is equivalent to
+    finding the $k$ most probable states according to the Gibbs distribution $\rho
   \sim \exp(-\beta \mathcal{H})$. One way to achieve this is to prepare the
-system in a Gibbs state
-\begin{equation}
-  \ket{\rho} \sim \sum_{\mathbf{s}} \exp(-\beta \mathcal{H}/2)\ket{\mathbf{s}}
-\end{equation}
-and then perform a measurement. If repeated multiple times, this procedure
-would yield the desired low-energy spectrum with high probability.
+    system in a Gibbs state
+    \begin{equation}
+      \ket{\rho} \sim \sum_{\mathbf{s}} \exp(-\beta \mathcal{H}/2)\ket{\mathbf{s}}
+    \end{equation}
+    and then perform a measurement. If repeated multiple times, this procedure
+    would yield the desired low-energy spectrum with high probability.
 
-While the above procedure is useful conceptually, it clearly cannot be directly
-used on a classical computer, as it would require preparing a dense vector of
-$2^{N}$ elements. Instead, in our algorithm we represent the Gibbs distribution
+    While the above procedure is useful conceptually, it clearly cannot be directly
+    used on a classical computer, as it would require preparing a dense vector of
+  $2^{N}$ elements. Instead, in our algorithm we represent the Gibbs distribution
 approximately via a suitable tensor--network. Then, instead of performing a
 quantum measurement, we extract the needed information by traversing the
 probability tree using the branch-and-bound method. In what follows, we
@@ -65,32 +65,14 @@ new marginal probability distributions can be computed as
 We can exploit locality of the problem by observing that conditional
 probability in \eqref{eq:conditional-prob} of configuration in the region $X =
   (1, 2, \ldots, k)$ depends only on configuration on the border $\partial X$ comprising those spins that directly interact with the region
-$\overline{X} = (k+1, 2, \ldots N)$. To see that, denote by $H_X$ the usual
-Hamiltonian $H$ restricted to the graph induced by vertices in $X$. Further,
-let $H_{X, \overline{X}} = H - H_X - H_{\overline{X}}$. Notice that $H_{X,
-    \overline{X}}$ contains only quadratic terms $J_{ij} s_i s_j$ such that $i \in
-  X$ and $j \in \overline{X}$. Slightly abusing the notation, one may thus write
-\begin{equation}
-  H(s_1, \ldots, s_N) = H_X(s_1, \ldots, s_k) + H_{\overline{X}}(s_{k+1}, \ldots, s_N) + H_{X, \overline{X}}(s_1, \ldots, s_N)
-\end{equation}
-Using definition of conditional probability applied to Boltzmann distribution,
-one thus gets
-\begin{align}
-  p(s_{k+1}|s_1, \ldots, s_k) & = \frac{\sum\limits_{(z_{k+2}, \ldots, z_N)}e^{-\beta H(s_1, \ldots, s_{k+1}, z_{k+2},\ldots,z_N)}}{\sum\limits_{(z_{k+1}, \ldots, z_N)}e^{-\beta H(s_1, \ldots, s_k, z_{k+1},\ldots,z_N)}}                                                                                                                                                     \\
-                              & = \frac{\sum\limits_{(z_{k+2}, \ldots, z_N)}e^{-\beta (H_X(s_1, \ldots, s_k) + H_{\overline{X}}(s_{k+1}, z_{k+2},\ldots,z_N) + H_{X, \overline{X}}(s_1, \ldots, z_N))}}{\sum\limits_{(z_{k+1}, \ldots, z_N)}e^{-\beta (H_X(s_1, \ldots, s_k) + H_{\overline{X}}(z_{k+1}, \ldots,z_N) + H_{X, \overline{X}}(s_1, \ldots, z_N))}}                 \\
-                              & = \frac{e^{-\beta H_X(s_1, \ldots, s_k)}\sum\limits_{(z_{k+2}, \ldots, z_N)} e^{-\beta(H_{\overline{X}}(s_{k+1}, z_{k+2},\ldots,z_N) + H_{X, \overline{X}}(s_1, \ldots, z_N))}}{e^{-\beta H_X(s_1, \ldots, s_k)}\sum\limits_{(z_{k+1}, \ldots, z_N)}e^{ -\beta(H_{\overline{X}}(z_{k+1}, \ldots,z_N) + H_{X, \overline{X}}(s_1, \ldots, z_N))}} \\
-                              & = \frac{\sum\limits_{(z_{k+2}, \ldots, z_N)} e^{-\beta(H_{\overline{X}}(s_{k+1}, z_{k+2},\ldots,z_N) + H_{X, \overline{X}}(s_1, \ldots, z_N))}}{\sum\limits_{(z_{k+1}, \ldots, z_N)}e^{ -\beta(H_{\overline{X}}(z_{k+1}, \ldots,z_N) + H_{X, \overline{X}}(s_1, \ldots, z_N))}}
-\end{align}
-Note, in both numerator and denominator spins with indices from $X$ appear
-non-trivially only in $H_{X, \overline{X}}$ , i.e. the whole expression depends
-only on those spins in $X$ that directly interact with spins in $\overline{X}$,
-which was to be demonstrated.
+$\overline{X} = (k+1, 2, \ldots N)$ (for detailed explanation see section
+\ref{sec:probability} in the Appendix).
 
 \begin{figure}
   \centering
   \includegraphics[width=\textwidth]{figures/squarelattice.pdf}
-  \caption{\textbf{a.} An example Ising spin--glass  of 16 spins on a square lattice. The conditional probability for spins in the region $\overline{X}$ conditioned with a given configuration of spins in the region $X$ depends only on part of the configuration on the border $\partial X$. \textbf{b.} A fragment of state space tree. States kept at each level
-    are marked with green, and the pruned branches are marked with red.}
+  \caption{\textbf{a.} An example Ising spin--glass  of 16 spins on a square lattice. The conditional probability for spins in the region $\overline{X}$ conditioned with a given configuration of spins in the region $X$ depends only on part of the configuration on the border $\partial X$. \textbf{b.} A fragment of the state space tree. States kept at each
+    level are marked with green, and the pruned branches are marked with red.}
   \label{fig:lattice-and-border}
 \end{figure}
 
@@ -143,12 +125,12 @@ affects numerical stability. Next, with each cluster we associate a PEPS tensor
   A^{\mathbf{s_c}}_{\mathbf{lrud}} = e^{-\beta H(\mathbf{s_c})} B^{\mathbf{s_c}^l}_\mathbf{l}C^{\mathbf{s_c}^r}_\mathbf{r}B^{\mathbf{s_c}^u}_\mathbf{u}C^{\mathbf{s_c}^d}_\mathbf{d}
 \end{equation}
 Here, $\mathbf{s_c}$ collects all spins in a given cluster, and
-$\mathbf{s_c}^l$, $\mathbf{s_c}^r$, $\mathbf{s_c}^u$, $\mathbf{s_c}^d$ collect
-spins interacting with it from the left, right, up and down respectively. Each
-such tensor has five legs: the physical one $\mathbf{s_c}$ of dimension $2^m$,
-where $m$ denotes the number of spins in the cluster, and the virtual ones $l,
+  $\mathbf{s_c}^l$, $\mathbf{s_c}^r$, $\mathbf{s_c}^u$, $\mathbf{s_c}^d$ collect
+    spins interacting with it from the left, right, up and down respectively. Each
+    such tensor has five legs: the physical one $\mathbf{s_c}$ of dimension $2^m$,
+    where $m$ denotes the number of spins in the cluster, and the virtual ones $l,
   r, u, d$ with dimensions depending on the number of inter-cluster edges. Note
-that $H$ in \eqref{eq:peps} is restricted to the graph induced by spins
+    that $H$ in \eqref{eq:peps} is restricted to the graph induced by spins
 belonging to the considered cluster. The construction is depicted in Fig.
 \ref{fig:tensors}. Combining the tensors gives an exact representation of the
 Gibbs distribution as
@@ -160,14 +142,14 @@ exact, contracting the network to obtain the information is still a difficult
 task. In principle, one could use some approximation schemes \cite{lewenstein}.
 However, in our approach, we decided to use another procedure exploiting the
 locality of the problem graph. Namely, we employ a matrix product state (MPS)
--- matrix product operator (MPO) based approach \cite{murg} approach. One starts by
-considering the first row of the lattice as a vector in high dimensional space
-having a natural decomposition in the form of MPS. Then, we add another row,
-viewed as MPO, which enlarges the MPS representation. Adding subsequent rows
-would require an exponential growth of the bond dimension $\chi$. To prevent
-this, a sequence of truncation is performed, which results in a series of
-boundary MPS. The new MPS are found by minimizing their distance from the
-enlarged previous ones. The MPS-MPO construction is depicted in Fig.
+-- matrix product operator (MPO) based approach \cite{murg} approach. One
+starts by considering the first row of the lattice as a vector in high
+dimensional space having a natural decomposition in the form of MPS. Then, we
+add another row, viewed as MPO, which enlarges the MPS representation. Adding
+subsequent rows would require an exponential growth of the bond dimension
+$\chi$. To prevent this, a sequence of truncation is performed, which results
+in a series of boundary MPS. The new MPS are found by minimizing their distance
+from the enlarged previous ones. The MPS-MPO construction is depicted in Fig.
 \ref{fig:tensors}(e)--(f). In the end, the network can be contracted exactly
 resulting in the desired conditional probability.
 \begin{figure}
@@ -187,24 +169,24 @@ Quantum annealer DW-2000Q$_6$. As it is hard to directly compare samples
 obtained from the D-Wave annealer with the output of our deterministic
 algorithm, we decided to use time-to-solution as a metric. The time to solution
 $\mbox{TTS}$ is defined as
-\begin{equation}
-  \label{eq:tts}
-  \mbox{TTS} = t \frac{\log(1 - p_{target})}{\log(1 - p_{succ})},
-\end{equation}
-where $p_{target}$ is the desired probability of obtaining solution, $p_{succ}$
-is the empirical probability of obtaining the solution and $t$ is the running
-time of the solver. In addition, for D-Wave annealers, we multiply $\mbox{TTS}$
-by the ratio $N/\mbox{num\_qubits}$, to account for the possibility of fitting
-multiple instances of the problem on the device at the same time. Naturally,
-one might consider $\mbox{TTS}$ metric not only for finding a ground state, but
+    \begin{equation}
+      \label{eq:tts}
+      \mbox{TTS} = t \frac{\log(1 - p_{target})}{\log(1 - p_{succ})},
+    \end{equation}
+    where $p_{target}$ is the desired probability of obtaining solution, $p_{succ}$
+    is the empirical probability of obtaining the solution and $t$ is the running
+    time of the solver. In addition, for D-Wave annealers, we multiply $\mbox{TTS}$
+    by the ratio $N/\mbox{num\_qubits}$, to account for the possibility of fitting
+    multiple instances of the problem on the device at the same time. Naturally,
+    one might consider $\mbox{TTS}$ metric not only for finding a ground state, but
 also for finding a solution approximating a ground state with a given
-approximation ratio  (i.e. solution lying in the desired lowest
-fraction of the full energy spectrum). The results of these benchmarks are
-presented in Table \ref{tab:tnvspt}. For all instances, our algorithm was able
-to find the ground state, which was not the case for other solvers. However, if
-one is not necessarily interested in finding the ground state, both D-Wave
-annealers and classical parallel tempering solver might be a better choice, as
-they were able to find a satisfying solution in a shorter time.
+approximation ratio (i.e. solution lying in the desired lowest fraction of the
+full energy spectrum). The results of these benchmarks are presented in Table
+\ref{tab:tnvspt}. For all instances, our algorithm was able to find the ground
+state, which was not the case for other solvers. However, if one is not
+necessarily interested in finding the ground state, both D-Wave annealers and
+classical parallel tempering solver might be a better choice, as they were able
+to find a satisfying solution in a shorter time.
 \begin{table}[b]
   \centering
   \begin{tabular}{|l|c|ccc|}
@@ -231,25 +213,25 @@ they were able to find a satisfying solution in a shorter time.
   \caption{Comparison of time-to-solution metric for our tensor network-based algorithm,
     in-house Parallel Tempering implementation and D-Wave 2000Q$_{6}$. The
     \emph{adaptive} and \emph{geometric} terms refer to the distribution of inverse
-    temperature $\beta$ in Parallel Tempering replicas. We bounded the running time of
-    our solver to 30 minutes with bond dimension $\chi = 16$, $\beta=3$ and
+    temperature $\beta$ in Parallel Tempering replicas. We bounded the running time
+    of our solver to 30 minutes with bond dimension $\chi = 16$, $\beta=3$ and
     probability cutoff $\delta_{p} = 10^{-3}$. For PT, the $t$ in the equation
     \ref{eq:tts} is inferred from the running time and number of performed MC
-    sweeps:  a single MC sweep took 0.00005s for N=512 and 0.00011s
-    for $N=1024$. For the adaptive PT, we used 12 replicas. For geometric PT, we
-    used 25 replicas with geometrically distributed $\beta$, with
-    $\beta_{\min}=0.0001$ and $\beta_{\max}=10$. For all probabilistic samplers, we
-    used target probability $p_{\mbox{target}}=0.99$. In the case of D-Wave
-    annealers, we modified instances by dropping inactive qubits. To obtain the
-    reference ground state, we once again used our algorithm. We optimized time to
-    solution over annealing times of $5\mu s$, $20\mu s$ and $200\mu s$. For each instance and each
-    annealing time, we gathered 1000 samples for $N=512$ and 2500 for other values
-    of $N$. Also, we used $t=\tau$ for the D-Wave annealers, i.e. we considered only
-    annealing time and disregarded other factors contributing to overall solution time.
-    This choice is justified by the fact that the other contributions are minuscule.
-    The ``timed-out'' string indicates that the given algorithm could not
-    find a solution within the given approximation ratio (i.e. $p_{\mbox{succ}}=0$). }
-  \label{tab:tnvspt}
+    sweeps: a single MC sweep took 0.00005s for N=512 and 0.00011s for $N=1024$.
+    For the adaptive PT, we used 12 replicas. For geometric PT, we used 25 replicas
+    with geometrically distributed $\beta$, with $\beta_{\min}=0.0001$ and
+      $\beta_{\max}=10$. For all probabilistic samplers, we used target probability
+      $p_{\mbox{target}}=0.99$. In the case of D-Wave annealers, we modified
+        instances by dropping inactive qubits. To obtain the reference ground state, we
+        once again used our algorithm. We optimized time to solution over annealing
+        times of $5\mu s$, $20\mu s$ and $200\mu s$. For each instance and each
+        annealing time, we gathered 1000 samples for $N=512$ and 2500 for other values
+        of $N$. Also, we used $t=\tau$ for the D-Wave annealers, i.e. we considered
+        only annealing time and disregarded other factors contributing to overall
+        solution time. This choice is justified by the fact that the other
+        contributions are minuscule. The ``timed-out'' string indicates that the given
+        algorithm could not find a solution within the given approximation ratio (i.e.
+      $p_{\mbox{succ}}=0$). } \label{tab:tnvspt}
 \end{table}
 
 \begin{figure}
@@ -263,7 +245,7 @@ they were able to find a satisfying solution in a shorter time.
     probabilities obtained from contracting PEPS network $p_{n}$ and the Boltzmann
     weights calculated from the configuration's energy. \textbf{d.} Comparison of
     largest discarded probability $p_{d}$ and the ground state probability $p_{1}$.
-    With increasing $\beta$ we were able to achieve $p_{d} < p_{1}$, indicating
+        With increasing $\beta$ we were able to achieve $p_{d} < p_{1}$, indicating
     that the algorithm indeed reached the ground state. }
   \label{fig:tn-single-state}
 \end{figure}
