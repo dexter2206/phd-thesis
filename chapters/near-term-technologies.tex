@@ -22,7 +22,7 @@ underlying adiabatic theorem, which can be stated as follows \cite{farhi,
 \begin{theorem}[Adiabatic theorem]
   Suppose we are give a time-dependent Hamiltonian $\tilde{H}(t)$ with
   eigenenergies $E_1(t) \le E_2(t) \le \ldots \le E_i(t) \le \ldots$ and
-  corresponding eigenstates $\ket{\psi_i(t)}$, Further, suppose we are given a
+  corresponding eigenstates $\ket{\psi_i(t)}$. Further, suppose we are given a
   physical system $\mathcal{S}$ evolving according to $H(t) = \tilde{H}(t/T)$ and
   let $\ket{\psi(t)}$ denote the state of $\mathcal{S}$ at time $t$. If
   $\ket{\psi(0)} = \ket{\psi_n(0)}$, then also $\ket{\psi(t)} = \ket{\psi_n(t)}$
@@ -196,8 +196,8 @@ will discuss next.
   \caption{
     Chimera $C_3$ topology drawn using different layouts.
     \subref{fig:chimera-cross} The cross layout. \subref{fig:chimera-shore-column}
-    The grid layout. The internal couplers are marked with {\color{Tan} orange},
-    and the external couplers are marked with {\color{RoyalBlue} blue}. }
+    The grid layout. The internal couplers are marked with {\color{RoyalBlue} blue},
+    and the external couplers are marked with {\color{Tan} orange}. }
   \label{fig:chimera}
 \end{figure}
 
@@ -579,7 +579,7 @@ kernels. The C/C++ CUDA code can be compiled using Nvidia's \texttt{nvcc}
 compiler, shipped out of the box with the CUDA toolkit. For CUDA Fortran code,
 the Nvidia High-Performance Computing (HPC) suite contains \texttt{nvfortran}
 compiler\footnote{The \texttt{nvfortran} compiler was previously a third--party
-  program called \texttt{pgfortran}, developed by the PGI \cite{PGI}}. Giving a
+  program called \texttt{pgfortran}, developed by PGI \cite{PGI}}. Giving a
 comprehensive walkthrough of using either C/C++ or Fortran with CUDA is well
 beyond the scope of this thesis, but for the sake of completeness, below we
 present a short example of the CUDA C/C++ and CUDA Fortran code.
