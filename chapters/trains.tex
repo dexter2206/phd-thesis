@@ -1,6 +1,6 @@
 \chapter[Railway conflict management]{Application to railway conflict management}
 \label{chapter:trains}
-As the last point in the thesis, in this chapter we describe how the results
+As the last point in the thesis, in this chapter, we describe how the results
 presented so far can be applied in the field of operational research. Namely,
 we propose an approach to solving the railway dispatching problem using quantum
 annealing. We benchmark the implementation of our algorithm on the current
@@ -45,9 +45,17 @@ occupy different parts of the networks than they are supposed to and resuming
 operations according to the original timetable might not be possible. First of
 all, some trains might already be delayed too much to be physically able to
 follow the timetable. Secondly, trying to closely follow the timetable after
-the disturbance might generate conflicts. Hence, a new, conflict--free
-timetable has to be promptly created. Preferably, this new timetable should, in
-some sense, minimize the resulting delays.
+the disturbance might generate conflicts. The problem might be viewed from
+different perspectives, e.g. that of a passenger or transport operation company
+\cite{tornquist,lamorgese,Jensen2016}. This this chapter, we look at the
+problem of the infrastructure manager whose task, in the presence of a
+disturbance, is to create a new, conflict-free timetable. Naturally, in most
+cases, there will be multiple possible solutions to the arising conflicts, and
+hence one has to decide on what criteria make one timetable more appealing than
+another. In our approach, we assume that the dispatcher aims to minimize some
+function of the delays, which we will describe later. There are also other
+possible choices of the objective function \cite{8795577} such as the total
+passenger delay or the total cost of operations.
 
 Let us observe that independently from the algorithm for constructing a new
 timetable, some delays after the disturbance might be inevitable, e.g. due to
@@ -564,14 +572,14 @@ practice. Those heuristics are:
 
 In FCFS (resp. FLFS) the way is given to the train that first arrives (resp.
 first leaves) the considered station block at which the conflict occurs. AMCC
-is slightly more complex. In this heuristic, one tries to minimize the maximum
-secondary delays of the trains. We want to stress that those heuristics
-facilitate different objective functions, and hence it is not possible to
-directly compare them -- nevertheless, it might be useful to discuss
-qualitative differences between the solutions they produce. The solutions
-provided by the AMCC heuristic also provides a lower bound for the values of
-maximum secondary delays $d_{\max}(j)$, which we will use when constructing
-QUBO.
+\cite{mascis2002job} is slightly more complex. In this heuristic, one tries to
+minimize the maximum secondary delays of the trains. We want to stress that
+those heuristics facilitate different objective functions, and hence it is not
+possible to directly compare them -- nevertheless, it might be useful to
+discuss qualitative differences between the solutions they produce. The
+solutions provided by the AMCC heuristic also provide a lower bound for the
+values of maximum secondary delays $d_{\max}(j)$, which we will use when
+constructing QUBO.
 
 For the case of Nidzica--Olsztynek line, all heuristics returned the same
 solution, depicted in Fig. \ref{resolution}. The conflict is avoided by
@@ -582,7 +590,7 @@ the solution.
 
 We also applied the aforementioned heuristics to all the considered
 disturbances in the Goleszów -- Wisła Uzdrowisko segment. For brevity, we
-refrain from presenting the detailed discussion of the solutions for all the
+refrain from presenting a detailed discussion of the solutions for all the
 cases and limit ourselves to the summary of the maximum secondary delay, which
 is presented in Table \ref{tab:simple}
 
@@ -619,7 +627,7 @@ of the corresponding train, resulting in the cost function of the form:
 \end{equation}
 where $s^{*} = s_{j,end-1}$. The priorities $w_{j}$ are chosen specifically for
 both networks. One can immediately observe that larger values of $w_{j}$
-increase contribution stemming from the delay of given train, and hence the
+increase contribution stemming from the delay of a given train, and hence the
 objective function favors solutions with smaller delays for the trains with
 larger priorities. For the segment of line No. 216, we assume $w_{j}= 1.5$ for
 all \emph{Inter-City} trains, and the $w_{j}=1.0$ for the regional train. This
@@ -736,8 +744,8 @@ parameters for which a ground state was obtained is presented in table
     \caption{}\label{c2}
     \includegraphics[width=\textwidth]{figures/dwave_line216_ground1.pdf}
   \end{subfigure}
-  \caption{Example ground state solutions for the conflicted timetable of Line 216. All other
-   ground states are equivalent from the dispatching point of view.}
+  \caption{Example ground state solutions for the conflicted timetable of Line 216. All
+    other ground states are equivalent from the dispatching point of view.}
   \label{fig:dwline216grounds}
 \end{figure}
 
