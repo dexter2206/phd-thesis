@@ -16,25 +16,27 @@ particular optimization problems solved in our experiments are particularly hard
 D-Wave devices and checked our predictions with numerical experiments.
 
 To assist in the process of benchmarking the annealers, we developed two distinctive
-algorithms. The recent, tensor network--based algorithm allows one to solve Ising
+algorithms. The recent, tensor network-based algorithm allows one to solve Ising
 spin--glass instances defined on Chimera graph and other similar layouts. The algorithm
 is useful in itself as an optimization approach, but for other research conducted for
 this thesis, provided a classical baseline for the results obtained by the D-Wave
 annealer. The second of our algorithms, a massively parallelizable distributed bruteforce
 algorithm, allows for the exact computation of the low--energy spectrum of small,
-but otherwise arbitrary, spin--glass instances. Importantly, this simple yet
+but otherwise arbitrary, spin-glass instances. Importantly, this simple yet
 efficient algorithm is exact and deterministic. We used the brute-force algorithm
-to obtain low--energy spectra for some of the smaller instances uses throughout
+to obtain low-energy spectra for some of the smaller instances used throughout
 our experiments. This provided us not only with a means of assessing the quality of
-solutions obtained from other solvers or annealers, but also with valuable
-insights about the structure of the solution space.
+solutions obtained from other solvers or annealers but also with valuable
+insights into the structure of the solution space.
 
 To benchmark another anticipated use of quantum annealers, i.e. solving hard
-optimization problems stemming from real--life problems, we described an approach
+optimization problems stemming from real-life problems, we described an approach
 for solving railway-dispatching problems by converting them to QUBO. We then
 conducted experiments testing our approach on two generations of D-Wave quantum
-annealers. Remarkably, for our tests, we used real railway timetables from a Polish
-railway segments.
+annealers. Remarkably, for our tests, we used real railway timetables from two Polish
+railway segments. In our experiments, D-Wave annealers were able to successfully
+find an optimal solution to the small problem instances, although the performance
+varied greatly depending on the parameters such as the annealing time and chain strength.
 
 %%% Local Variables:
 %%% mode: latex
