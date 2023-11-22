@@ -504,7 +504,7 @@ best states found so far amongst states with $i$-th suffix. The
 \texttt{current\_states} and \texttt{current\_energies} store configuration and
 corresponding energy of current state being processed for $i$-th suffix. Each
 iteration starts by determining the index of the next bit to be flipped. This
-value is the same for all suffixes. Next, the algorithm computes energy
+value is the same for all suffixes. Next, the algorithm computes the energy
 difference using the equation \ref{eq:energydiff1} and updates the
 corresponding energy accordingly. After all $2^{N-M}$ iterations, the
 \texttt{best\_states} and \texttt{best\_energies} arrays are used to extract
