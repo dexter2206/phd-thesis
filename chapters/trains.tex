@@ -623,11 +623,11 @@ see Fig. \ref{fig:dwtrainsoldlarge}.
 
 \begin{figure}
   \begin{subfigure}[b]{0.5\textwidth}
-    \caption{}\label{fig:dwtd1}
+    \caption{}\label{fig:dwtd1large}
     \includegraphics[width=\textwidth]{figures/sol_case1_DWave_1400_2_250k}
   \end{subfigure}
   \begin{subfigure}[b]{0.5\textwidth}
-    \caption{}\label{fig:dwtd2}
+    \caption{}\label{fig:dwtd2large}
     \includegraphics[width=\textwidth]{figures/sol_case2_DWave_1200_2_250k}
   \end{subfigure}
   \caption{
@@ -721,6 +721,20 @@ although with different frequencies. The summary of parameters for which a
 ground state was obtained is presented in table \ref{tab:line216ground}.
 Example ground states found are depicted in Fig. \ref{fig:dwline216grounds}.
 
+\begin{figure}[t]
+  \begin{subfigure}[b]{0.5\textwidth}
+    \caption{}\label{c1}
+    \includegraphics[width=\textwidth]{figures/dwave_line216_ground1}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.5\textwidth}
+    \caption{}\label{c2}
+    \includegraphics[width=\textwidth]{figures/dwave_line216_ground1.pdf}
+  \end{subfigure}
+  \caption{Example ground state solutions for the conflicted timetable of Line 216. All
+    other ground states are equivalent from the dispatching point of view.}
+  \label{fig:dwline216grounds}
+\end{figure}
+
 \begin{table}
   \small
   \centering
@@ -773,19 +787,6 @@ devices (see D-Wave QPU datasheets \cite{dwavedocs}), which in turn might
 affect the DAC quantization effect (see discussion of error sources in section
 \ref{sec:parallel-in-time}).
 
-\begin{figure}
-  \begin{subfigure}[b]{0.5\textwidth}
-    \caption{}\label{c1}
-    \includegraphics[width=\textwidth]{figures/dwave_line216_ground1}
-  \end{subfigure}
-  \begin{subfigure}[b]{0.5\textwidth}
-    \caption{}\label{c2}
-    \includegraphics[width=\textwidth]{figures/dwave_line216_ground1.pdf}
-  \end{subfigure}
-  \caption{Example ground state solutions for the conflicted timetable of Line 216. All
-    other ground states are equivalent from the dispatching point of view.}
-  \label{fig:dwline216grounds}
-\end{figure}
 
 %%% Local Variables:
 %%% mode: pdflatex
