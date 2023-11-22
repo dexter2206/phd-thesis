@@ -335,8 +335,8 @@ follows
 \end{equation}
 and has to be applied for limited number of trains $j \in \JJ^{0} (\JJ^{1})$
 and $j' \in \JJ^{1}(\JJ^{0})$. This limit is imposed indirectly by the upper
-bounds on the delays. Here, $C(m)$ is, similarly to $B(m)$, the set of delays violating
-the condition for the given pair.
+bounds on the delays. Here, $C(m)$ is, similarly to $B(m)$, the set of delays
+violating the condition for the given pair.
 \subsection{The rolling stock circulation condition}
 Our model assumes that some trains are assigned the same train set. Naturally,
 there exists some necessary \emph{turnover time}, before a train set can be
@@ -375,8 +375,8 @@ where $E(d) = \{0, 1, \ldots, m-R(j, j')\}$.
 The conditions \eqref{eq:qubo:passingtime}, \eqref{eq:qubo:singleblock},
 \eqref{eq:qubo:deadlock}, \eqref{eq:qubo:rollingstock} together with cost
 function \eqref{eq:qubo:cost} define a constrained $0-1$ problem. However, in
-order to use a quantum annealer, we must convert it to QUBO, which means we have to
-incorporate those constraints into the cost function.
+order to use a quantum annealer, we must convert it to QUBO, which means we
+have to incorporate those constraints into the cost function.
 
 One might observe that penalties defined by the dispatching conditions are of
 the form:
@@ -387,10 +387,10 @@ the form:
 for some set of pairs of indices $\mathcal{V}_{p}$. For every feasible solution
 (i.e. one meeting all the constraints) the sum in equation
 \eqref{eq:quadraticpenalty} is 0, whereas violation of the corresponding
-condition gives a strictly positive value. Hance, one can add such a sum to the
+condition gives a strictly positive value. Hence, one can add such a sum to the
 cost function, effectively penalizing the infeasible solutions. More generally,
-one might multiply the sum by some constant $p_{pair} > 0$, to further
-increase the value of the cost function for the infeasible solutions.
+one might multiply the sum by some constant $\ppair > 0$, to further increase
+the value of the cost function for the infeasible solutions.
 
 The same reasoning cannot be applied e.g. to the constraint
 \eqref{eq:onehotconstraint}, which comprises equations of the form
@@ -408,7 +408,7 @@ one can consider the following quadratic form of the same penalty:
 In contrast to \eqref{eq:linearpenalty}, this time the left hand is equal to 0
 for feasible solution, and a positive value for any solution violating the
 one--hot encoding constraint. As with previous, quadratic penalties, we might
-want to multiply such penalties by some constant $p_{sum} > 0$. An important
+want to multiply such penalties by some constant $\psum > 0$. An important
 thing to mention here is that the expansion of the left-hand side in
 \eqref{eq:linearpenalty2} gives a nonzero constant offset, which we will
 ignore. therefore, the final form of the penalty term reads:
@@ -605,11 +605,11 @@ is presented in Table \ref{tab:simple}
     \hline
     \rowcolor{theader} Heuristics & case $1$ & case $2$ & case $3$ & case $4$ \\
     \hline
-    FLFS       & 6        & 13       & 4        & 2        \\
+    FLFS                          & 6        & 13       & 4        & 2        \\
     \hline
-    FCFS       & 5        & 5        & 5        & 2        \\
+    FCFS                          & 5        & 5        & 5        & 2        \\
     \hline
-    AMCC       & 5        & 5        & 4        & 2        \\
+    AMCC                          & 5        & 5        & 4        & 2        \\
     \hline
   \end{tabular}
   \caption{The maximum secondary delays, in minutes, resulting from simple heuristics.
@@ -679,36 +679,172 @@ obtained in this way are presented in Fig. \ref{fig:penaltyhistogram}.
   \includegraphics[width=\textwidth]{figures/railway_histograms_bf}
   \caption{Energy histogram for feasible (green) and infeasible (red) solutions of QUBO
     defined for line No. 216 with varying penalty weights. The figure takes into
-    account first 5000 low energy states.} \label{fig:penaltyhistogram}
+    account the first 5000 low-energy states.} \label{fig:penaltyhistogram}
 \end{figure}
 In our experiments, we used several combinations of $p_{pair}$ and $p_{sum}$.
+For D-Wave 2000Q series devices, which we used for the experiments reported
+in~\cite{railwaydispatching}, we used $p_{\text{pair}}=2.7$,
+$p_{\text{sum}}=2.2$ and $p_{\text{pair}} = p_{\text{sum}} = 1.75$.
+Additionally, in this thesis, we extend these results by running additional
+experiments with $p_{\text{pair}}=p_{\text{sum}}=n$ for $n=2, 3, 4$ on
+Advantage and Advantage2 prototype devices.
 
-\subsubsection{Solutions using the D-Wave annealer}
+\subsubsection{Initial experiments on D-Wave annealers}
+In our initial experiments, reported in \cite{railwaydispatching}, we used
+mostly the D-Wave 2000Q device. We were able to successfully embed all the
+problem instances, except case 3 for Line 191. As for the QUBO parameters, we
+used $p_{\text{pair}}=2.2$, $p_{\text{sum}}=2.7$ and
+$p_{\text{pair}}=p_{\text{sum}}=1.75$. We used several values of the chain
+strengths, all of them being a multiplicity of $\max|J_{ij}|$ (computed
+separately for each problem before the embedding). Following convention from
+\cite{railwaydispatching}, we call the multiplier \emph{chain strength scale}
+($css$), and in our experiments, it ranged from $1$ to $9$. The annealing time
+varied between $5$--$2000\mu$s.
 
-All QUBOs presented in this chapter have a small number of variables relative
-to the number of qubits available in the current generation of the annealers.
-The density of the graphs, defined as the number of edges relative to the
-number of edges in a full graph with the same number of vertices, is also
-relatively low. Nevertheless, the problem graphs are not compatible with the
-topology of the current generation of the annealers and hence had to be
-embedded. We used several chain strengths in our experiments, ranging from $4$
-to $12$, with those values being determined by running a set of initial samples
-and assessing the results. Similarly, we also used several values of annealing
-time $\\tau$ ranging from $5$ to $2000$.
+For QUBO defined for Line 216, the D-Wave annealers failed to reach the ground
+state for all the tested parameters. However, the lowest energy--solution found
+by the annealer was equivalent to the ground state from the dispatching
+perspective\footnote{Here, equivalent from the dispatching perspective means
+  that the order of trains leaving any given station is the same.).}. The Fig.
+\ref{fig:dwtrainsold} shows the solutions obtained from the D-Wave annealer, as
+well as the deviation from the ground state energy. Since the best solution was
+obtained for $css=2$, we decided to use the same value for the consecutive
+experiments.
 
-The problem defined on Line 216 was small enough to fit on all devices,
-including two Pegasus-based Advantage systems and a new prototype Advantage2
-system featuring Zephyr topology. All of the annealers were able to find a
-feasible solution to the problem for at least some combination of parameters.
-However, their performance varied highly depending on the parameter range. The
-frequency of finding a feasible solution by the annealers is depicted in Fig.
-\ref{fig:dwline216freq}. As seen there, the Advantage system6.3 and Advantage2
-prototype1.1 devices exhibited much better performance than the older Advantage
-system4.1 device. As for the quality of the solutions, all solvers managed to
-find an optimal solution, although with different frequencies. The summary of
-parameters for which a ground state was obtained is presented in table
-\ref{tab:line216ground}. Example ground states found are depicted in Fig.
-\ref{fig:dwline216grounds}.
+\begin{figure}
+  \begin{subfigure}[b]{0.5\textwidth}
+    \caption{}\label{fig:dwtd1}
+    \includegraphics[width=\textwidth]{figures/small_DWave22_27_2000_2}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.5\textwidth}
+    \caption{}\label{fig:dwtd2}
+    \includegraphics[width=\textwidth]{figures/small_DWave175_175_2000_2}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.5\textwidth}
+    \caption{}\label{fig:dwen1}
+    \includegraphics[width=\textwidth]{figures/energy_small_22_27}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.5\textwidth}
+    \caption{}\label{fig:dwen2}
+    \includegraphics[width=\textwidth]{figures/energy_small_175_175}
+  \end{subfigure}
+  \caption{
+    \textbf{a.} -- \textbf{b.} Best solutions obtained with D-Wave 2000Q annealer,
+    optimized over all annealing times and chain strength scales.
+    \textbf{c.} -- \textbf{d.} Energy of the best D-Wave solution as the function of
+    $css$ scale. For panels \textbf{a.} and \textbf{c.} we used $\ppair=2.2$, $\psum=2.7$
+    and for panels \textbf{b}, \textbf{d.} we used $\ppair=1.75$, $\psum=1.75$.
+  }
+  \label{fig:dwtrainsold}
+\end{figure}
+
+Finding a feasible solution for QUBOs defined for Line 191 proved to be much
+more difficult for the D-Wave 2000Q annealer. Hence, we increased the total
+number of obtained samples to $250$k. Still, even with the increased number of
+samples we were unable to reach a feasible solution. The best solutions found
+by the annealer for case 1 and case 2 violate a single constraint and can be
+easily corrected to obtain a feasible (and in case 2, even optimal) solution,
+see Fig. \ref{fig:dwtrainsoldlarge}.
+
+\begin{figure}
+  \begin{subfigure}[b]{0.5\textwidth}
+    \caption{}\label{fig:dwtd1}
+    \includegraphics[width=\textwidth]{figures/sol_case1_DWave_1400_2_250k}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.5\textwidth}
+    \caption{}\label{fig:dwtd2}
+    \includegraphics[width=\textwidth]{figures/sol_case2_DWave_1200_2_250k}
+  \end{subfigure}
+  \caption{
+    Lowest energy solutions obtained for QUBO problems defined for Line 191. In all
+    panels $\ppair = 2.2, \psum = 2.7$ and $css=2.0$. \textbf{a.} Solution obtained
+    for case 1 (with annealing time $\tau=1400$). The solution is infeasible
+    because the train Ks3 stays at the station block 7 shorter than 1 minute. The
+    solution can be turned into a feasible one by prolonging the stay of Ks3 at
+    station block 7. \textbf{b.} The best solution obtained for case 2
+    ($\tau=1200$). The solution is infeasible as Ks3 does not stop at station 7.
+    This solution can be made into an optimal one by shortening the stays of Ks3 at
+    station 3 and IC2 at station 7. } \label{fig:dwtrainsoldlarge}
+\end{figure}
+
+In comparison, the QUBOs for cases 1--4 turn out to not be that challenging for
+the classical solvers. Both the tensor networks algorithm, described in chapter
+\ref{chapter:tn}, and the IBM CPLEX solver were able to find high-quality
+solutions equivalent to the ground state from the dispatching point of view,
+with CPLEX slightly outperforming the tensor network algorithm in cases 3 and
+4. The values of the cost function obtained from these solvers are presented in
+table \ref{tab:line191classical}. In the same table, we also present, for
+reference, values of our objective function for solutions obtained with simple
+heuristics.
+
+At the time we were conducting experiments presented in
+\cite{railwaydispatching}, the new Advantage System 1.1 device was entering the
+market, and we were able to run a very limited set of experiments. We decided
+to try a slightly larger problem, constructed by extending the timetable for
+Line 191 with more trains. Although we were able to embed it on the device, our
+attempts to find a feasible solution on this early Pegasus-based system were
+futile. For the details of this part of the experiment, we refer the interested
+reader to \cite{railwaydispatching}.
+
+\begin{table}
+  \centering
+  \begin{tabular}{|c|c|c|c|c|c|}
+    \hline
+    \rowcolor{theader} \multicolumn{2}{|c|}{Method} & Case 1          & Case 2                      & Case 3                      & Case 4                                                    \\
+    \hline
+    \multirow{2}{*}{QUBO model}                     & CPLEX           & \textcolor{RoyalBlue}{0.54} & \textcolor{RoyalBlue}{1.40} & \textcolor{RoyalBlue}{0.73} & \textcolor{RoyalBlue}{0.20} \\
+    \cline{2-6}
+                                                    & Tensor Networks & \textcolor{RoyalBlue}{0.54} & \textcolor{RoyalBlue}{1.40} & \textcolor{RoyalBlue}{1.65} & \textcolor{RoyalBlue}{0.29} \\
+    \hline
+    \multirow{3}{*}{Simple heuristics}              & AMCC            & 0.77                        & \textcolor{RoyalBlue}{1.30} & \textcolor{RoyalBlue}{0.73} & \textcolor{RoyalBlue}{0.20} \\
+    \cline{2-6}
+                                                    & FLFS            & \textcolor{RoyalBlue}{0.54} & 1.71                        & \textcolor{RoyalBlue}{0.73} & \textcolor{RoyalBlue}{0.20} \\
+    \cline{2-6}
+                                                    & FCFS            & 0.77                        & \textcolor{RoyalBlue}{1.30} & 0.95                        & \textcolor{RoyalBlue}{0.20} \\
+    \hline
+  \end{tabular}
+  \caption{
+    Values of the cost functions obtained by the classical solvers for the QUBO
+    problems defined for line 191. Values marked with \textcolor{RoyalBlue}{blue}
+    represent solutions equivalent (from the dispatching perspective) to the ground
+    state of the corresponding problem. Values for the solutions obtained with
+    simple heuristics are provided for reference, but it should be noted that those
+    methods use different objective functions and hence cannot be directly compared
+    to CPLEX or tensor networks-based solver. } \label{tab:line191classical}
+\end{table}
+
+\subsubsection{Extended experiment on the Advantage System annealers}
+
+Since the time of our experiments described in the previous section, new models
+of the annealers from the Advantage System generation became available.
+Furthermore, the first Advantage2 Prototype devices entered the market. We
+decided to extend our experiment and run further tests to investigate the
+performance of these devices for a broader range of parameters. To this end, we
+decided to test how the newer Pegasus-based devices perform on the QUBO problem
+defined on Line 216. We decided that due to the limitation of our resources, we
+could not run comprehensive experiments with the problem cases defined on Line
+191, and instead opted for a more comprehensive sweep through the parameter
+space for the smaller problem.
+
+In this new scenario, we decided to increase $\ppair$ and $\psum$ values, to
+investigate if a wider energy separation between feasible and infeasible
+solutions will be beneficial for the annealers' performance. As previously, the
+annealing times varied from $\tau=5$ to $\tau=2000$. We used chain strengths
+varying between $4$ and $12$. We would like to stress, that here we mean
+absolute values of the chain strengths and not scales of chain strengths in
+relation to the maximum absolute value of quadratic terms of the problem like
+in the initial experiment.
+
+All of the annealers were able to find a feasible solution to the problem for
+at least some combination of parameters. However, their performance varied
+highly depending on the parameter range. The frequency of finding a feasible
+solution by the annealers is depicted in Fig. \ref{fig:dwline216freq}. As seen
+there, the Advantage System6.3 and Advantage2 Prototype1.1 devices exhibited
+much better performance than the older Advantage System4.1 device. As for the
+quality of the solutions, all solvers managed to find an optimal solution,
+although with different frequencies. The summary of parameters for which a
+ground state was obtained is presented in table \ref{tab:line216ground}.
+Example ground states found are depicted in Fig. \ref{fig:dwline216grounds}.
 
 \begin{table}
   \small
@@ -741,7 +877,28 @@ parameters for which a ground state was obtained is presented in table
     $p_{\text{pair}}=p_{\text{sum}}=4.0$. } \label{tab:line216ground}
 \end{table}
 
-\begin{figure}[b]
+\begin{figure}
+  \includegraphics[width=\textwidth]{figures/dwave_line_216_result.pdf}
+  \caption{
+    Frequency of finding a feasible solution for the problem defined for Line 216.
+    Rows in the grid correspond to different values of chain strength and the
+    columns correspond to different values of penalty scalings. In each cell, the
+    X-axis depicts the annealing time $\tau$, while the $Y$-axis depicts the
+    obtained fraction of the feasible solution (out of 1000 samples) }
+  \label{fig:dwline216freq}
+\end{figure}
+
+One of the interesting observations one could make about the results presented
+in Fig. \ref{fig:dwline216freq} is the performance difference between different
+models of the annealers, which seem to be highly dependent on the regime of
+parameters. Determining the sources of these differences requires further
+research, but it is possible that they can be partially explained by
+differences in the available range of quadratic coefficients between the
+devices (see D-Wave QPU datasheets \cite{dwavedocs}), which in turn might
+affect the DAC quantization effect (see discussion of error sources in section
+\ref{sec:parallel-in-time}).
+
+\begin{figure}
   \begin{subfigure}[b]{0.5\textwidth}
     \caption{}\label{c1}
     \includegraphics[width=\textwidth]{figures/dwave_line216_ground1}
@@ -753,17 +910,6 @@ parameters for which a ground state was obtained is presented in table
   \caption{Example ground state solutions for the conflicted timetable of Line 216. All
     other ground states are equivalent from the dispatching point of view.}
   \label{fig:dwline216grounds}
-\end{figure}
-
-\begin{figure}
-  \includegraphics[width=\textwidth]{figures/dwave_line_216_result.pdf}
-  \caption{
-    Frequency of finding a feasible solution for the problem defined for Line 216.
-    Rows in the grid correspond to different values of chain strength and the
-    columns correspond to different values of penalty scalings. In each cell, the
-    X-axis depicts the annealing time $\tau$, while the $Y$-axis depicts the
-    obtained fraction of the feasible solution (out of 1000 samples) }
-  \label{fig:dwline216freq}
 \end{figure}
 
 %%% Local Variables:
