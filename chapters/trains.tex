@@ -46,7 +46,7 @@ operations according to the original timetable might not be possible. First of
 all, some trains might already be delayed too much to be physically able to
 follow the timetable. Secondly, trying to closely follow the timetable after
 the disturbance might generate conflicts. The problem might be viewed from
-different perspectives, e.g. that of a passenger or transport operation company
+various perspectives, e.g. that of a passenger or transport operation company
 \cite{tornquist,lamorgese,Jensen2016}. This this chapter, we look at the
 problem of the infrastructure manager whose task, in the presence of a
 disturbance, is to create a new, conflict-free timetable. Naturally, in most
@@ -200,7 +200,6 @@ We can now use one--hot encoding for $d(j, s)$ and introduce binary variables
 $x_{s, j, m}$:
 
 \begin{equation}
-  \label{eq:onehotconstraint}
   \forall_{j \in \JJ}\forall_{s \in S_{j}} \forall_{m \in A_{j, s}} \quad x_{s,j,m} = \begin{cases}
     1, & d(j, s) = m      \\
     0, & \mbox{otherwise}
@@ -209,6 +208,7 @@ $x_{s, j, m}$:
 Naturally, possible values for $d(j, s)$ are mutually exclusive, which can be
 expressed as the following constraint:
 \begin{equation}
+  \label{eq:onehotconstraint}
   \forall_{j \in \JJ}\forall_{s \in S_{j}} \sum_{m \in A_{j, s}} x_{s, j, m} = 1
 \end{equation}
 As for the cost function, we decided to use a simple weighted sum of the
@@ -245,7 +245,7 @@ Using \eqref{eq:djs} and \eqref{eq:pt} one can easily verify that inequality
 \end{equation}
 In binary variables, it means that if, for a fixed $j,s,m$, the $x_{j,s,m}=1$,
 then delays $d(j,s)$ smaller than $m-\alpha(j, s, \rho_j(s))$ are prohibited
-and thus the corresponding variables have to zero out. Hence, we arrive at the
+and thus the corresponding variables have to zero-out. Hence, we arrive at the
 following condition:
 \begin{equation}
   \label{eq:qubo:passingtime}
@@ -296,12 +296,16 @@ constraint, and the condition becomes:
   \label{eq:qubo:singleblock}
   \forall_{i=0,1} \forall_{j, j' \in \JJ^{i}} \forall_{s \in S^{*}_{j} \cap S^{*}_{j'}} \sum_{m \in A_{j, s}} \left(
   \sum_{m' \in B(m) \cap A_{j', s}} x_{j,s,m}x_{j',s,m'}
-  \right) = 0
+  \right) = 0,
 \end{equation}
+where $B(m) = \{m + \Delta(j, s, j', s), d + \Delta(j, s, j', s)+ 1,\ldots, m +
+    \Delta(j, s, j', s) + \tau_{(1)}(j,s, \rho_j(s))-1 \}$ is a set of delays
+violating condition \eqref{eq:single-block-delays}.
+
 \subsection{The deadlock condition}
 The deadlock condition is analogous to the single block occupation condition
-but for trains going into opposite directions. Suppose trains $j$ and $j'$ are
-heading in the opposite directions on a route determined by two consecutive
+but for trains going in opposite directions. Suppose trains $j$ and $j'$ are
+heading in opposite directions on a route determined by two consecutive
 stations $s$ and $\rho_j(s)$. Note that for $j'$ the order is reversed, i.e. it
 starts at $\rho_j(s)$ and travels in the direction of $s$. In this case, $j$
 has to arrive at $\rho_j(s)$ before $j'$ can leave $\rho_j(s)$. We formalize it
@@ -317,21 +321,22 @@ inequality \eqref{eq:deadlock} reads:
   \label{eq:deadlock2}
   d(j',\rho_j(s)) \ge d(j, s) + \Delta(j,s,j',\rho_j(s)) + \tauuu(j, s, \rho_j(s)).
 \end{equation}
-This condition is to be applied if train $j$ is supposed to leave before train
-$j'$ leaves $\rho_{j}(s)$, otherwise the order has to be appropriately
-reversed.
+This condition is to be applied for pairs of trains $j,j'$ going in opposite
+dimension if train $j$ is supposed to leave before the train $j'$ leaves
+$\rho_{j}(s)$, otherwise the order has to be appropriately reversed.
 
 In decision variables, the deadlock condition in its basic form looks as
 follows
 \begin{equation}
   \label{eq:qubo:deadlock}
   \forall_{s \in S^{*}_{j} \cap S^{*}_{j'}} \sum_{m \in A_{j, s}} \left(
-  \sum_{m' \in B(m) \cap A_{j', s}} x_{j,s,m}x_{j',s,m'}
+  \sum_{m' \in C(m) \cap A_{j', s}} x_{j,s,m}x_{j',s,m'}
   \right) = 0,
 \end{equation}
 and has to be applied for limited number of trains $j \in \JJ^{0} (\JJ^{1})$
 and $j' \in \JJ^{1}(\JJ^{0})$. This limit is imposed indirectly by the upper
-bounds on the delays.
+bounds on the delays. Here, $C(m)$ is, similarly to $B(m)$, the set of delays violating
+the condition for the given pair.
 \subsection{The rolling stock circulation condition}
 Our model assumes that some trains are assigned the same train set. Naturally,
 there exists some necessary \emph{turnover time}, before a train set can be
@@ -370,7 +375,7 @@ where $E(d) = \{0, 1, \ldots, m-R(j, j')\}$.
 The conditions \eqref{eq:qubo:passingtime}, \eqref{eq:qubo:singleblock},
 \eqref{eq:qubo:deadlock}, \eqref{eq:qubo:rollingstock} together with cost
 function \eqref{eq:qubo:cost} define a constrained $0-1$ problem. However, in
-use a quantum annealer, we must convert it to QUBO, which means we have to
+order to use a quantum annealer, we must convert it to QUBO, which means we have to
 incorporate those constraints into the cost function.
 
 One might observe that penalties defined by the dispatching conditions are of
@@ -384,7 +389,7 @@ for some set of pairs of indices $\mathcal{V}_{p}$. For every feasible solution
 \eqref{eq:quadraticpenalty} is 0, whereas violation of the corresponding
 condition gives a strictly positive value. Hance, one can add such a sum to the
 cost function, effectively penalizing the infeasible solutions. More generally,
-one might multiply the sum by some constant $p_{pair} \ge 1$, to further
+one might multiply the sum by some constant $p_{pair} > 0$, to further
 increase the value of the cost function for the infeasible solutions.
 
 The same reasoning cannot be applied e.g. to the constraint
@@ -403,8 +408,8 @@ one can consider the following quadratic form of the same penalty:
 In contrast to \eqref{eq:linearpenalty}, this time the left hand is equal to 0
 for feasible solution, and a positive value for any solution violating the
 one--hot encoding constraint. As with previous, quadratic penalties, we might
-want to multiply such penalties by some constant $p_{sum} > 1$. An important
-thing to mention here is that the expansion of the left--hand side in
+want to multiply such penalties by some constant $p_{sum} > 0$. An important
+thing to mention here is that the expansion of the left-hand side in
 \eqref{eq:linearpenalty2} gives a nonzero constant offset, which we will
 ignore. therefore, the final form of the penalty term reads:
 \begin{equation}
