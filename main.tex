@@ -15,7 +15,7 @@
 \usepackage[linesnumbered,ruled]{algorithm2e}
 \usepackage{listings}
 \usepackage{float}
-\usepackage[url=false,style=phys,biblabel=brackets,maxbibnames=10,backend=bibtex,sorting=none]{biblatex}
+\usepackage[url=false,eprint=true,style=phys,biblabel=brackets,maxbibnames=10,backend=bibtex,sorting=none]{biblatex}
 \usepackage{subcaption}
 \usepackage[font={small}]{caption}
 \usepackage{xfrac}
@@ -133,9 +133,10 @@
 \input{chapters/trains.tex}
 \input{chapters/summary.tex}
 
-
-\printbibliography
-
+{
+  \small
+  \printbibliography
+}
 \appendix
 \input{chapters/appendix.tex}
 
