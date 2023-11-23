@@ -1,4 +1,6 @@
 \chapter{Solving spin-glass problems using tensor networks}
+\chaptermark{Solving spin-glass problems}
+
 \label{chapter:tn}
 
 Benchmarking quantum annealers requires adequate algorithms for providing
@@ -82,11 +84,13 @@ quasi-two-dimensional graph, i.e. one in which nodes can be grouped into
 \emph{clusters} forming a two-dimensional square lattice (see Fig.
 \ref{fig:clustering}). One can easily see, that again we can construct a
 tree-like structure representing state space, this time considering joint
-configurations of spins in a single cluster. Therefore, for the most of the
+configurations of spins in a single cluster. Therefore, for most of the
 time, we might "forget" the underlying spin-glass structure and consider square
-lattices in which spin clusters act like higher-dimensional systems.
+lattices in which spin clusters act like higher-dimensional systems. Furthermore,
+by the same argument, it is clearly visible that our approach is not limited
+to the Ising systems, but could be also used for systems of higher dimensions.
 
-\begin{figure}[b]
+\begin{figure}
   \includegraphics[width=\textwidth]{figures/clustering}
   \caption{Grouping spins into clusters in a quasi-two-dimensional graph. Here, spins in
     the original graphs are grouped together to form a square lattice. Each site in
