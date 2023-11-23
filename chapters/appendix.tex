@@ -4,24 +4,24 @@ In order to characterize the complexity of algorithms, it is useful to use
 asymptotic big-O notation. Consider two functions $f, g \colon \NN \to \RR$. We
 say that $f$ is $O(g)$ if and only if there exists a constant $C > 0$ and a
 natural number $n_{C}$ such that the inequality $0 \le f(n) \le C\cdot g(n)$
-    holds for all $n > n_{C}$ \cite{clrs}. It is common to write $f=O(g)$ instead
+holds for all $n > n_{C}$ \cite{clrs}. It is common to write $f=O(g)$ instead
 of ``$f$ is $O(g)$'', slightly abusing the mathematical notation \cite{clrs}.
 One should notice that big-O notation does not provide a tight bound. For
 instance, we have $n + 1 = O(n)$ (since $n + 1 \le 2 \cdot n$) but also $n+1 =
   O(n^{10})$.
 
-    In the context of computational complexity, big-O notation is most commonly
-    used for expressing upper bound on number of (dominating) operations performed
-    by an algorithm as a function of its input size $N$. Since the number of
-    performed operations is roughly proportional to the algorithm's execution time,
-    it follows that algorithms with better bound can be considered as more
-    performant. However, care must be taken when applying this reasoning to judge
-    practical performance. In particular, one should be mindful of the constant
-    factor $C$ in the definition above, as well as any bottlenecks stemming from
-    the working of the underlying hardware. As a concrete example, Strassen's
-    algorithm for multiplying two $N \times N$ matrices requires $O(N^{\alpha})$
-    multiplications, where $2 < \alpha < 3$, and yet may perform worse than naive
-    algorithm peforming $N^{3}$ multiplications, even for $N$ of order of several
+In the context of computational complexity, big-O notation is most commonly
+used for expressing upper bound on number of (dominating) operations performed
+by an algorithm as a function of its input size $N$. Since the number of
+performed operations is roughly proportional to the algorithm's execution time,
+it follows that algorithms with better bound can be considered as more
+performant. However, care must be taken when applying this reasoning to judge
+practical performance. In particular, one should be mindful of the constant
+factor $C$ in the definition above, as well as any bottlenecks stemming from
+the working of the underlying hardware. As a concrete example, Strassen's
+algorithm for multiplying two $N \times N$ matrices requires $O(N^{\alpha})$
+multiplications, where $2 < \alpha < 3$, and yet may perform worse than naive
+algorithm peforming $N^{3}$ multiplications, even for $N$ of order of several
 hundreds \cite{dalberto}.
 
 We conclude this section by mentioning that there exist several other
@@ -35,29 +35,30 @@ Consider a square lattice, such as the one depicted in Fig. \ref{fig:lattice-and
 Let denote by $H_X$ the usual Hamiltonian $H$ restricted to the graph
 induced by vertices in $X$. Further, let $H_{X, \overline{X}} = H - H_X -
   H_{\overline{X}}$. Notice that $H_{X, \overline{X}}$ contains only quadratic
-    terms $J_{ij} s_i s_j$ such that $i \in X$ and $j \in \overline{X}$. Slightly
-    abusing the notation, one may thus write
-    \begin{equation}
-      \small
-      H(s_1, \ldots, s_N) = H_X(s_1, \ldots, s_k) + H_{\overline{X}}(s_{k+1}, \ldots, s_N) + H_{X, \overline{X}}(s_1, \ldots, s_N)
-    \end{equation}
-    Using definition of conditional probability applied to Boltzmann distribution,
-    one thus gets
+terms $J_{ij} s_i s_j$ such that $i \in X$ and $j \in \overline{X}$. Slightly
+abusing the notation, one may thus write
+\begin{equation}
+  \small
+  H(s_1, \ldots, s_N) = H_X(s_1, \ldots, s_k) + H_{\overline{X}}(s_{k+1}, \ldots, s_N) + H_{X, \overline{X}}(s_1, \ldots, s_N)
+\end{equation}
+Using definition of conditional probability applied to Boltzmann distribution,
+one thus gets
 
-    \begin{align}
-      &p(s_{k+1}|s_1, \ldots, s_k) = \frac{\sum\limits_{(z_{k+2}, \ldots, z_N)}e^{-\beta H(s_1, \ldots, s_{k+1}, z_{k+2},\ldots,z_N)}}{\sum\limits_{(z_{k+1}, \ldots, z_N)}e^{-\beta H(s_1, \ldots, s_k, z_{k+1},\ldots,z_N)}}                                                                                                                                                     \\
-                                  & = \frac{\sum\limits_{(z_{k+2}, \ldots, z_N)}e^{-\beta (H_X(s_1, \ldots, s_k) + H_{\overline{X}}(s_{k+1}, z_{k+2},\ldots,z_N) + H_{X, \overline{X}}(s_1, \ldots, z_N))}}{\sum\limits_{(z_{k+1}, \ldots, z_N)}e^{-\beta (H_X(s_1, \ldots, s_k) + H_{\overline{X}}(z_{k+1}, \ldots,z_N) + H_{X, \overline{X}}(s_1, \ldots, z_N))}}                 \\
-                                  & = \frac{e^{-\beta H_X(s_1, \ldots, s_k)}\sum\limits_{(z_{k+2}, \ldots, z_N)} e^{-\beta(H_{\overline{X}}(s_{k+1}, z_{k+2},\ldots,z_N) + H_{X, \overline{X}}(s_1, \ldots, z_N))}}{e^{-\beta H_X(s_1, \ldots, s_k)}\sum\limits_{(z_{k+1}, \ldots, z_N)}e^{ -\beta(H_{\overline{X}}(z_{k+1}, \ldots,z_N) + H_{X, \overline{X}}(s_1, \ldots, z_N))}} \\
-                                  & = \frac{\sum\limits_{(z_{k+2}, \ldots, z_N)} e^{-\beta(H_{\overline{X}}(s_{k+1}, z_{k+2},\ldots,z_N) + H_{X, \overline{X}}(s_1, \ldots, z_N))}}{\sum\limits_{(z_{k+1}, \ldots, z_N)}e^{ -\beta(H_{\overline{X}}(z_{k+1}, \ldots,z_N) + H_{X, \overline{X}}(s_1, \ldots, z_N))}}
-      \end{align}
-    Note, in both numerator and denominator, spins with indices from $X$ appear
-    non-trivially only in $H_{X, \overline{X}}$ , i.e. the whole expression depends
-    only on those spins in $X$ that directly interact with spins in $\overline{X}$,
-    which was to be demonstrated.
+\begin{align}
+   & p(s_{k+1}|s_1, \ldots, s_k) = \frac{\sum\limits_{(z_{k+2}, \ldots, z_N)}e^{-\beta H(s_1, \ldots, s_{k+1}, z_{k+2},\ldots,z_N)}}{\sum\limits_{(z_{k+1}, \ldots, z_N)}e^{-\beta H(s_1, \ldots, s_k, z_{k+1},\ldots,z_N)}}                                                                                                                         \\
+   & = \frac{\sum\limits_{(z_{k+2}, \ldots, z_N)}e^{-\beta (H_X(s_1, \ldots, s_k) + H_{\overline{X}}(s_{k+1}, z_{k+2},\ldots,z_N) + H_{X, \overline{X}}(s_1, \ldots, z_N))}}{\sum\limits_{(z_{k+1}, \ldots, z_N)}e^{-\beta (H_X(s_1, \ldots, s_k) + H_{\overline{X}}(z_{k+1}, \ldots,z_N) + H_{X, \overline{X}}(s_1, \ldots, z_N))}}                 \\
+   & = \frac{e^{-\beta H_X(s_1, \ldots, s_k)}\sum\limits_{(z_{k+2}, \ldots, z_N)} e^{-\beta(H_{\overline{X}}(s_{k+1}, z_{k+2},\ldots,z_N) + H_{X, \overline{X}}(s_1, \ldots, z_N))}}{e^{-\beta H_X(s_1, \ldots, s_k)}\sum\limits_{(z_{k+1}, \ldots, z_N)}e^{ -\beta(H_{\overline{X}}(z_{k+1}, \ldots,z_N) + H_{X, \overline{X}}(s_1, \ldots, z_N))}} \\
+   & = \frac{\sum\limits_{(z_{k+2}, \ldots, z_N)} e^{-\beta(H_{\overline{X}}(s_{k+1}, z_{k+2},\ldots,z_N) + H_{X, \overline{X}}(s_1, \ldots, z_N))}}{\sum\limits_{(z_{k+1}, \ldots, z_N)}e^{ -\beta(H_{\overline{X}}(z_{k+1}, \ldots,z_N) + H_{X, \overline{X}}(s_1, \ldots, z_N))}}
+\end{align}
+Note, in both numerator and denominator, spins with indices from $X$ appear
+non-trivially only in $H_{X, \overline{X}}$ , i.e. the whole expression depends
+only on those spins in $X$ that directly interact with spins in $\overline{X}$,
+which was to be demonstrated.
 
-    \chapter{Dispatching conditions}
-    \label{chapter:dispatching}
-    \section{The minimum passing time condition.}
+\chapter{Dispatching conditions}
+\label{chapter:dispatching}
+In the following appendix, we use the notation from chapter \ref{chapter:trains}.
+\section{The minimum passing time condition.}
 A train cannot travel through a block faster than the corresponding minimum
 passing time
 \begin{equation}
