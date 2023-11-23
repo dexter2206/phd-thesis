@@ -24,22 +24,22 @@ in the probability space rather than in the energy space. This physics-inspired
 approach is closely tied to the quantum computing paradigm. To explain why, let
 us begin by replacing classical Ising Hamiltonian $H(s)$ with its quantum
 counterpart $\mathcal{H} = H(\boldsymbol{\sigma}^{z})$ (i.e. replacing each
-    variable $s_{i}$ with a Pauli operator $\sigma_{a}$ acting on the $i$-th spin.
-    Naturally, there exists a one-to-one correspondence between the eigenstates of
-  $\mathcal{H}$ and the possible classical configurations. If one now wishes to
-    find the low-energy spectrum of size $k \ll 2^{N}$, the task is equivalent to
-    finding the $k$ most probable states according to the Gibbs distribution $\rho
+variable $s_{i}$ with a Pauli operator $\sigma_{a}$ acting on the $i$-th spin.
+Naturally, there exists a one-to-one correspondence between the eigenstates of
+$\mathcal{H}$ and the possible classical configurations. If one now wishes to
+find the low-energy spectrum of size $k \ll 2^{N}$, the task is equivalent to
+finding the $k$ most probable states according to the Gibbs distribution $\rho
   \sim \exp(-\beta \mathcal{H})$. One way to achieve this is to prepare the
-    system in a Gibbs state
-    \begin{equation}
-      \ket{\rho} \sim \sum_{\mathbf{s}} \exp(-\beta \mathcal{H}/2)\ket{\mathbf{s}}
-    \end{equation}
-    and then perform a measurement. If repeated multiple times, this procedure
-    would yield the desired low-energy spectrum with high probability.
+system in a Gibbs state
+\begin{equation}
+  \ket{\rho} \sim \sum_{\mathbf{s}} \exp(-\beta \mathcal{H}/2)\ket{\mathbf{s}}
+\end{equation}
+and then perform a measurement. If repeated multiple times, this procedure
+would yield the desired low-energy spectrum with high probability.
 
-    While the above procedure is useful conceptually, it clearly cannot be directly
-    used on a classical computer, as it would require preparing a dense vector of
-  $2^{N}$ elements. Instead, in our algorithm we represent the Gibbs distribution
+While the above procedure is useful conceptually, it clearly cannot be directly
+used on a classical computer, as it would require preparing a dense vector of
+$2^{N}$ elements. Instead, in our algorithm we represent the Gibbs distribution
 approximately via a suitable tensor--network. Then, instead of performing a
 quantum measurement, we extract the needed information by traversing the
 probability tree using the branch-and-bound method. In what follows, we
@@ -84,11 +84,12 @@ quasi-two-dimensional graph, i.e. one in which nodes can be grouped into
 \emph{clusters} forming a two-dimensional square lattice (see Fig.
 \ref{fig:clustering}). One can easily see, that again we can construct a
 tree-like structure representing state space, this time considering joint
-configurations of spins in a single cluster. Therefore, for most of the
-time, we might "forget" the underlying spin-glass structure and consider square
-lattices in which spin clusters act like higher-dimensional systems. Furthermore,
-by the same argument, it is clearly visible that our approach is not limited
-to the Ising systems, but could be also used for systems of higher dimensions.
+configurations of spins in a single cluster. Therefore, for most of the time,
+we might "forget" the underlying spin-glass structure and consider square
+lattices in which spin clusters act like higher-dimensional systems.
+Furthermore, by the same argument, it is clearly visible that our approach is
+not limited to the Ising systems, but could be also used for systems of higher
+dimensions.
 
 \begin{figure}
   \includegraphics[width=\textwidth]{figures/clustering}
@@ -129,12 +130,12 @@ affects numerical stability. Next, with each cluster we associate a PEPS tensor
   A^{\mathbf{s_c}}_{\mathbf{lrud}} = e^{-\beta H(\mathbf{s_c})} B^{\mathbf{s_c}^l}_\mathbf{l}C^{\mathbf{s_c}^r}_\mathbf{r}B^{\mathbf{s_c}^u}_\mathbf{u}C^{\mathbf{s_c}^d}_\mathbf{d}
 \end{equation}
 Here, $\mathbf{s_c}$ collects all spins in a given cluster, and
-  $\mathbf{s_c}^l$, $\mathbf{s_c}^r$, $\mathbf{s_c}^u$, $\mathbf{s_c}^d$ collect
-    spins interacting with it from the left, right, up and down respectively. Each
-    such tensor has five legs: the physical one $\mathbf{s_c}$ of dimension $2^m$,
-    where $m$ denotes the number of spins in the cluster, and the virtual ones $l,
+$\mathbf{s_c}^l$, $\mathbf{s_c}^r$, $\mathbf{s_c}^u$, $\mathbf{s_c}^d$ collect
+spins interacting with it from the left, right, up and down respectively. Each
+such tensor has five legs: the physical one $\mathbf{s_c}$ of dimension $2^m$,
+where $m$ denotes the number of spins in the cluster, and the virtual ones $l,
   r, u, d$ with dimensions depending on the number of inter-cluster edges. Note
-    that $H$ in \eqref{eq:peps} is restricted to the graph induced by spins
+that $H$ in \eqref{eq:peps} is restricted to the graph induced by spins
 belonging to the considered cluster. The construction is depicted in Fig.
 \ref{fig:tensors}. Combining the tensors gives an exact representation of the
 Gibbs distribution as
@@ -173,16 +174,16 @@ Quantum annealer DW-2000Q$_6$. As it is hard to directly compare samples
 obtained from the D-Wave annealer with the output of our deterministic
 algorithm, we decided to use time-to-solution as a metric. The time to solution
 $\mbox{TTS}$ is defined as
-    \begin{equation}
-      \label{eq:tts}
-      \mbox{TTS} = t \frac{\log(1 - p_{target})}{\log(1 - p_{succ})},
-    \end{equation}
-    where $p_{target}$ is the desired probability of obtaining solution, $p_{succ}$
-    is the empirical probability of obtaining the solution and $t$ is the running
-    time of the solver. In addition, for D-Wave annealers, we multiply $\mbox{TTS}$
-    by the ratio $N/\mbox{num\_qubits}$, to account for the possibility of fitting
-    multiple instances of the problem on the device at the same time. Naturally,
-    one might consider $\mbox{TTS}$ metric not only for finding a ground state, but
+\begin{equation}
+  \label{eq:tts}
+  \mbox{TTS} = t \frac{\log(1 - p_{target})}{\log(1 - p_{succ})},
+\end{equation}
+where $p_{target}$ is the desired probability of obtaining solution, $p_{succ}$
+is the empirical probability of obtaining the solution and $t$ is the running
+time of the solver. In addition, for D-Wave annealers, we multiply $\mbox{TTS}$
+by the ratio $N/\mbox{num\_qubits}$, to account for the possibility of fitting
+multiple instances of the problem on the device at the same time. Naturally,
+one might consider $\mbox{TTS}$ metric not only for finding a ground state, but
 also for finding a solution approximating a ground state with a given
 approximation ratio (i.e. solution lying in the desired lowest fraction of the
 full energy spectrum). The results of these benchmarks are presented in Table
@@ -190,7 +191,15 @@ full energy spectrum). The results of these benchmarks are presented in Table
 state, which was not the case for other solvers. However, if one is not
 necessarily interested in finding the ground state, both D-Wave annealers and
 classical parallel tempering solver might be a better choice, as they were able
-to find a satisfying solution in a shorter time.
+to find a satisfying solution in a shorter time. In Fig.
+\ref{fig:tn-single-state}, we show an example solution for a single instance
+with discreet values of $J_{ij}$ with $dJ=\frac{1}{75}$. One can observe that
+increasing the $\beta$ allows for obtaining tighter bounds on the possible
+error. It is also visible that the algorithm demonstrates consistency between
+the probabilities obtained from the tensor network contractions and the ones
+obtained from the Boltzmann weights calculated from the corresponding
+configuration energies.
+
 \begin{table}[b]
   \centering
   \begin{tabular}{|l|c|ccc|}
@@ -224,18 +233,18 @@ to find a satisfying solution in a shorter time.
     sweeps: a single MC sweep took 0.00005s for N=512 and 0.00011s for $N=1024$.
     For the adaptive PT, we used 12 replicas. For geometric PT, we used 25 replicas
     with geometrically distributed $\beta$, with $\beta_{\min}=0.0001$ and
-      $\beta_{\max}=10$. For all probabilistic samplers, we used target probability
-      $p_{\mbox{target}}=0.99$. In the case of D-Wave annealers, we modified
-        instances by dropping inactive qubits. To obtain the reference ground state, we
-        once again used our algorithm. We optimized time to solution over annealing
-        times of $5\mu s$, $20\mu s$ and $200\mu s$. For each instance and each
-        annealing time, we gathered 1000 samples for $N=512$ and 2500 for other values
-        of $N$. Also, we used $t=\tau$ for the D-Wave annealers, i.e. we considered
-        only annealing time and disregarded other factors contributing to overall
-        solution time. This choice is justified by the fact that the other
-        contributions are minuscule. The ``timed-out'' string indicates that the given
-        algorithm could not find a solution within the given approximation ratio (i.e.
-      $p_{\mbox{succ}}=0$). } \label{tab:tnvspt}
+    $\beta_{\max}=10$. For all probabilistic samplers, we used target probability
+    $p_{\mbox{target}}=0.99$. In the case of D-Wave annealers, we modified
+    instances by dropping inactive qubits. To obtain the reference ground state, we
+    once again used our algorithm. We optimized time to solution over annealing
+    times of $5\mu s$, $20\mu s$ and $200\mu s$. For each instance and each
+    annealing time, we gathered 1000 samples for $N=512$ and 2500 for other values
+    of $N$. Also, we used $t=\tau$ for the D-Wave annealers, i.e. we considered
+    only annealing time and disregarded other factors contributing to overall
+    solution time. This choice is justified by the fact that the other
+    contributions are minuscule. The ``timed-out'' string indicates that the given
+    algorithm could not find a solution within the given approximation ratio (i.e.
+    $p_{\mbox{succ}}=0$). } \label{tab:tnvspt}
 \end{table}
 
 \begin{figure}
@@ -249,14 +258,35 @@ to find a satisfying solution in a shorter time.
     probabilities obtained from contracting PEPS network $p_{n}$ and the Boltzmann
     weights calculated from the configuration's energy. \textbf{d.} Comparison of
     largest discarded probability $p_{d}$ and the ground state probability $p_{1}$.
-        With increasing $\beta$ we were able to achieve $p_{d} < p_{1}$, indicating
+    With increasing $\beta$ we were able to achieve $p_{d} < p_{1}$, indicating
     that the algorithm indeed reached the ground state. }
   \label{fig:tn-single-state}
 \end{figure}
 
+We also benchmarked our algorithm on the set of \emph{deceptive cluster loops}
+\cite{helmut_deceptive_2018} instances, also expected to be hard for the
+classical heuristic solvers. One particular reason for the hardness of these
+instances is their enormous ground-state degeneracy. In 97\% of the cases, we
+were able to recover the lowest reference energy from
+\cite{helmut_deceptive_2018}. In the other 3\% of instances, we were able to
+find a better solution.
+
+In our final benchmark, we tested our algorithm with regard to fair sampling.
+In order to do so, we solved instances of the Ising model with integer
+coefficients and counted the identified ground-state degeneracy. The test
+instances had $J_{ij}$ drawn uniformly at random from the set $\{\pm 1, \pm 2,
+    \pm 4\}$, following similar tests performed for parallel tempering and parallel
+tempering with isoenergetic cluster moves \cite{Zhu_PT+ICM_2015} in Ref.
+\cite{zhu_fair_2019}. We present the results in Fig.
+\ref{fig:ground-degeneracy}. For smaller system sizes, we observe consistency
+with the results reported in \cite{zhu_fair_2019}. For $N=1152$, we observe
+some degeneracies approaching the order of $10^{8}$, while the previously
+reported numbers were reaching only the magnitude of $10^{6}$. Moreover, we
+were able to reach $N=2048$,
+
 \begin{figure}
   \includegraphics[width=\textwidth]{figures/tn-ground-degeneracy.pdf}
-  \caption{Histogram of ground state degeneracy found by our algorithm fore test instances
+  \caption{Histogram of ground state degeneracy found by our algorithm for test instances
     constructed by drawing couplings $J_{ij}$ uniformly from a set $\{\pm 1, \pm 2,
         \pm 4\}$ and setting all local fields $h_{i} = 0$.}
   \label{fig:ground-degeneracy}
