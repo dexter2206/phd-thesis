@@ -69,55 +69,58 @@ Using \eqref{eq:djs} and \eqref{eq:pt} one can easily verify that inequality
 \eqref{eq:dc1} is equivalent to
 \begin{equation}
   \label{eq:passingtime}
-  d(j, \rho(s)) \ge d(j, s) - \alpha(j, s, \rho(s)).
+  d(j, s_{j,k+1} \ge d(j, s_{j,k}) - \alpha(j, s_{j,k+1}).
 \end{equation}
 In binary variables, it means that if, for a fixed $j,s,m$, the $x_{j,s,m}=1$,
-then delays $d(j,s)$ smaller than $m-\alpha(j, s, \rho_j(s))$ are prohibited
-and thus the corresponding variables have to zero-out. Hence, we arrive at the
+then delays $d(j,s)$ smaller than $m-\alpha(j, s, s_{j,k+1})$ are prohibited
+and thus the corresponding variables have to zero out. Hence, we arrive at the
 following condition:
 \begin{equation}
   \label{eq:qubo:passingtime}
-  \forall_{j} \forall_{s \in S_j \setminus \{s_{{j,\text{end}}}\}}
+  \forall_{j} \forall_{s \in S_j \setminus \{s_{{j,\eend_{j}}}\}}
   \sum_{d \in A_{j,s}}
   \left(
-  \sum_{ d' \in D(d) \cap A_{j, \rho_j(s)}} x_{j, s, d}
-  x_{j, \rho_j(s), d'} \right) = 0,
+  \sum_{ d' \in D(d) \cap A_{j, s_{j,k+1}}} x_{j, s, d}
+  x_{j, s_{j,k+1}, d'} \right) = 0,
 \end{equation}
-where $D(d) = \{0, 1, \ldots, d - \alpha(j, s, \rho_j(s)) -1\}$.
+where $D(d) = \{0, 1, \ldots, d - \alpha(j, s_{j,k+1}) -1\}$.
 \section{The single block occupation condition.}
 Two trains cannot occupy the same part of a single railway track. Consider two
-trains, $j, j' \in \JJ_0$ leaving the same station $s$ in the direction of the
-next station block $\rho_j(s)$. Suppose further that the train $j$ leaves
+trains, $j, j' \in \JJ_0$ leaving the same station $s_{j,k} \in \Sj$ in the direction of the
+next station block $s_{j,k+1}$. Suppose further that the train $j$ leaves
 first. i.e. $\tout(j', s) > \tout(j, s)$. Since two trains cannot occupy the
 same block, some amount of time has to pass after $\tout(j, s)$ before the
 train $j'$ can leave. This amount of time is dependent on both $j$ and a
-sequence of blocks, and hence we denote it by $\tauu(j, s, \rho_j(s))$. Thus,
+sequence of blocks, and hence we denote it by $\tauu(j, s_{j,k}, s_{j,k+1})$. Thus,
 the condition becomes
 \begin{equation}
   \label{eq:single-block}
-  \tout(j', s) \ge \tout(j, s) + \tauu(j, s, \rho_j(s)).
+  \tout(j', s_{j,k}) \ge \tout(j, s_{j,k}) + \tauu(j, s_{j,k}).
 \end{equation}
 Substituting for $\tout$ in \eqref{eq:single-block} yields the following
 inequality for delays
 \begin{equation}
+\begin{split}
   \label{eq:single-block-delays}
-  d(j', s) \ge d(j, s) + \ttout(j, s) - \ttout(j', s) + \tauu(j, s, \rho_j(s))
+  d(j', s_{j,k}) &\ge d(j, s_{j,k}) + \ttout(j, s_{j,k}) - \ttout(j', s_{j,k}) + \\
+  &+\tauu(j, s_{j,k})
+\end{split}
 \end{equation}
 or,
 \begin{equation}
-  d(j', s) \ge d(j, s) + \Delta(j, s, j', s) + \tauu(j, s, \rho_j(s))
+  d(j', s_{j,k}) \ge d(j, s_{j,k}) + \Delta(j, j',s_{j,k}) + \tauu(j, s_{j,k})
 \end{equation}
 where
 \begin{equation}
   \label{eq:delta}
-  \Delta(j, s, j', s) = \ttout(j, s) - \ttout(j', s)
+  \Delta(j, j', s_{j,k}) = \ttout(j, s) - \ttout(j', s)
 \end{equation}
 The precise form of $\tauu$ depends on the dispatching detail of the problem.
 In our approach, we propose the following form:
 \begin{equation}
-  \tauu(j, s) = \max_{i \in \{k+1,\ldots,l-1\}}(\ttin(j, m_{i+1}) - \ttin(j, m_i))
+  \tauu(j, s) = \max_{b}(\pt(j,b))
 \end{equation}
-
+where the maximum is taken over all blocks between stations $s_{j,k}$ and $s_{j,k+1}$.
 For our decision variables, we use a similar scheme as with the previous
 constraint, and the condition becomes:
 \begin{equation}
@@ -126,32 +129,32 @@ constraint, and the condition becomes:
   \sum_{m' \in B(m) \cap A_{j', s}} x_{j,s,m}x_{j',s,m'}
   \right) = 0,
 \end{equation}
-where $B(m) = \{m + \Delta(j, s, j', s), d + \Delta(j, s, j', s)+ 1,\ldots, m +
-    \Delta(j, s, j', s) + \tau_{(1)}(j,s, \rho_j(s))-1 \}$ is a set of delays
+where $B(m) = \{m + \Delta(j, j', s), d + \Delta(j, j', s)+ 1,\ldots, m +
+    \Delta(j, j', s) + \tau_{(1)}(j,s)-1 \}$ is a set of delays
 violating condition \eqref{eq:single-block-delays}.
 
 \section{The deadlock condition}
 The deadlock condition is analogous to the single block occupation condition
 but for trains going in opposite directions. Suppose trains $j$ and $j'$ are
 heading in opposite directions on a route determined by two consecutive
-stations $s$ and $\rho_j(s)$. Note that for $j'$ the order is reversed, i.e. it
-starts at $\rho_j(s)$ and travels in the direction of $s$. In this case, $j$
-has to arrive at $\rho_j(s)$ before $j'$ can leave $\rho_j(s)$. We formalize it
+stations $s$ and $s_{j,k+1}$. Note that for $j'$ the order is reversed, i.e. it
+starts at $s_{j,k+1}$ and travels in the direction of $s$. In this case, $j$
+has to arrive at $s_{j,k+1}$ before $j'$ can leave $s_{j,k+1}$. We formalize it
 as:
 \begin{equation}
   \label{eq:deadlock}
-  \tout(j', \rho_j(s)) \ge \tout(j,s) + \tauuu(j, s, \rho_j(s)),
+  \tout(j', s_{j,k+1}) \ge \tout(j,s_{j,k}) + \tauuu(j, s),
 \end{equation}
-where $\tauuu(j, s, \rho_j(s))$ is the minimum time required for train $j$ to
-get from station block $s$ to $\rho_{j}(s)$. Rewritten in terms of delays, the
+where $\tauuu(j, s_{j,k}))$ is the minimum time required for train $j$ to
+get from station block $s_{j,k}$ to $s_{j,k+1}$. Rewritten in terms of delays, the
 inequality \eqref{eq:deadlock} reads:
 \begin{equation}
   \label{eq:deadlock2}
-  d(j',\rho_j(s)) \ge d(j, s) + \Delta(j,s,j',\rho_j(s)) + \tauuu(j, s, \rho_j(s)).
+  d(j',s_{j,k+1}) \ge d(j, s_{j,k}) + \Delta(j,j',s_{j,k+1} + \tauuu(j, s).
 \end{equation}
 This condition is to be applied for pairs of trains $j,j'$ going in opposite
 dimension if train $j$ is supposed to leave before the train $j'$ leaves
-$\rho_{j}(s)$, otherwise the order has to be appropriately reversed.
+$s_{j,k+1}$, otherwise the order has to be appropriately reversed.
 
 In decision variables, the deadlock condition in its basic form looks as
 follows
@@ -166,30 +169,30 @@ and $j' \in \JJ^{1}(\JJ^{0})$. This limit is imposed indirectly by the upper
 bounds on the delays. Here, $C(m)$ is, similarly to $B(m)$, the set of delays
 violating the condition for the given pair.
 \section{The rolling stock circulation condition}
-Our model assumes that some trains are assigned the same train set. Naturally,
+Our model assumes that some trains might be assigned the same train set. Naturally,
 there exists some necessary \emph{turnover time}, before a train set can be
-used. Formally, if trains $j$ and $j'$ going in opposite directions are
+reused. Formally, if trains $j$ and $j'$ going in opposite directions are
 assigned the same train set, then the following inequality has to hold:
 \begin{equation}
-  \tout(j', s_{j',1}) > \tout(j, s_{j,end}) + \Delta(j, j')
+  \tout(j', s_{j',1}) > \tout(j, s_{j,\eend_{j}}) + \Delta(j, j')
 \end{equation}
 where $\Delta(j, j')$ is the minimum turnover time. In the delay
 representation, the inequality becomes:
 \begin{equation}
   \label{eq:rolling}
   \begin{split}
-    d(j',s_{j',1}) + \ttout(j',s_{j',1}) > & \; d(j, s_{j,end-1}) + \ttout(j, s_{j,end-1}) + \\
-    & \; \tauuu(j, s_{j,end-1}) + \Delta(j,j').
+    d(j',s_{j',1}) + \ttout(j',s_{j',1}) > & \; d(j, s_{j,\eend-1}) + \ttout(j, s_{j,\eend-1}) + \\
+    & \; \tauuu(j, s_{j,\eend-1}) + \Delta(j,j').
   \end{split}
 \end{equation}
 Inequality \eqref{eq:rolling} can be simplified to
 \begin{equation}
-  d(j',s_{j',1}) > d(j, s_{j,end-1}) - R(j,j'),
+  d(j',s_{j',1}) > d(j, s_{j,\eend-1}) - R(j,j'),
 \end{equation}
 by setting
 \begin{equation}
   \label{eq:rolling2}
-  R(j, j') = \ttout(j',s_{j',1}) - \ttout(j, s_{j,end-1}) - \tauuu(j,s_{j,end-1})
+  R(j, j') = \ttout(j',s_{j',1}) - \ttout(j, s_{j,\eend_{j}-1}) - \tauuu(j,s_{j,end_{j}-1})
 \end{equation}
 In decision variables, the rolling stock circulation condition for trains $j$
 and $j'$ can be written as

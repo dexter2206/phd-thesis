@@ -157,7 +157,7 @@ secondary delay. In the absence of time reserve, one would simply have $d_U(j,
   s) = d_U(j, s')$ for any given train $j$ and blocks $s,s' \in S_{j}$. However,
 the time reserve allows to somewhat compensate delays, and hence we have
 \begin{equation}
-  d_U(j, s_{j,k}) = \max\{0, d_U(j, s_{j,k}) - \alpha(j, s_{j,k+1})\}.
+  d_U(j, s_{j,k+1}) = \max\{0, d_U(j, s_{j,k}) - \alpha(j, s_{j,k+1})\}.
 \end{equation}
 
 The secondary delays can be, in principle, arbitrarily large. However, it is
@@ -365,7 +365,7 @@ with two delays. The purpose of this scenario is to illustrate our approach on
 a simple and yet real-world example. The first one is a 15-minute delay of
 IC5320 starting from station block 5. The second one is that of the IC3521
 leaving station block 1 5 minutes late. Considering this and our assumptions,
-this creates conflicts, where two \emph{Inter--City} trains, as well as an
+this creates conflicts where two \emph{Inter--City} trains, as well as an
 \emph{Inter--City} train and the \emph{Regio} train, have conflicts at block 4.
 The conflicted, infeasible train diagram for this situation is depicted in Fig.
 \ref{fig:smallconflict}.
@@ -499,12 +499,12 @@ of the corresponding train, resulting in the cost function of the form:
 \begin{equation}
   f(\mathbf{x}) = \sum_{j \in J}\left(\sum_{m  \in A_{j,s_{\eend_{j}-1}}}w_{j} \frac{d(j,s^{*}) - d_{U}(j,s^{*})}{d_{\max}(j)}x_{j,s^{*},m}\right),
 \end{equation}
-The priorities $w_{j}$ are chosen specifically for both networks. One can
+where $s^{*} = s_{\eend_{j}-1}$. The priorities $w_{j}$ are chosen specifically for both networks. One can
 immediately observe that larger values of $w_{j}$ increase contribution
 stemming from the delay of a given train, and hence the objective function
 favors solutions with smaller delays for the trains with larger priorities. For
 the segment of line No. 216, we assume $w_{j}= 1.5$ for all \emph{Inter-City}
-trains, and the $w_{j}=1.0$ for the regional train. This prioritization
+trains, and $w_{j}=1.0$ for the regional train. This prioritization
 coincides with the usual prioritization of trains in Poland (and many
 countries). For the segment of line No. 191, we decided to adopt a slightly
 more complicated prioritization. For the trains heading toward block 10, we set
