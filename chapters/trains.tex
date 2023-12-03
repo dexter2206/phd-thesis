@@ -95,60 +95,67 @@ next section.
 Before we can formulate the optimization problem to be run on D-Wave, we need
 first to formally describe the railway model. The first idea that comes to mind
 is to define quantities corresponding to departure and arrival times of each
-train and relevant station blocks, and express all other quantities in the
+train and relevant station blocks and express all other quantities in the
 model in terms of their difference with respect to the times found in the
 original timetable. However, as we will soon see, one can almost completely
 forget about arrival and departure times, and instead express all qunatities in
 the model using delays. Moreover, we will further simplify our model by
 assuming all secondary delays are integers falling into some finite range.
 
-The set of all trains will be denoted by $\JJ$. This set is naturally
-partitioned into the set $\JJ_0$ of trains going into one direction and the set
-$\JJ_1$ of trains going into the opposite direction. This is a proper
-partition, i.e.:
+We assume that the analyzed network segment is a sequence $N$ blocks, with
+first and the last blocks being station blocks. The set of all trains will be
+denoted by $\JJ$. This set is naturally partitioned into the set $\JJ_0$ of
+trains going into one direction and the set $\JJ_1$ of trains going into the
+opposite direction. This is a proper partition, i.e.:
 \begin{equation}
   \JJ_0 \cup \JJ_1 = \JJ \quad \JJ_0 \cap \JJ_1 = \emptyset
 \end{equation}
-Our model forbids recirculation, i.e. each train passes every block in its
-route exactly once. Furthermore, we assume that each train starts and ends its
-route at some station. Therefore, the route of each train and is uniquely
-identified by a sequence of station blocks $\left(s_{j,1}, s_{j, 2}, \ldots,
-  s_{j, \eend_j}\right)$, i.e., there are no alternative routes between any two
-    stations. We will denote the route of train $j$ by $\mathcal{S}_{j}$ and the
-    time at which the train $j$ should leave a block $s \in \Sj$ according to the
-    original timetable by $\ttout(j, s)$. Similarly, the time at which the train
-  $j$ is supposed to leave block $s$ will be denoted by $\ttin(j, s)$. In our
-    model, we assume that the time at which a train leaves one block is precisely
-    the same as the time it enters the next block, i.e.
-    \begin{equation}
-      \ttout(j, s_{j,k}) = \ttin(j, s_{j,k+1})
-    \end{equation}
-    It is clear that the original timetable determines how long it takes for a
-    train $j$ to travel through a given block $s \in \Sj$. We call this time the
-\emph{passage time}, denoted by $\pt(j, s)$
+We assume that each train travels through the whole analyzed network segment.
+The route $\Bj$ of a train $j$ comprises sequence of blocks:
 \begin{equation}
-  \pt(j, s) \coloneq \ttout(j, s) - \ttin(j, s).
+  \Bj \coloneq (b_{j,1}, b_{j,2}, \ldots, b_{j,N})
 \end{equation}
-An important observation is that passage times defined by the timetable may not
-be the minimum physically achievable passing times $\pmin(j, s)$. In other
-words, for each train $j$ and block $s \in \Sj$ there exists a time reserve
+Our model forbids recirculation, i.e. each train passes every block in its
+route exactly once. Therefore, the route of each train is uniquely identified
+by a sequence of station blocks $\Sj$:
+\begin{equation}
+  \Sj \coloneq  \left(s_{j,1}, s_{j, 2}, \ldots, s_{j, \eend}\right).
+\end{equation}
+We will denote the time at which the train $j$ should leave a block $b \in \Bj$ according to the
+original timetable by $\ttout(j, b)$. Similarly, the time at which the train
+$j$ is supposed to enter block $b$ will be denoted by $\ttin(j, b)$. In our
+model, we assume that the time at which a train leaves one block is precisely
+the same as the time it enters the next block, i.e.
+\begin{equation}
+  \ttout(j, b_{j,k}) = \ttin(j, b_{j,k+1}).
+\end{equation}
+It is clear that the original timetable determines how long it takes for a
+train $j$ to travel through a given block $b \in \Bj$. We call this time the
+\emph{passage time}, and denote it by $\pt(j, b)$:
+\begin{equation}
+  \pt(j, b) \coloneq \ttout(j, b) - \ttin(j, b).
+\end{equation}
+An important observation is that the passage times defined by the timetable may
+not be the minimum physically achievable passing times $\pmin(j, b)$.
+Therefore, one can define a time reserve $\alpha(j, b)$ which can be used by
+train $j$ to compensate for the delay when traveling through block $b$:
 \begin{equation}
   \label{eq:pt}
-  0 \le \alpha(j, s) \coloneq \pt(j, s) - \pmin(j, s)
+  0 \le \alpha(j, b) \coloneq \pt(j, b) - \pmin(j, b).
 \end{equation}
-This time reserve will become important when discussing the propagation of the
+The time reserve will become important when discussing the propagation of the
 primary delays.
 
 \subsection{Delay representation}
 Suppose the disturbance happened, resulting in some trains not being able to
 meet the schedule. Hence, the actual leaving and arrival times (denoted by
 $\tout$ and $\tin$) differ from the scheduled ones. The delay $d(j, s)$ of the
-train $j$ at block $s \in \Sj$ is defined as the difference
+train $j$ at station block $s \in \Sj$ is defined as the difference:
 \begin{equation}
   \label{eq:djs}
   d(j, s) \coloneqq \tout(j, s) - \ttout(j, s) %= \tin(j, \rho(s)) - \ttin(j, \rho(s)).
 \end{equation}
-As already mentioned, $d(j, s)$ can be expressed as a sum
+As already mentioned, $d(j, s)$ can be expressed as a sum:
 \begin{equation}
   d(j, s) = d_U(j, s) + d_S(j, s)
 \end{equation}
@@ -157,16 +164,17 @@ secondary delay. In the absence of time reserve, one would simply have $d_U(j,
   s) = d_U(j, s')$ for any given train $j$ and blocks $s,s' \in S_{j}$. However,
     the time reserve allows to somewhat compensate delays, and hence we have
     \begin{equation}
-      d_U(j, s_{j,k+1}) = \max\{0, d_U(j, s_{j,k}) - \alpha(j, s_{j,k+1})\}.
+      d_U(j, s_{j,k+1}) = \max\left\{0, d_U(j, s_{j,k}) - \sum_{b}\alpha(j, b)\right\},
     \end{equation}
-
-    The secondary delays can be, in principle, arbitrarily large. However, it is
-    convenient to assume that all secondary delays for the train $j$ are bound from
-    above by some constant $d_{\max}(j)$. One can find a reasonable upper bound by
-running some fast heuristic, or determine it manually (e.g. there might be an
-\emph{a priori} established maximum allowable delay of the train). Henceforth,
-we will consider $d_{\max}(j)$ to be parameters of the model. With this
-assumption, we have the following upper and lower bound on the overall delays
+    where the sum runs over all blocks starting from the one following $s_{j,k}$
+    and ending on $s_{j,k+1}$. The secondary delays can be, in principle,
+    arbitrarily large. However, it is convenient to assume that all secondary
+    delays for the train $j$ are bound from above by some constant $d_{\max}(j)$.
+One can find a reasonable upper bound by running some fast heuristic, or
+determine it manually (e.g. there might be an \emph{a priori} established
+maximum allowable delay of the train). Henceforth, we will consider
+$d_{\max}(j)$ to be parameters of the model. With this assumption, we have the
+following upper and lower bound on the overall delays
 \begin{equation}
   d_U(j, s) \le d(j, s) \le d_U(j, s) + d_{\max}(j).
 \end{equation}
@@ -177,12 +185,12 @@ a linear, constrained model of the dispatching problem. However, since the
 secondary delay values are continuous variables, such a model would not be
 compatible with the quantum annealer. We circumvent this issue by discretizing
 the delays. One way to do it is to require all secondary delays to be natural
-numbers, i.e.
+numbers, i.e.:
 \begin{equation}
   \forall_{j \in \JJ} \forall_{s \in S_{j}}\quad  d_{S}(j, s) \in \{0, 1, \ldots, d_{\max}(j)\}.
 \end{equation}
 As a consequence, the total delays become discretized as well. We will denote
-the set of possible values for $d(j, s)$ by $A_{j, s}$, i.e.
+the set of possible values for $d(j, s)$ by $A_{j, s}$, i.e.:
     \begin{equation}
       \forall_{j}\forall_{s \in \Sj}  A_{j, s} \coloneq \{d_{U}(j, s), d_{U}(j, s) + 1, \ldots, d_{U}(j, s) + d_{\max}(j)\}.
     \end{equation}
@@ -205,7 +213,7 @@ the set of possible values for $d(j, s)$ by $A_{j, s}$, i.e.
       \forall_{j \in \JJ}\forall_{s \in \Sj} \sum_{m \in A_{j, s}} x_{s, j, m} = 1
     \end{equation}
     As for the cost function, we decided to use a simple weighted sum of the
-    delays, i.e. the cost function of the form
+    delays, i.e. the cost function of the form:
     \begin{equation}
       \label{eq:qubo:cost}
       f(\mathbf{x}) = \sum_{j \in \mathcal{J}}\sum_{s \in \Sjs} \sum_{m \in A_{j,s}} w(s,j,m) \cdot x_{j,s,m},
@@ -254,16 +262,16 @@ cost function, effectively penalizing the infeasible solutions. More generally,
 one might multiply the sum by some constant $\ppair > 0$, to further increase
 the value of the cost function for the infeasible solutions. Finally, taking
 into account all penalties from all dispatching conditions gives the following
-penalty term that can be added to the objective function
+penalty term that can be added to the objective function:
 \begin{equation}
   \Ppair(\mathbf{x}) = \ppair \sum_{\mathcal{V}_{p}}\sum_{(l, l') \in \mathcal{V}_{p}} x_{l}x_{l'} = 0.
 \end{equation}
 
 The same reasoning cannot be applied e.g. to the constraint
-\eqref{eq:onehotconstraint}, which comprises equations of the form
+\eqref{eq:onehotconstraint}, which comprises equations of the form:
 \begin{equation}
   \label{eq:linearpenalty}
-  \sum_{i \in \mathcal{V}_{s}}x_{l} = 1.
+  \sum_{l \in \mathcal{V}_{s}}x_{l} = 1.
 \end{equation}
 If one added sums from the equation \eqref{eq:linearpenalty} to the cost
 function, it would favor the infeasible solution comprising all 0s. Instead,
@@ -281,7 +289,7 @@ side in \eqref{eq:linearpenalty2} gives a nonzero constant offset, which we
 will ignore. Therefore, the final form of the penalty corresponding to the
 one-hot encoding constraint is:
 \begin{equation}
-  \Psum(\mathbf{x}) = \psum \sum_{\mathcal{V}_{s}}\left(\sum_{l,l' \in \mathcal{V}_{s}^{\times 2}, l\ne l'} x_{l}x_{l'}  - \sum_{l \in \mathcal{V}_{s}}x_{l}\right).
+  \Psum(\mathbf{x}) = \psum \sum_{\mathcal{V}_{s}}\left(\sum_{(l,l') \in \mathcal{V}_{s}^{\times 2}, l\ne l'} x_{l}x_{l'}  - \sum_{l \in \mathcal{V}_{s}}x_{l}\right).
 \end{equation}
 Lastly, the total objective function for our QUBO reads:
 \begin{equation}
@@ -498,9 +506,9 @@ all trains entering their last station block. Additionally, we weight the
 contributions of each delay with a coefficient depending on the prioritization
 of the corresponding train, resulting in the cost function of the form:
 \begin{equation}
-  f(\mathbf{x}) = \sum_{j \in J}\left(\sum_{m  \in A_{j,s_{\eend_{j}-1}}}w_{j} \frac{d(j,s^{*}) - d_{U}(j,s^{*})}{d_{\max}(j)}x_{j,s^{*},m}\right),
+  f(\mathbf{x}) = \sum_{j \in J}\left(\sum_{m  \in A_{j,s_{\eend-1}}}w_{j} \frac{d(j,s^{*}) - d_{U}(j,s^{*})}{d_{\max}(j)}x_{j,s^{*},m}\right),
 \end{equation}
-where $s^{*} = s_{\eend_{j}-1}$. The priorities $w_{j}$ are chosen specifically
+where $s^{*} = s_{\eend-1}$. The priorities $w_{j}$ are chosen specifically
     for both networks. One can immediately observe that larger values of $w_{j}$
     increase contribution stemming from the delay of a given train, and hence the
     objective function favors solutions with smaller delays for the trains with
