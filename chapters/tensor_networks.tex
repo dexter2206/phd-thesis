@@ -58,12 +58,15 @@ marginal probability $p(s_1, s_2, \ldots, s_k)$ as a criterion for deciding
 which partial configurations are most promising. More precisely, we explore the
 solution tree in a top-down manner, keeping at most $M$ states at $k$-th level
 and branching them into $2M$ new partial configurations at level $k+1$ . The
-new marginal probability distributions can be computed as
-
+new marginal probability distributions can be computed as:
 \begin{equation}
   \label{eq:conditional-prob}
   p(s_1, s_2, \ldots, s_k, s_{k+1}) = p(s_1, s_2, \ldots, s_k)p(s_{k+1}|, s_1, \ldots, s_k)
 \end{equation}
+The parameter $M$ can be made iteratoin dependend by keeping only the states
+whose marginal probability divided by the maximal probability is larger than
+sum \emph{probability cutoff} $\delta_{p}$.
+
 We can exploit locality of the problem by observing that conditional
 probability in \eqref{eq:conditional-prob} of configuration in the region $X =
   (1, 2, \ldots, k)$ depends only on configuration on the border $\partial X$ comprising those spins that directly interact with the region
