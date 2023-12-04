@@ -179,9 +179,9 @@ algorithm, we decided to use time-to-solution as a metric. The time to solution
 $\mbox{TTS}$ is defined as
 \begin{equation}
   \label{eq:tts}
-  \mbox{TTS} = t \frac{\log(1 - p_{target})}{\log(1 - p_{succ})},
+  \mbox{TTS} = t \frac{\log(1 - \ptarget)}{\log(1 - \psucc)},
 \end{equation}
-where $p_{target}$ is the desired probability of obtaining solution, $p_{succ}$
+where $p_{target}$ is the desired probability of obtaining solution, $\psucc$
 is the empirical probability of obtaining the solution and $t$ is the running
 time of the solver. In addition, for D-Wave annealers, we multiply $\mbox{TTS}$
 by the ratio $N/\mbox{num\_qubits}$, to account for the possibility of fitting
@@ -247,7 +247,7 @@ configuration energies.
     solution time. This choice is justified by the fact that the other
     contributions are minuscule. The ``timed-out'' string indicates that the given
     algorithm could not find a solution within the given approximation ratio (i.e.
-    $p_{\mbox{succ}}=0$). } \label{tab:tnvspt}
+    $\psucc=0$). } \label{tab:tnvspt}
 \end{table}
 
 \begin{figure}
