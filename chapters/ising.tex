@@ -54,7 +54,7 @@ exactly once\footnote{ In the literature, the Ising Hamiltonian
   \eqref{eq:ising-hamiltonian} is often negated. However, the definition provided
   here is consistent with the one used by D-Wave, and thus more suitable for use
   in this thesis.}. In this thesis, we will call the instances of the Ising model
-\emph{Ising spin-glass}. An illustrative representation of spin-glass is depicted in
+\emph{Ising spin-glasses}. An illustrative representation of a spin-glass is depicted in
 Fig. \ref{fig:ising}.
 
 
@@ -144,7 +144,7 @@ be classified as $O(N)$ and $O(N^{2})$ respectively.
 \section{Complexity classes}
 Although there might exist more than one algorithm for solving a particular
 problem, one might consider the smallest time complexity needed to do so.
-Consequently , one might group computational problems based on their demand on
+Consequently, one might group computational problems based on their demand on
 resources. In this view, sets of similar problems are called \emph{complexity
   classes} \cite{arora}. The definition of some complexity classes might also be
 restricted to specific types of problems. For instance, one might consider only
@@ -354,7 +354,7 @@ ${i, j}$, and thus $F$ can be written as:
   \label{eq:qubocomplete}
   F(q_1, \ldots, q_N) =  \sum_{i=1}^N \sum_{j=i+1}^N a_{ij} q_i q_j + \sum_{i=1}^N b_iq_i,
 \end{equation}
-One can now define a $n \times n$ real symmetric matrix $Q$ with coefficients
+One can now define a $n \times n$ real symmetric matrix $Q$ with coefficients:
 \begin{equation}
   Q_{ij} = \begin{cases}
     b_{i}  & i = j \\
@@ -363,7 +363,7 @@ One can now define a $n \times n$ real symmetric matrix $Q$ with coefficients
   \end{cases}
 \end{equation}
 Having in mind that squaring a binary variable does not change its value, we
-can again rewrite $F$ as
+can again rewrite $F$ as:
 \begin{equation}
   \label{eq:qubomatrix}
   F(q_{i}, \ldots, q_{N}) = \sum_{i \le j} Q_{ij} q_{i}q_{j} = \sum_{j \le i} Q_{ij} q_{i}q_{j}.
