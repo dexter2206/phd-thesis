@@ -219,7 +219,7 @@ the probabilities obtained from the tensor network contractions and the ones
 obtained from the Boltzmann weights calculated from the corresponding
 configuration energies.
 
-\begin{table}[b]
+\begin{table}
   \centering
   \begin{tabular}{|l|c|ccc|}
     \hline
@@ -282,6 +282,14 @@ configuration energies.
   \label{fig:tn-single-state}
 \end{figure}
 
+\begin{figure}
+  \includegraphics[width=\textwidth]{figures/tn-ground-degeneracy_overlay.pdf}
+  \caption{Histogram of ground state degeneracy found by our algorithm for test instances
+    constructed by drawing couplings $J_{ij}$ uniformly from a set $\{\pm 1, \pm 2,
+        \pm 4\}$ and setting all local fields $h_{i} = 0$.}
+  \label{fig:ground-degeneracy}
+\end{figure}
+
 We also benchmarked our algorithm on the set of \emph{deceptive cluster loops}
 instances \cite{helmut_deceptive_2018}, also expected to be hard for the
 classical heuristic solvers. One particular reason for the hardness of these
@@ -289,6 +297,8 @@ instances is their enormous ground-state degeneracy. In 97\% of the cases, we
 were able to recover the lowest reference energy from
 \cite{helmut_deceptive_2018}. In the other 3\% of instances, we were able to
 find a better solution.
+
+
 
 In our final benchmark, we tested our algorithm with regard to fair sampling.
 In order to do so, we solved instances of the Ising model with integer
@@ -303,13 +313,7 @@ some degeneracies approaching the order of $10^{8}$, while the previously
 reported numbers were reaching only the magnitude of $10^{6}$. Moreover, we
 were able to reach beyond $N=1152$ studied in \cite{zhu_fair_2019}.
 
-\begin{figure}
-  \includegraphics[width=\textwidth]{figures/tn-ground-degeneracy.pdf}
-  \caption{Histogram of ground state degeneracy found by our algorithm for test instances
-    constructed by drawing couplings $J_{ij}$ uniformly from a set $\{\pm 1, \pm 2,
-        \pm 4\}$ and setting all local fields $h_{i} = 0$.}
-  \label{fig:ground-degeneracy}
-\end{figure}
+
 %%% Local Variables:
 %%% mode: latex
 %%% TeX-master: "../main"
