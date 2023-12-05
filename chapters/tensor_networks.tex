@@ -26,11 +26,11 @@ us begin by replacing classical Ising Hamiltonian $H(s)$ with its quantum
 counterpart $\mathcal{H} = H(\boldsymbol{\sigma}^{z})$ (i.e. replacing each
 variable $s_{i}$ with a Pauli operator $\ssigma_{z}$ acting on the $i$-th spin.
 Naturally, there exists a one-to-one correspondence between the eigenstates of
-$\mathcal{H}$ and the possible classical configurations. If one now wishes to
+$\mathcal{H}$ and the possible classical states. If one now wishes to
 find the low-energy spectrum of size $k \ll 2^{N}$, the task is equivalent to
 finding the $k$ most probable states according to the Gibbs distribution $\rho
   \sim \exp(-\beta \mathcal{H})$. One way to achieve this is to prepare the
-system in a Gibbs state
+system in a Gibbs state:
 \begin{equation}
   \ket{\rho} \sim \sum_{\mathbf{s}} \exp(-\beta \mathcal{H}/2)\ket{\mathbf{s}}
 \end{equation}
@@ -43,7 +43,7 @@ $2^{N}$ elements. Instead, in our algorithm we represent the Gibbs distribution
 approximately via a suitable tensor--network. Then, instead of performing a
 quantum measurement, we extract the needed information by traversing the
 probability tree using the branch-and-bound method. In what follows, we
-describe the whole procedure in detail, starting with the branch-and-bound
+describe the procedure in detail, starting with the branch-and-bound
 part.
 %\todo[inline,color=SkyBlue]{Mention the other Chimera-specific algorithm}
 
@@ -57,8 +57,8 @@ prune the less promising branches. In the approach described here, we use
 marginal probability $p(s_1, s_2, \ldots, s_k)$ as a criterion for deciding
 which partial configurations are most promising. More precisely, we explore the
 solution tree in a top-down manner, keeping at most $M$ states at $k$-th level
-and branching them into $2M$ new partial configurations at level $k+1$ . The
-new marginal probability distributions can be computed as:
+and branching them into $2M$ new partial configurations at level $k+1$. The
+new marginal probability distributions can be computed using the following formula:
 \begin{equation}
   \label{eq:conditional-prob}
   p(s_1, s_2, \ldots, s_k, s_{k+1}) = p(s_1, s_2, \ldots, s_k)p(s_{k+1}|, s_1, \ldots, s_k)
@@ -115,7 +115,7 @@ dimensions.
 \section{PEPS network construction}
 We begin the construction of a PEPS network for a quasi-two-dimensional graph
 by considering two spins at sites $i$ and $j$ connected by an edge $J_{ij}$.
-This edge can be decomposed as
+This edge can be decomposed as:
 
 \begin{equation}
   e^{-\beta J_{ij}s_i s_j} = \sum_{\gamma = \pm 1} B^{s_{i\phantom{j}}}_\gamma C^{s_j}_\gamma
@@ -127,7 +127,7 @@ where
 \end{equation}
 Note that decomposition \eqref{eq:decomposition}, although not unique, has the
 advantage of comprising only non-negative coefficients, which positively
-affects numerical stability. Next, with each cluster we associate a PEPS tensor
+affects numerical stability. Next, with each cluster we associate a PEPS tensor:
 \begin{equation}
   \label{eq:peps}
   A^{\mathbf{s_c}}_{\mathbf{lrud}} = e^{-\beta H(\mathbf{s_c})} B^{\mathbf{s_c}^l}_\mathbf{l}C^{\mathbf{s_c}^r}_\mathbf{r}B^{\mathbf{s_c}^u}_\mathbf{u}C^{\mathbf{s_c}^d}_\mathbf{d}
@@ -141,7 +141,7 @@ where $m$ denotes the number of spins in the cluster, and the virtual ones $l,
 that $H$ in \eqref{eq:peps} is restricted to the graph induced by spins
 belonging to the considered cluster. The construction is depicted in Fig.
 \ref{fig:tensors}. Combining the tensors gives an exact representation of the
-Gibbs distribution as
+Gibbs distribution as:
 \begin{equation}
   \exp(-\beta H(\mathbf{s})) \sim \sum_{\mathbf{k}}\prod_{c^{i}}A_{\mathbf{k}^{i}}^{\mathbf{s}_{c^{i}}}
 \end{equation}
@@ -176,12 +176,12 @@ algorithm against classical solvers based on Parallel-Tempering, and D-Wave
 Quantum annealer DW-2000Q$_6$. As it is hard to directly compare samples
 obtained from the D-Wave annealer with the output of our deterministic
 algorithm, we decided to use time-to-solution as a metric. The time to solution
-$\mbox{TTS}$ is defined as
+$\mbox{TTS}$ is defined as:
 \begin{equation}
   \label{eq:tts}
-  \mbox{TTS} = t \frac{\log(1 - p_{target})}{\log(1 - p_{succ})},
+  \mbox{TTS} = t \frac{\log(1 - \ptarget)}{\log(1 - \psucc)},
 \end{equation}
-where $p_{target}$ is the desired probability of obtaining solution, $p_{succ}$
+where $p_{target}$ is the desired probability of obtaining solution, $\psucc$
 is the empirical probability of obtaining the solution and $t$ is the running
 time of the solver. In addition, for D-Wave annealers, we multiply $\mbox{TTS}$
 by the ratio $N/\mbox{num\_qubits}$, to account for the possibility of fitting
@@ -247,7 +247,7 @@ configuration energies.
     solution time. This choice is justified by the fact that the other
     contributions are minuscule. The ``timed-out'' string indicates that the given
     algorithm could not find a solution within the given approximation ratio (i.e.
-    $p_{\mbox{succ}}=0$). } \label{tab:tnvspt}
+    $\psucc=0$). } \label{tab:tnvspt}
 \end{table}
 
 \begin{figure}
