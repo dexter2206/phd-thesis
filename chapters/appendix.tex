@@ -25,7 +25,7 @@ algorithm peforming $N^{3}$ multiplications, even for $N$ of order of several
 hundreds \cite{dalberto}.
 
 We conclude this section by mentioning that there exist several other
-asymptotic notations. For instance, $\Omega$, describing asymptotic lower bound
+asymptotic notations. For instance, $\Omega$, describing the asymptotic lower bound
 of a function, and $\Theta$ combining big-O and $\Theta$. For more details, we
 refer the reader to \cite{clrs}.
 
@@ -59,7 +59,7 @@ which was to be demonstrated.
 \label{chapter:dispatching}
 In the following appendix, we use the notation from chapter \ref{chapter:trains}.
 \section{The minimum passing time condition.}
-Any train $j$ cannot travel through a block $b \in Bj$ faster than the corresponding minimum
+Any train $j$ cannot travel through a block $b \in \Bj$ faster than the corresponding minimum
 passing time:
 \begin{equation}
   \label{eq:dc1}
@@ -69,7 +69,7 @@ Using \eqref{eq:djs} and \eqref{eq:pt} one can easily verify that inequality
 \eqref{eq:dc1} is equivalent to the following inequality for station blocks:
 \begin{equation}
   \label{eq:passingtime}
-  d(j, s_{j,k+1} \ge d(j, s_{j,k}) - \sum_{b}\alpha(j, b),
+  d(j, s_{j,k+1}) \ge d(j, s_{j,k}) - \sum_{b}\alpha(j, b),
 \end{equation}
 where the sum runs over all blocks starting form the one succeeding $s_{j,k}$
 and ending in $s_{j,k+1}$.
@@ -87,12 +87,12 @@ following condition:
 \end{equation}
 where $D(m) = \{0, 1, \ldots, m - \sum_{b}\alpha(j, b) -1\}$.
 \section{The single block occupation condition.}
-Two trains cannot occupy the same part of a single railway track. Consider two
+Two trains cannot occupy the same line block. Consider two
 trains, $j, j' \in \JJ_0$ leaving the same station $s_{j,k} \in \Sj$ in the direction of the
 next station block $s_{j,k+1}$. Suppose further that the train $j$ leaves
 first. i.e. $\tout(j', s) > \tout(j, s)$. Since two trains cannot occupy the
-same block, some amount of time has to pass after $\tout(j, s)$ before the
-train $j'$ can leave. This amount of time is dependent on both $j$ and a
+same block, some headway time has to pass after $\tout(j, s)$ before the
+train $j'$ can leave. This headway is dependent on both $j$ and a
 sequence of blocks, and hence we denote it by $\tauu(j, s_{j,k})$. Thus,
 the condition becomes:
 \begin{equation}
@@ -117,7 +117,7 @@ where
   \label{eq:delta}
   \Delta(j, j', s_{j,k}) = \ttout(j, s) - \ttout(j', s)
 \end{equation}
-The precise form of $\tauu$ depends on the dispatching detail of the problem.
+The precise form of the headway $\tauu$ depends on the dispatching detail of the problem.
 In our approach, we propose the following form:
 \begin{equation}
   \tauu(j, s_{j,k}) = \max_{b}\{\pt(j,b)\}
@@ -131,18 +131,19 @@ constraint and the condition becomes:
   \sum_{m' \in B(m) \cap A_{j', s}} x_{j,s,m}x_{j',s,m'}
   \right) = 0,
 \end{equation}
-where $B(m) = \{m + \Delta(j, j', s), d + \Delta(j, j', s)+ 1,\ldots, m +
-    \Delta(j, j', s) + \tau_{(1)}(j,s)-1 \}$ is a set of delays
-violating condition \eqref{eq:single-block-delays}.
+where, as previously, $\Sjs = \Sj \setminus \{s_{j,\eend}\}$, and $B(m) = \{m + \Delta(j, j', s), m + \Delta(j, j', s)+ 1,\ldots, m +
+  \Delta(j, j', s) + \tau_{(1)}(j,s)-1 \}$
+is a set of delays violating condition \eqref{eq:single-block-delays}.
+
 
 \section{The deadlock condition}
 The deadlock condition is analogous to the single block occupation condition
 but for trains going in opposite directions. Suppose trains $j$ and $j'$ are
 heading in opposite directions on a route determined by two consecutive
-stations $s$ and $s_{j,k+1}$. Note that for $j'$ the order is reversed, i.e. it
-starts at $s_{j,k+1}$ and travels in the direction of $s$. In this case, $j$
-has to arrive at $s_{j,k+1}$ before $j'$ can leave $s_{j,k+1}$. We formalize it
-as:
+stations $s_{j,k}$ and $s_{j,k+1}$. Note that for $j'$ the order is reversed, i.e. it
+starts at $s_{j,k+1}$ and travels in the direction of $s_{j,k}$. In this case, if $j$
+is supposed to to leave $s_{j,k}$ before $j'$ leaves $s_{j,k+1}$, the following
+condition has to be satisfied:
 \begin{equation}
   \label{eq:deadlock}
   \tout(j', s_{j,k+1}) \ge \tout(j,s_{j,k}) + \tauuu(j, s),
@@ -154,11 +155,6 @@ inequality \eqref{eq:deadlock} reads:
   \label{eq:deadlock2}
   d(j',s_{j,k+1}) \ge d(j, s_{j,k}) + \Delta(j,j',s) + \tauuu(j, s).
 \end{equation}
-Similarly to
-This condition is to be applied for pairs of trains $j,j'$ going in opposite
-dimension if train $j$ is supposed to leave before the train $j'$ leaves
-$s_{j,k+1}$, otherwise the order has to be appropriately reversed.
-
 In decision variables, the deadlock condition in its basic form looks as
 follows:
 \begin{equation}
@@ -168,8 +164,7 @@ follows:
   \right) = 0,
 \end{equation}
 and has to be applied for a limited number of trains $j \in \JJ^{0} (\JJ^{1})$
-and $j' \in \JJ^{1}(\JJ^{0})$. This limit is imposed indirectly by the upper
-bounds on the delays. Here, $C(m)$ is, similarly to $B(m)$, the set of delays
+and $j' \in \JJ^{1}(\JJ^{0})$. Here, $C(m)$ is, similarly to $B(m)$, the set of delays
 violating the condition for the given pair.
 \section{The rolling stock circulation condition}
 Our model assumes that some trains might be assigned the same train set. Naturally,
