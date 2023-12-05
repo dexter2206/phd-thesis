@@ -1,0 +1,20 @@
+\documentclass{standalone}
+
+\usepackage{tikz}
+
+
+\begin{document}
+\begin{tikzpicture}
+  \node (original) at (0, 0) {
+    \includegraphics{peps.pdf}
+  };
+
+  \node[fill=white] at (-3.9, 1.4) {\scriptsize\textbf{a.}};
+  \node[fill=white] at (-1.7, 1.4) {\scriptsize\textbf{c.}};
+  \node[fill=white] at (-3.9, -0.25) {\scriptsize\textbf{b.}};
+  \node[fill=white] at (-1.7, -0.25) {\scriptsize\textbf{d.}};
+  \node[fill=white] at (2.3, 1.4) {\scriptsize\textbf{e.}};
+  \node[fill=white] at (2.3, -0.25) {\scriptsize\textbf{f.}};
+\end{tikzpicture}
+
+\end{document}

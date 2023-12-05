@@ -161,8 +161,24 @@ from the enlarged previous ones. The MPS-MPO construction is depicted in Fig.
 \ref{fig:tensors}(e)--(f). In the end, the network can be contracted exactly
 resulting in the desired conditional probability.
 \begin{figure}
-  \includegraphics[width=\textwidth]{figures/peps.pdf}
-  \caption{Construction of PEPS network} \label{fig:tensors}
+  \includegraphics[width=\textwidth]{figures/peps_overlay.pdf}
+  \caption{
+    Tensor network formalism for solving Ising spin-glasses on Chimera-like
+    graphs. \textbf{a.}, \textbf{b.} Assignment of PEPS tensors to groups of $l$ spins (clusters).
+    Each PEPS tensor has four virtual legs of dimension $D = 2^{\min(m,n)}$ and
+    one physical leg of dimension $2^{l}$. Here, $m$ is the number of spins in one
+    cluster interacting with $n$ of those in the neighboring cluster. For the Chimera
+    graph, depicted in panel \textbf{d.}, $n=m=4$. Note that adding more complicated interactions not present
+    in the Chimera topology as in panel \textbf{b.} would not increase the bond dimension $D$. \textbf{c.} The resulting tensor network
+    used to represent probability distribution $p(\mathbf{s})\sim \exp(-\beta H(\mathbf{s}))$.
+    \textbf{e.} The conditional probabilities $p(\mathbf{s}_{c}|\mathbf{s}_{X})$ are obtained
+    by projecting the physical degrees of freedom in the region $X$ to given
+    configuration $\mathbf{s}_{X}$ and tracing out the remaining ones. Next, the
+    approximate MPO-MPS scheme is used to collapse the network in a bottom-top fashion
+    until only two rows remain. Finally, as in panel \textbf{f.}, the remaining tensors can be exactly contracted to
+    obtain the desired conditional probability.
+
+  } \label{fig:tensors}
 \end{figure}
 
 \section{Benchmarks}
