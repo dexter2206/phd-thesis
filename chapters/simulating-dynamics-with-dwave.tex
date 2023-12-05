@@ -13,7 +13,7 @@ annealing devices such as D-Wave quantum annealers and similar devices. To
 illustrate the working of our algorithm, we simulate the simplest single-qubit
 system and demonstrate that already near-term annealing devices are capable of
 capturing its dynamics in a narrow regime of parameters. Furthermore, the class
-of physics-inspired instances of the Ising model proposed in this chapter
+of physics-inspired problem instances proposed in this chapter
 can be valuable in benchmarking other (not necessarily quantum) solvers.
 
 \section{Parallel in time simulation of dynamical systems}
@@ -24,7 +24,7 @@ nature. In our case, it is possible by enlarging the Hilbert space of the
 system under consideration, so that the states of this larger space encode also
 temporal information \cite{feynmanclock}.
 
-Let us first start by precisely defining the problem we want to address.
+Let us start by precisely defining the problem we want to address.
 Consider an $L$--dimensional real or complex system, whose state at time $t$ is
 described by the vector $\ket{\psi(t)}$ evolving according to a differential
 equation of the form:
@@ -41,7 +41,7 @@ Hamiltonian, transforms the equation \eqref{eq:dynamical-system} into
 Schr\"{o}dinger equation.
 
 Given an initial state, $\ket{\psi(t_0)}$ the equation
-\eqref{eq:dynamical-system} admits a unique solution, namely:
+\eqref{eq:dynamical-system} admits a unique solution:
 \begin{equation}
   \ket{\psi(t)} \coloneqq U(t, t_0) \ket{\psi(t_0)},
 \end{equation}
@@ -124,7 +124,7 @@ linear equations encoding the solution to the equation
 \eqref{eq:dynamical-system} under the given initial condition. At this point,
 however, it is not possible to solve it using a quantum annealer yet. To do so,
 one first needs to convert this system into an optimization problem with
-dichotomous variables, which is what we will deal with next.
+dichotomous variables, which will be the topic of the next section.
 \section{Solving systems of linear equations as an optimization problem}
 There is a straightforward way of converting equation \eqref{eq:gsys} into an
 optimization problem. One can observe that the solution minimizes the norm
@@ -166,7 +166,7 @@ that the considered systems are real.
 
 If one assumes (binary) order of magnitude of coefficients of
 $\mathbf x$ to be $D$ (i.e. $x_i \in [-2^D, 2^D]$ for each $i$), then it can be
-approximated up to $R$ bits of precision as:
+approximated up to $R$ bits of precision using the formula:
 \begin{equation}
   \label{eq:fixed}
   x_i \approx 2^D \left(2 \sum_{\alpha=0}^{R-1}2^{-\alpha}q_i^{\alpha} -1\right).
@@ -235,7 +235,7 @@ easily see that the evolution of the system is real (as opposed to complex),
 which halves the number of needed variables. Secondly, for integral time points
 $t_0=0, t_1=1, \ldots$ coefficients of the wave function can be expressed
 \emph{exactly} using only two bits of precision per coefficient, which further
-reduces the number of needed variables.
+reduces the number of variables.
 
 \begin{figure}[!h]
   \centering
@@ -267,7 +267,7 @@ solution, the state vector was normed before plotting.
 
 To put these results into context, we also compare them to the ones obtained
 using two purely classical methods: CPLEX optimizer and recently developed
-tensor network-based algorithm (which we describe later in chapter
+tensor network-based algorithm (which we describe later in Chapter
 \ref{chapter:tn}. The results of this comparison are depicted in Fig.
 \ref{fig:cplex_tn_dwave}.
 
@@ -276,7 +276,7 @@ tensor network-based algorithm (which we describe later in chapter
   \includegraphics[width=\textwidth]{figures/fig34_merge.pdf}
   \caption{ \textbf{a.}--\textbf{b.} Performance of the two state-of-the-art heuristic
     algorithms: the CPLEX optimizer (CP) and a tensor networks-based (TN) solver
-    (see chapter \ref{chapter:tn}) in comparison to the D-Wave $2000$Q quantum annealer (DW),
+    (see Chapter \ref{chapter:tn}) in comparison to the D-Wave $2000$Q quantum annealer (DW),
     cf. Fig~\ref{fig:energy-hist}. The graphs on which the problems were defined
     had respectively $|V|=360$ (\textbf{a.}) and $|V|=624$ (\textbf{b.}) vertices. The annealing time was set
     to $\tau=200$\textmu{}s. The numerical precision of the solution vector is

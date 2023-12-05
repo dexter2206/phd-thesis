@@ -82,7 +82,7 @@
 
 \DeclareFieldFormat{title}{#1}
 \DeclareFieldFormat[article]{title}{{\itshape #1}}
-
+\DeclareFieldFormat[book]{title}{{\href{\thefield{url}}{\itshape #1}}}
 \allowdisplaybreaks[4]
 
 \begin{document}

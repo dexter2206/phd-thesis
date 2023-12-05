@@ -2,7 +2,7 @@
 \chapter{Brute--forcing spin--glass problems with CUDA}
 \label{chapter:bruteforce}
 \chaptermark{Brute--forcing spin--glass problems}
-In chapter \ref{chapter:tn} we presented a tensor network--based heuristic algorithm
+In Chapter \ref{chapter:tn} we presented a tensor network--based heuristic algorithm
 tailored for Ising spin--glass problems defined on Chimera graphs. In stark contrast, in this
 chapter we will shift our attention to a deterministic algorithm capable of solving problems defined
 on arbitrary (but relatively small) graphs.
@@ -55,14 +55,14 @@ $2^{40}\cdot 4B = 4398046511104\mbox{B}$, or $4\mbox{TB}$ of working memory to
     adapt our algorithm to take into account limited memory and parallelism. To do
     so, we introduce the following assumptions:
     \begin{enumerate}
-      \item We will process the solution space in \emph{chunks} that can fit into GPU
+      \item We will process the space of possible solutions in \emph{chunks} that can fit into the GPU
         memory.
       \item Number of states in a chunk can be larger than the total number of threads.
         Should this be the case, the threads will process the chunk using a
         grid--stride loop pattern.
     \end{enumerate}
     As an added benefit of our assumptions, we decouple the grid size from the
-    problem size. The number of thread blocks and block size become parameters of
+    problem size. The number of thread blocks and the block size become parameters of
     our algorithm, which facilitates further fine-tuning of the kernel execution
     parameters.
 
@@ -119,8 +119,7 @@ chunk size $=2^{M}$ for some $M < N$. We conceptually split each configuration
 \begin{equation}
   \mathbf{q}_{i}^{j} = i + 2^{M}\cdot j,\qquad i=0,\ldots,2^{M}-1, \; j=0,\ldots,2^{N-M}-1
 \end{equation}
-The following example demonstrates the representation described above in
-detail.
+The following example demonstrates the representation described above.
 \begin{example}[Processing solution space in chunks]
   Consider QUBO with $N=8$ variables. We decide to use $M=5$. Hence, there are
   $2^{M}=32$ states in each chunk and a total of $2^{N-M}=8$ chunks. The
@@ -257,7 +256,7 @@ Product States (MPS). The detailed description of this algorithm is outside the
 scope of this thesis, and we refer the interested reader to the Supplementary
 Material in \cite{tn}. Nevertheless, before we outline how the algorithm works.
 
-Similarly to the algorithm presented in chapter \ref{chapter:tn}, in the
+Similarly to the algorithm presented in Chapter \ref{chapter:tn}, in the
 MPS--based approach one explores the probability distribution (as opposed to
 exploring the energy landscape directly). The basic idea behind is to
 approximate Boltzmann distribution as
@@ -412,7 +411,7 @@ When one talks about a binary encoding of integers, the first thing that comes
 to mind is a usual positional base-2 system. This encoding certainly does not
 fit our purpose. Indeed, suppose $N=3$ and we are currently processing state
 corresponding to number $3$, whose representation in binary is $(011)_{2}$. The
-    next state, corresponding to $4$ is encoded by the string $(100)_{2}$, which
+    next state, corresponding to number $4$, is encoded by the string $(100)_{2}$, which
 differs in all three bits.
 
 Instead of using the positional system, we might utilize an encoding called
@@ -462,7 +461,7 @@ For instance, POSIX--compatible C standard libraries include \texttt{ffsll}
 function \cite{ffs}. In CUDA, there is a \texttt{\_\_ffsll} function available
 \cite{CUDAguide}. For both of the above cases, the function counts bits from
 $1$. Using this convention, we can write a pseudocode for a function
-\texttt{find\_bit\_to\_flip} from listing \ref{lst:grayserial} like in the
+\texttt{find\_bit\_to\_flip}, occurring in the listing \ref{lst:grayserial}, like in the
 listing~\ref{lst:findbit}.
 
 \begin{listing}
@@ -523,7 +522,7 @@ require us to split the algorithm into several kernel invocations.
 
 There are two optimizations we can make to further reduce the number of
 operations performed in each iteration. Let us first notice that the only bit
-flips that can happen, do so in the prefix part. Going back to the equation
+flips that can happen, do so in the prefix part. Going back to equation
 \eqref{eq:energydiff1}, we can rewrite the expression for $F(\bq{2})-F(\bq{1})$
 into a sum of two parts:
 \begin{align}

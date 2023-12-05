@@ -85,9 +85,8 @@ to be minimized we only need to take into account the secondary delays. For
 instance, we might want to minimize their total sum or their weighted sum, with
 weights corresponding to the trains' priorities.
 
-Our high--level description of the problem needs now a mathematical
-formulation. We start by describing the details of the network model in the
-next section.
+The above high-level description of the problem needs now a mathematical
+formulation, which we present in the next section.
 
 \section{The mathematical model}
 Before we can formulate the optimization problem to be run on D-Wave, we need
@@ -172,7 +171,7 @@ One can find a reasonable upper bound by running some fast heuristic, or
 determine it manually (e.g. there might be an \emph{a priori} established
 maximum allowable delay of the train). Henceforth, we will consider
 $d_{\max}(j)$ to be parameters of the model. With this assumption, we have the
-following upper and lower bound on the overall delays:
+following bounds on the overall delays:
 \begin{equation}
   d_U(j, s) \le d(j, s) \le d_U(j, s) + d_{\max}(j).
 \end{equation}
@@ -260,7 +259,7 @@ cost function, effectively penalizing the infeasible solutions. More generally,
 one might multiply the sum by some constant $\ppair > 0$, to further increase
 the value of the cost function for the infeasible solutions. Finally, taking
 into account all penalties from all dispatching conditions gives the following
-penalty term that can be added to the objective function:
+term that can be added to the objective function:
 \begin{equation}
   \Ppair(\mathbf{x}) = \ppair \sum_{\mathcal{V}_{p}}\sum_{(l, l') \in \mathcal{V}_{p}} x_{l}x_{l'}.
 \end{equation}
@@ -346,7 +345,7 @@ Fig. \ref{fig:linelarge:diagram}.
     additional passenger platforms at Ustroń Zdrój, Ustroń Poniwiec and Wisła
     Jawornik. \subref{fig:linelarge:diagram} Train diagram for the timetable of the line in \subref{fig:linelarge:line}.
     The timetable features two \emph{Inter--City} trains (IC1 and IC2) and four regional trains (Ks1--Ks4).
-    The paths of the \emph{Inter--City} trains are marked with red and paths of the regional trains are
+    The paths of the \emph{Inter--City} trains are marked with red and the paths of the regional trains are
     marked with black.}
   \label{fig:linelarge}
 \end{figure}
@@ -468,11 +467,11 @@ earlier than 14:25, i.e. 4 minutes later than in the conflicted timetable. In
 this case, the additional 4 minutes constitute the maximum secondary delay of
 the solution.
 
-We also applied the aforementioned heuristics to all the considered
+We also applied the aforementioned simple heuristics to all the considered
 disturbances in the Goleszów -- Wisła Uzdrowisko segment. For brevity, we
 refrain from presenting a detailed discussion of the solutions for all the
 cases and limit ourselves to the summary of the maximum secondary delay, which
-is presented in Table \ref{tab:simple}
+is presented in Table \ref{tab:simple}:
 
 \begin{table}[bh]
   \centering
@@ -532,14 +531,15 @@ As for the maximum secondary delay $d_{\max}$, for simplicity, we assume it is
     No. 191 we set $d_{\max}=10$. The total number of decision variables is given
     by
     \begin{equation}
+      \label{eq:numvariables}
       \mbox{\#variables} = (\mbox{\#station blocks}-1) \cdot (\mbox{\#number of trains}) \cdot (d_{\max}+1)
     \end{equation}
-    We therefore get $2\cdot 3 \cdot 8 = 48$ decision variables for line No. 216
+    Using formula \eqref{eq:numvariables} we get $2\cdot 3 \cdot 8 = 48$ decision variables for line No. 216
     and $3 \cdot 6 \cdot 11 = 198$ variables for line No. 191. Importantly, the
 moderately low number of variables for line no. 216 allows us to solve it using
 the brute--force algorithm presented in Chapter \ref{chapter:bruteforce}.
 
-Lastly, we need to choose values for $p_{pair}$ and $p_{sum}$ penalty weights.
+Lastly, we need to choose values for $\ppair$ and $\psum$ penalty weights.
     This is a very subtle choice. On the one hand, setting it too low may cause
     some of the infeasible solutions to have the value of the objective function
     smaller than that of feasible solutions, which is undesirable. On the other
@@ -547,8 +547,8 @@ Lastly, we need to choose values for $p_{pair}$ and $p_{sum}$ penalty weights.
     a perturbation for the penalty terms, which is also undesirable. To illustrate
     the difference those weights make to the energy landscape, we computed the
     low-energy spectrum for the problem defined on line No. 216 for several
-    different values of $p_{pair}$ and $p_{sum}$. The histograms of energies
-obtained in this way are presented in Fig. \ref{fig:penaltyhistogram}.
+    different values of $\ppair$ and $\psum$. The obtained energy histograms
+    are presented in Fig. \ref{fig:penaltyhistogram}.
 
 \begin{figure}
   \includegraphics[width=\textwidth]{figures/railway_histograms_bf}
@@ -560,7 +560,7 @@ In our experiments, we used several combinations of $p_{pair}$ and $p_{sum}$.
 For D-Wave 2000Q series devices, which we used for the experiments reported
 in~\cite{railwaydispatching}, we used $p_{\text{pair}}=2.7$,
   $p_{\text{sum}}=2.2$ and $p_{\text{pair}} = p_{\text{sum}} = 1.75$.
-    Additionally, in this thesis, we extend these results by running additional
+    Additionally, in this thesis, we extend these results by running
     experiments with $p_{\text{pair}}=p_{\text{sum}}=n$ for $n=2, 3, 4$ on
 Advantage and Advantage2 prototype devices.
 
@@ -643,7 +643,7 @@ see Fig. \ref{fig:dwtrainsoldlarge}.
 \end{figure}
 
 In comparison, the QUBOs for cases 1--4 turn out to not be that challenging for
-the classical solvers. Both the tensor networks algorithm, described in chapter
+the classical solvers. Both the tensor networks algorithm, described in Chapter
 \ref{chapter:tn}, and the IBM CPLEX solver were able to find high-quality
 solutions equivalent to the ground state from the dispatching point of view,
 with CPLEX slightly outperforming the tensor network algorithm in cases 3 and
@@ -717,7 +717,7 @@ solution by the annealers is depicted in Fig. \ref{fig:dwline216freq}. As seen
 there, the Advantage System6.3 and Advantage2 Prototype1.1 devices exhibited
 much better performance than the older Advantage System4.1 device. As for the
 quality of the solutions, all solvers managed to find an optimal solution,
-although with different frequencies. The summary of parameters for which a
+although with different success rates. The summary of parameters for which a
 ground state was obtained is presented in table \ref{tab:line216ground}.
 Example ground states found are depicted in Fig. \ref{fig:dwline216grounds}.
 
@@ -761,8 +761,8 @@ Example ground states found are depicted in Fig. \ref{fig:dwline216grounds}.
     Advantage2 Prototype1.1   & 12             & 2000           & 1              \\
     \hline
   \end{tabular}
-  \caption{Parameters for which D-Wave annealer managed to find the optimal solution to
-    the problem defined on Line 216. All ground states occurred at
+  \caption{Parameters for which the D-Wave annealers managed to find the optimal solution to
+    the problem defined on Line 216. All samples with ground states occurred at
     $p_{\text{pair}}=p_{\text{sum}}=4.0$. } \label{tab:line216ground}
 \end{table}
 
@@ -784,7 +784,7 @@ parameters. Determining the sources of these differences requires further
 research, but it is possible that they can be partially explained by
 differences in the available range of quadratic coefficients between the
 devices (see D-Wave QPU datasheets \cite{dwavedocs}), which in turn might
-affect the DAC quantization effect (see discussion of error sources in section
+affect the DAC quantization effect (see discussion of error sources in Section
 \ref{sec:parallel-in-time}).
 
 %%% Local Variables:

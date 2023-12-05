@@ -67,11 +67,11 @@ The parameter $M$ can be made iteratoin dependend by keeping only the states
 whose marginal probability divided by the maximal probability is larger than
 sum \emph{probability cutoff} $\delta_{p}$.
 
-We can exploit locality of the problem by observing that conditional
+We can exploit the locality of the problem by observing that conditional
 probability in \eqref{eq:conditional-prob} of configuration in the region $X =
   (1, 2, \ldots, k)$ depends only on configuration on the border $\partial X$ comprising those spins that directly interact with the region
-$\overline{X} = (k+1, 2, \ldots N)$ (for detailed explanation see section
-\ref{sec:probability} in the Appendix).
+  $\overline{X} = (k+1, 2, \ldots N)$. For a detailed explanation of why this is the case
+  we refer the reader to Section \ref{sec:probability} in the Appendix.
 
 \begin{figure}
   \centering
@@ -261,8 +261,8 @@ configuration energies.
     probabilities obtained from contracting PEPS network $p_{n}$ and the Boltzmann
     weights calculated from the configuration's energy. \textbf{d.} Comparison of
     largest discarded probability $p_{d}$ and the ground state probability $p_{1}$.
-    With increasing $\beta$ we were able to achieve $p_{d} < p_{1}$, indicating
-    that the algorithm indeed reached the ground state. }
+    With increasing $\beta$ we were able to achieve $p_{d} < p_{1}$. This indicates
+    that the algorithm was indeed able to reach the ground state. }
   \label{fig:tn-single-state}
 \end{figure}
 

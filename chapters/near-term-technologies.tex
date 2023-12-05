@@ -398,7 +398,7 @@ running several threads of execution at the same time. However, every
 non-trivial classical algorithm involving parallelism must necessarily also
 include a serial part which limits speedup gained for introducing more
 execution units (CPU cores or CPUs). In contrast, quantum annealers are capable
-of annealing multiple qubits at the same time, which makes their operation
+of annealing multiple qubits at the same time, making their operation
 inherently parallel.
 
 \section{Nvidia CUDA}
@@ -411,7 +411,7 @@ viable approach is to compute the exact low energy spectra of some test
 instances, which in turn requires an exact solver. In particular, one might
 perform an exhaustive search over all possible states and extract only the
 selected number of the ones with the lowest energy, the approach also known as
-the brute-force approach. In chapter \ref{chapter:bruteforce} we demonstrate a
+the brute-force approach. In Chapter \ref{chapter:bruteforce} we demonstrate a
 massively parallel implementation of the brute-force algorithm using Nvidia
 CUDA, but before we do this, in this section we will introduce the basic
 principles of using CUDA-enabled graphic processing units.
@@ -485,8 +485,8 @@ executed by some core as a part of a thread. In CUDA however, the very same
 kernel is executed by multiple threads. Executing a kernel requires specifying
 a \emph{grid} that will be used for running it. A grid can be 1, 2-- or
 3--dimensional and is itself divided into blocks. Each block is in turn also
-organized in 1, 2--, or 3-dimensional structure of threads (the same for every
-block in the grid). A schematic view of a two-dimensional grid is presented in
+organized in 1, 2--, or 3-dimensional structure of threads, which has to be the same for every
+block in the grid. A schematic view of a two-dimensional grid is presented in
 Fig. \ref{fig:cuda_grid}.
 
 As already mentioned, each thread in the grid executes \emph{precisely the
@@ -494,9 +494,9 @@ As already mentioned, each thread in the grid executes \emph{precisely the
 surprising that, nevertheless, they can access different parts of memory or
 otherwise handle a different part of the computational task. This is possible
 because each thread is identified by its indices in both the grid and the
-block. Those indices can be used e.g. for computing offsets in arrays that are
-being processed. A more sophisticated use of thread and block indices will be
-exemplified in chapter \ref{chapter:bruteforce}.
+block. Those indices can be used for computing offsets in arrays that are
+being processed or (as we will demonstrate in Chapter \ref{chapter:bruteforce})
+otherwise used for performing computations.
 
 \begin{figure}[ht]
   \centering
@@ -606,7 +606,7 @@ present a short example of the CUDA C/C++ and CUDA Fortran code.
   are declared as pointers, for which the memory has to be manually allocated and
   later deallocated using the combination of \texttt{cudaMalloc} and
   \texttt{cudaFree}. Lastly, C/C++ uses zero-based indexing, whereas Fortran uses
-  one-based indexing. This affects how the thread id, stored in \texttt{tid}
+  one-based indexing. This affects how the global thread index, stored in \texttt{tid}
   variable, is computed.
 
   \begin{listing}
