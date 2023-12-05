@@ -179,10 +179,10 @@ algorithm, we decided to use time-to-solution as a metric. The time to solution
 $\mbox{TTS}$ is defined as:
 \begin{equation}
   \label{eq:tts}
-  \mbox{TTS} = t \frac{\log(1 - \ptarget)}{\log(1 - \psucc)},
+  \mbox{TTS} = T \frac{\log(1 - \ptarget)}{\log(1 - \psucc)},
 \end{equation}
 where $\ptarget$ is the desired probability of obtaining solution, $\psucc$
-is the empirical probability of obtaining the solution and $t$ is the running
+is the empirical probability of obtaining the solution and $T$ is the running
 time of the solver. In addition, for D-Wave annealers, we multiply $\mbox{TTS}$
 by the ratio $N/\mbox{num\_qubits}$, to account for the possibility of fitting
 multiple instances of the problem on the device at the same time. Naturally,
@@ -231,7 +231,7 @@ configuration energies.
     \emph{adaptive} and \emph{geometric} terms refer to the distribution of inverse
     temperature $\beta$ in Parallel Tempering replicas. We bounded the running time
     of our solver to 30 minutes with bond dimension $\chi = 16$, $\beta=3$ and
-    probability cutoff $\delta_{p} = 10^{-3}$. For PT, the $t$ in the equation
+    probability cutoff $\delta_{p} = 10^{-3}$. For PT, the $T$ in the equation
     \ref{eq:tts} is inferred from the running time and number of performed MC
     sweeps: a single MC sweep took 0.00005s for N=512 and 0.00011s for $N=1024$.
     For the adaptive PT, we used 12 replicas. For geometric PT, we used 25 replicas
@@ -242,7 +242,7 @@ configuration energies.
     once again used our algorithm. We optimized time to solution over annealing
     times of $5\mu s$, $20\mu s$ and $200\mu s$. For each instance and each
     annealing time, we gathered 1000 samples for $N=512$ and 2500 for other values
-    of $N$. Also, we used $t=\tau$ for the D-Wave annealers, i.e. we considered
+    of $N$. Also, we used $T=\tau$ for the D-Wave annealers, i.e. we considered
     only annealing time and disregarded other factors contributing to overall
     solution time. This choice is justified by the fact that the other
     contributions are minuscule. The ``timed-out'' string indicates that the given
