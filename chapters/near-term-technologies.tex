@@ -71,7 +71,13 @@ solved, i.e.:
 \end{equation}
 where $N$, as previously, is the number of spins, $\ssigma^{(i)}_x$,
 $\ssigma^{(i)}_z$ denote Pauli operators acting on $i$-th qubit, and $h_i,
-  J_{ij} \in \mathbb{R}$ are coefficients of the instance. More precisely, the
+J_{ij} \in \mathbb{R}$ are coefficients of the instance. Note that finding
+the ground state of such Hamiltonian is equivalent to finding the ground state
+of its classical counterpart (c.f. eq. \eqref{eq:ising-hamiltonian}). For small system sizes,
+this can be accomplished by listing all possible configurations and sorting them
+with respect to their energies.
+
+More precisely, the
 time-dependent Hamiltonian implemented by the D-Wave devices is of the form:
 \begin{equation}
   \label{eq:dwaveham}
