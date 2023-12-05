@@ -7,8 +7,8 @@ exception, and numerical simulations now commonly assist experiments.
 
 Simulating quantum systems -- a holy grail of modern computational physics --
 is a highly challenging task for classical computers \cite{feynman.82}. The
-difficulties can be blamed on the enormous sizes of the state spaces of such
-systems. Direct, naive simulations would require solving systems of
+difficulties can be blamed on the enormous number of possible configurations of
+such systems. Direct, naive simulations would require solving systems of
 differential equations with the number of variables exponential in the number
 of particles. But what about using more sophisticated algorithms? Surprisingly,
 it is commonly believed that a sufficiently efficient classical algorithm for
@@ -32,7 +32,7 @@ later proven to be equivalent to the standard gate-based model \cite{aharonov}.
 Just like a classical computer, a quantum computer needs software to run, and
 software is based on algorithms, describing how the computation should be
 performed. It is not a surprise that quantum computers operate in a very
-different way than classical ones, and so they require different, specialized
+different way than classical ones, and require different, specialized
 algorithms. What is surprising is that several notable quantum algorithms were
 developed even before the first quantum computers were constructed. In 1994
 Peter Shor published his, now famous, algorithm for integer factorization
@@ -89,7 +89,7 @@ device. In Chapter \ref{chapter:tn}, we present a recent, heuristic algorithm
 for finding the low-energy spectrum of an Ising spin-glass based on tensor
 networks, specifically suited for problems defined on Chimera-like graphs.
 
-Chapter \ref{chapter:bruteforce} describes a fast, parallel approach for
+Chapter \ref{chapter:bruteforce} describes a fast, parallel approach to
 exhaustively searching for a low-energy spectrum of Ising spin-glass problems.
 Our method is suitable for solving small (less than 54 spins), but otherwise
 arbitrary instances. The presented approach can be used for benchmarking other
@@ -100,9 +100,9 @@ exemplify the usage of our algorithm by conducting benchmarks of a recent
 MPS-based algorithm on a set of random spin-glass problems. Compared to the
 original algorithm presented in \cite{bruteforce}, the algorithm described in
 Chapter \ref{chapter:bruteforce} contains several new, non-trivial
-optimizations further increasing the problem sizes that it can tackle.
-To the best of our knowledge, those optimizations make our implementation the
-fastest brute-force solver for Ising and QUBO problems available on the market.
+optimizations further increasing the problem sizes that it can tackle. To the
+best of our knowledge, those optimizations make our implementation the fastest
+brute-force solver for Ising and QUBO problems available on the market.
 
 Lastly, in chapter \ref{chapter:trains}, we present the application of quantum
 annealing to solving certain railway dispatching problems. We discuss how such
