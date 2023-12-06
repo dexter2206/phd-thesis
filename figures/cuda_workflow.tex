@@ -111,7 +111,7 @@
 
 \coordinate[above=of SM1SP03.north] (A);
 
-\draw (CPU.south) edge[arrow color=host-to-gpu, vec arrow] (GPU.north);
+\draw[arrow color=host-to-gpu, vec arrow] (CPU.south) -- ($(GPU.north west)!(CPU.south)!(GPU.north east)$);
 
 \draw[to path={-| (\tikztotarget)}]     
     ([xshift=0.05cm]SM1MP.140) edge[arrow color=gpu-bg, vec arrow] (GPU mem.south)
@@ -121,7 +121,7 @@
     (A) edge[arrow color=sp-bg, vec arrow] (SM1SP13);
 ;
 
-\coordinate[below=0.5cm of RAM.300] (s1);
+\coordinate[below=0.8cm of RAM.300] (s1);
 \node[right=0.5cm of RAM.east,step label] (l1) {1};
 \draw[step pointer] 
     (s1) 
@@ -154,7 +154,7 @@
     }
 ;
 
-\coordinate[below=1cm of RAM.240] (s4);
+\coordinate[below=1.15cm of RAM.240] (s4);
 \node[below=1cm of l1, step label] (l4) {4};
 \draw[step pointer]
     (s4)

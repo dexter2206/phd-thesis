@@ -48,8 +48,8 @@ part.
 %\todo[inline,color=SkyBlue]{Mention the other Chimera-specific algorithm}
 
 \section{Branch and bound}
-Let us first consider an Ising spin-glass problem defined on a square lattice,
-as depicted in Fig. \ref{fig:lattice-and-border}. The state space of such a
+Let us first consider an Ising spin-glass problem defined on a square lattice.
+The state space of such a
 system can be viewed as a tree, in which $k$-th level contains all partial
 configurations $(s_1, \ldots, s_k)$. This representation allows one to explore
 the state space incrementally in search for low energy states, and possibly
@@ -61,24 +61,25 @@ and branching them into $2M$ new partial configurations at level $k+1$. The
 new marginal probability distributions can be computed using the following formula:
 \begin{equation}
   \label{eq:conditional-prob}
-  p(s_1, s_2, \ldots, s_k, s_{k+1}) = p(s_1, s_2, \ldots, s_k)p(s_{k+1}|, s_1, \ldots, s_k)
+  p(s_1, s_2, \ldots, s_k, s_{k+1}) = p(s_1, s_2, \ldots, s_k)p(s_{k+1}|, s_1, \ldots, s_k).
 \end{equation}
-The parameter $M$ can be made iteratoin dependend by keeping only the states
+Importantly, in the Appendix \ref{sec:probability} we prove that the conditional
+probability in equation \eqref{eq:conditional-prob} can be effectively computed
+by exploiting the locality of the problem. The parameter $M$ can be made iteration-dependent by keeping only the states
 whose marginal probability divided by the maximal probability is larger than
 sum \emph{probability cutoff} $\delta_{p}$.
 
-We can exploit the locality of the problem by observing that conditional
-probability in \eqref{eq:conditional-prob} of configuration in the region $X =
-  (1, 2, \ldots, k)$ depends only on configuration on the border $\partial X$ comprising those spins that directly interact with the region
-  $\overline{X} = (k+1, 2, \ldots N)$. For a detailed explanation of why this is the case
-  we refer the reader to Section \ref{sec:probability} in the Appendix.
-
 \begin{figure}
   \centering
-  \includegraphics[width=\textwidth]{figures/squarelattice.pdf}
-  \caption{\textbf{a.} An example Ising spin--glass  of 16 spins on a square lattice. The conditional probability for spins in the region $\overline{X}$ conditioned with a given configuration of spins in the region $X$ depends only on part of the configuration on the border $\partial X$. \textbf{b.} A fragment of the state space tree. States kept at each
-    level are marked with green, and the pruned branches are marked with red.}
-  \label{fig:lattice-and-border}
+  % \textbf{a.} An example Ising spin--glass  of 16 spins on a square lattice. The conditional probability for spins in the region $\overline{X}$ conditioned with a given configuration of spins in the region $X$ depends only on part of the configuration on the border $\partial X$.
+  \includegraphics[width=\textwidth]{figures/tree.pdf}
+  \caption{An illustration of the branch and bound method. The state space is explored one spin at a time.
+    At each tree level, we branch each of at most $M$ configurations into $2M$ new configurations. Then,
+    the tree is pruned, and only $M$ most promising branches are kept. In the depicted example $M=3$.
+    As a criterion for pruning the tree, we use the marginal probability of the partial configurations
+    corresponding to each node. The marginal probabilities are computed using the equation \eqref{eq:conditional-prob}.
+  }
+  \label{fig:tree}
 \end{figure}
 
 Before discussing how probabilities in \eqref{eq:conditional-prob} can be
@@ -177,7 +178,6 @@ resulting in the desired conditional probability.
     approximate MPO-MPS scheme is used to collapse the network in a bottom-top fashion
     until only two rows remain. Finally, as in panel \textbf{f.}, the remaining tensors can be exactly contracted to
     obtain the desired conditional probability.
-
   } \label{fig:tensors}
 \end{figure}
 
@@ -219,7 +219,7 @@ the probabilities obtained from the tensor network contractions and the ones
 obtained from the Boltzmann weights calculated from the corresponding
 configuration energies.
 
-\begin{table}
+\begin{table}[b]
   \centering
   \begin{tabular}{|l|c|ccc|}
     \hline

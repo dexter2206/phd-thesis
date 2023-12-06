@@ -80,9 +80,10 @@
 
 \ExecuteBibliographyOptions{doi=false}
 
-\DeclareFieldFormat{title}{#1}
+%\DeclareFieldFormat{title}{#1}
 \DeclareFieldFormat[article]{title}{{\itshape #1}}
-\DeclareFieldFormat[book]{title}{{\href{\thefield{url}}{\itshape #1}}}
+\DeclareFieldFormat[book]{title}{\href{\thefield{url}}{\itshape #1}}
+\DeclareFieldFormat[thesis]{title}{\href{\thefield{url}}{\itshape #1}}
 \allowdisplaybreaks[4]
 
 \begin{document}
@@ -108,7 +109,7 @@
     \vspace{0.25in}
     Co-supervisor:\\ dr hab. inż. Łukasz Pawela\\
     \vfill
-    {Katowice, \today}
+    {Katowice, November 24, 2023}
   \end{center}
 \end{titlingpage}
 
@@ -133,7 +134,7 @@
     \vspace{0.25in}
     Promotor pomocniczy:\\ dr hab. inż. Łukasz Pawela\\
     \vfill
-    {Katowice, \today}
+    {Katowice, 24 listopada 2023}
   \end{center}
 \end{titlingpage}
 

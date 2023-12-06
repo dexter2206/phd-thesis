@@ -30,8 +30,22 @@ of a function, and $\Theta$ combining big-O and $\Theta$. For more details, we
 refer the reader to \cite{clrs}.
 
 \chapter{Conditional probability on square lattice}
+\chaptermark{Conditional probability}
 \label{sec:probability}
-Consider a square lattice, such as the one depicted in Fig. \ref{fig:lattice-and-border}.
+\begin{figure}
+  \centering
+  \includegraphics[width=0.6\textwidth]{figures/latticeonly}
+  \caption{An example Ising spin-glass of 16 spins on a square lattice. The conditional
+    probability for spins in the region $\overline{X}$ conditioned on the values of spins in the
+    region $X$ depends only on the configuration on the border $\partial X$.}
+  \label{fig:lattice}
+\end{figure}
+
+Consider a square lattice, such as the one depicted in Fig. \ref{fig:lattice}.
+We will prove that the conditional probability for spins in the region $\overline{X}$
+conditioned on the values of spins in the region $X$ depends only on the configurations of the spins on the
+border $\partial X$.
+
 Let denote by $H_X$ the usual Hamiltonian $H$ restricted to the graph
 induced by vertices in $X$. Further, let $H_{X, \overline{X}} = H - H_X -
   H_{\overline{X}}$. Notice that $H_{X, \overline{X}}$ contains only quadratic

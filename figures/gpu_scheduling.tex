@@ -10,7 +10,8 @@
 \begin{document}
 
 \begin{tikzpicture}[
-  gpunode/.style={rectangle,draw=black,minimum width=1cm, minimum height=1cm}
+  gpunode/.style={rectangle,draw=black,minimum width=1cm, minimum height=1cm},
+  label/.style={font=\Large}
 ]
 
 \matrix [
@@ -38,15 +39,15 @@ row 3 column 20/.style = {{nodes={opacity=0}}}
   \draw[-Latex]  (mat-2-\i) -- (mat-3-\i);
 }
 
-\node [left=3.5cm of mat-1-1,anchor=west] {Input index};
-\node [left=3.5cm of mat-2-1,anchor=west] {Global thread index};
-\node [left=3.5cm of mat-3-1,anchor=west] {Output index};
+\node [label, left=4.7cm of mat-1-1,anchor=west] {Input index};
+\node [label, left=4.7cm of mat-2-1,anchor=west] {Global thread index};
+\node [label, left=4.7cm of mat-3-1,anchor=west] {Output index};
 
-\draw [decorate,decoration={brace,amplitude=15pt,mirror,raise=1cm}] (mat-3-1.west) --  (mat-3-5.east) node [midway, below=2cm] {Iteration 1};
-\draw [decorate,decoration={brace,amplitude=15pt,mirror,raise=1cm}] (mat-3-6.west) -- (mat-3-10.east) node [midway, below=2cm] {Iteration 2};
-\draw [decorate,decoration={brace,amplitude=15pt,mirror,raise=1cm}] (mat-3-11.west) -- (mat-3-15.east) node [midway, below=2cm] {Iteration 3};
-\draw [decorate,decoration={brace,amplitude=15pt,mirror,raise=1cm}] (mat-3-16.west) -- (mat-3-20.east) node [midway, below=2cm] {Iteration 4};
+\draw [decorate,decoration={brace,amplitude=15pt,mirror,raise=1cm}] (mat-3-1.west) --  (mat-3-5.east) node [label, midway, below=2cm] {Iteration 1};
+\draw [decorate,decoration={brace,amplitude=15pt,mirror,raise=1cm}] (mat-3-6.west) -- (mat-3-10.east) node [label, midway, below=2cm] {Iteration 2};
+\draw [decorate,decoration={brace,amplitude=15pt,mirror,raise=1cm}] (mat-3-11.west) -- (mat-3-15.east) node [label, midway, below=2cm] {Iteration 3};
+\draw [decorate,decoration={brace,amplitude=15pt,mirror,raise=1cm}] (mat-3-16.west) -- (mat-3-20.east) node [label, midway, below=2cm] {Iteration 4};
 
-\draw [-Latex,<->] ($(mat-1-1.north west)+(0,0.5cm)$) -- ($(mat-1-5.north east)+(0,0.5cm)$) node [midway, above] {Grid size};
+\draw [-Latex,<->] ($(mat-1-1.north west)+(0,0.5cm)$) -- ($(mat-1-5.north east)+(0,0.5cm)$) node [label, midway, above] {Grid size};
 \end{tikzpicture}
 \end{document}

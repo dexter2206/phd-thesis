@@ -19,7 +19,7 @@
     energies/.style={memarray, nodes={memcell, fill=Energies}},
     rect/.style={minimum height=1cm, fill=Rect, draw, rectangle},
     decision/.style={draw, align=center, diamond, fill=Decision},
-    every node/.style={font={\footnotesize}},
+    every node/.style={font={\normalsize}},
     brace/.style={decorate,decoration={brace,amplitude=5pt,mirror,raise=1mm}},
     brace2/.style={decorate,decoration={brace,amplitude=5pt,mirror,raise=4mm}},
     subroutine/.style={draw, rounded corners},
@@ -59,7 +59,7 @@
   --
   (energies1-1-1.south east)
   node [midway, below=2mm,align=center] (brace1)
-  {\footnotesize $k$ best states \footnotesize so far};
+  { $k$ best states so far};
 
   \node [
   fit=(energies1label) (states1) (brace1) (kernelinput),
@@ -117,7 +117,7 @@
   (energies3-1-3.south west)
   --
   (energies3-1-3.south east)
-  node [midway, below=5mm,align=center] (brace1) {\footnotesize Rest of chunk};
+  node [midway, below=5mm,align=center] (brace1) {Rest of chunk};
 
   \node[fit=(energies3-1-2) (states3-1-3), subsubroutine, draw=Frame1] (selectedk) {};
   \node[fit=(energies3-1-2) (states3-1-1), subsubroutine, draw=Frame2, inner sep=3mm] (premerge) {};
@@ -176,7 +176,7 @@
   ($(selectk.south)+(0.2cm,0)$)
   --
   ($(selectedk.north)+(0.2cm,0)$)
-  node[midway,right,align=left] {Select best $k$ states\\from chunk};
+  node[midway,right,align=left] {Select best\\ $k$ states\\from chunk};
 
   \draw[-Latex]
   ($(premerge.south east)!(states4-1-1.north)!(premerge.south west)$)

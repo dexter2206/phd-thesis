@@ -15,7 +15,7 @@
 
 \begin{tikzpicture}[
     junction/.style={draw,circle},
-    station/.style={text=RoyalBlue},
+    station/.style={text=black, font={\bfseries \small}},
     onesideplatform/.pic={
         \node[
             draw,rectangle,minimum height=0.3cm, minimum width=1cm
@@ -43,9 +43,9 @@
 \node [junction, right=1.5cm of B] (C) {};
 \node [junction, right=1cm of C] (D) {};
 \node [right=1.5cm of D] (stop) {...};
-\node [station,above=\labeloffset of $(start.north)!0.5!(A.north)$] {Nidzica};
-\node [station,above=\labeloffset of $(B)!0.5!(C)$] {Waplewo};
-\node [station,above=\labeloffset of $(D)!0.5!(stop)$] {Olsztynek};
+\node [station,above=\labeloffset of $(start.north)!0.5!(A.north)$] (nidzica) {Nidzica};
+\node [station,right= 1.5cm of nidzica] (waplewo) {Waplewo};
+\node [station,right=1.5cm of waplewo] {Olsztynek};
 
  \draw (start) -- (A) node[midway,above left=0.0cm and -0.29cm]{\tiny $1^{(1)}$};
 \draw (A) -- (B) node[midway,above]{\tiny $2$};

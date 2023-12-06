@@ -4,13 +4,20 @@
 \begin{document}
 
     \begin{tikzpicture}[
-        scale=1,
+        scale=0.5,
         coupler/.style={draw},
-        qubit/.style={circle, ultra thick, font={\scriptsize}, fill=White,draw=darkgray,minimum size=7mm, inner sep=0.5mm},
+        qubit/.style={circle, ultra thick, font={\scriptsize}, fill=White,draw=darkgray,minimum size=3.5mm, inner sep=0.5mm},
         hidden/.style={opacity=0.0},
-        external/.style={color=Tan, bend left=25, line width=6pt},
+        external/.style={color=Tan, bend left=25, line width=3pt},
         internal/.style={color=RoyalBlue, thin},
+        coupler legend/.style={minimum height=1mm, minimum width=4mm, inner sep=0, fill,
+          rectangle}
     ]
+
+    \matrix [] at (7, -3.2) {
+        \node [xshift=-0.5cm,label=right:{\huge Coupler type}] {}; & \node [label=right:\phantom{{\huge Coupler type}}] {}; \\
+        \node [internal,coupler legend,label=right:{\huge Internal}] {}; & \node [external,coupler legend, label=right:{\huge External}] {}; \\
+      };
 
     \node[qubit, hidden] (0) at (4.0, 0.0) {  };
     \node[qubit, hidden] (4) at (0.0, 0.0) {  };

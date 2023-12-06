@@ -8,13 +8,13 @@
 
 \newcommand{\stheight}{0.7cm}
 \newcommand{\stshift}{0.3cm}
-\newcommand{\labeloffset}{1.6cm}
+\newcommand{\labeloffset}{2cm}
 
 \begin{document}
 
 \begin{tikzpicture}[
   junction/.style={draw,circle},
-  station/.style={text=RoyalBlue, text width=2cm},
+  station/.style={text=black, font={\bfseries \scriptsize}},
     onesideplatform/.pic={
         \node[
             draw,rectangle,minimum height=0.3cm, minimum width=1cm
@@ -55,10 +55,13 @@
 \node [junction, right=1cm of E, fill=line2line] (F) {};
 \node [junction, right=1cm of F] (G) {};
 \node [right=1.5cm of G] (stop) {...};
-\node [station,above=\labeloffset of $(start)!0.5!(A)$] {Goleszów};
-\node [station,above=\labeloffset of $(AA)!0.5!(AAA)$] {Ustroń};
-\node [station,above=\labeloffset of $(B)!0.5!(B)$] {Ustroń Zdrój};
-\node [station,above=\labeloffset of $(B)!0.5!(B)$] {Ustroń Zdrój};
+\node [station,above=\labeloffset of $(start)!0.5!(A)$] (goleszow) {Goleszów};
+\node [station,base right=1.9cm of goleszow] (ustron) {Ustroń};
+\node [text width=1.3cm, station,base right=0.9cm of ustron] (uz) {Ustroń\\Zdrój};
+\node [text width=1.3cm, station,base right=-0.3cm of uz] (up) {Ustroń\\Poniwiec};
+\node [text width=2cm, station,base right=0.8cm of up] (upo) {Ustroń\\Polana};
+\node [text width=2cm, station,base right=0.0cm of upo] (wj) {Wisła\\Jawornik};
+\node [text width=2cm, station,base right=0.0cm of wj] (wj) {Wisła\\Uzdrowisko};
 
 \draw (start) -- (A) node[midway,above left=0.0cm and -0.29cm]{\tiny $1^{(2)}$};
 \draw (A) -- (AA) node[midway,above]{\tiny $2$};

@@ -38,11 +38,11 @@ between its ground energy and the energy of the first excited state, and is
 evolved slowly enough, it will stay in the ground state during the whole
 evolution. Knowing this we can finally discuss how AQC works. First, an
 optimization problem to be solved is encoded as a ground state of some
-Hamiltonian $\HH_{target}$. Then, a physical system is prepared in a ground state
-of some simpler Hamiltonian, $\HH_{initial}$. After that, the system is driven
-slowly from $\HH_{initial}$ to $\HH_{target}$. By adiabatic theorem, the system
-ends up in a ground state of $\HH_{target}$, and after the measurement is
-performed the solution to the original problem can be decoded.
+Hamiltonian $\HH_{target}$. Then, a physical system is prepared in a ground
+state of some simpler Hamiltonian, $\HH_{initial}$. After that, the system is
+driven slowly from $\HH_{initial}$ to $\HH_{target}$. By adiabatic theorem, the
+system ends up in a ground state of $\HH_{target}$, and after the measurement
+is performed the solution to the original problem can be decoded.
 
 In Quantum Annealing (QA), one follows essentially the same procedure as in
 Adiabatic Quantum Computing. What is different, is that the evolution of the
@@ -62,23 +62,24 @@ D-Wave annealers and highlights the differences between their generations.
 
 As already mentioned in the introduction, D-Wave annealers are built to find
 the ground states of the classical Ising spin--glasses. In these devices, the
-spin variables correspond to physical two-level systems, called qubits. At the
-end of the annealing process, the (quantum) Hamiltonian of the annealer has to
-correspond to the classical Ising Hamiltonian of the spin--glass instance being
-solved, i.e.:
+spin variables correspond to physical two-level systems, called qubits, which
+are implemented using Josephson junctions \cite{chad,bauch2006quantum}. At the end of the
+annealing process, the (quantum) Hamiltonian of the annealer has to correspond
+to the classical Ising Hamiltonian of the spin-glass instance being solved,
+i.e.:
 \begin{equation}
   \HH_{target} = \sum_{i=1}^N h_i \ssigma^{(i)}_z + \sum_{<i, j>} J_{ij} \ssigma^{(i)}_z \ssigma^{(j)}_z,
 \end{equation}
 where $N$, as previously, is the number of spins, $\ssigma^{(i)}_x$,
 $\ssigma^{(i)}_z$ denote Pauli operators acting on $i$-th qubit, and $h_i,
-J_{ij} \in \mathbb{R}$ are coefficients of the instance. Note that finding
-the ground state of such Hamiltonian is equivalent to finding the ground state
-of its classical counterpart (c.f. eq. \eqref{eq:ising-hamiltonian}). For small system sizes,
-this can be accomplished by listing all possible configurations and sorting them
-with respect to their energies.
+  J_{ij} \in \mathbb{R}$ are coefficients of the instance. Note that finding the
+ground state of such Hamiltonian is equivalent to finding the ground state of
+its classical counterpart (c.f. eq. \eqref{eq:ising-hamiltonian}). For small
+system sizes, this can be accomplished by listing all possible configurations
+and sorting them with respect to their energies.
 
-More precisely, the
-time-dependent Hamiltonian implemented by the D-Wave devices is of the form:
+More precisely, the time-dependent Hamiltonian implemented by the D-Wave
+devices is of the form:
 \begin{equation}
   \label{eq:dwaveham}
   \HH(t) =  -\frac{A(t)}{2}\sum_{i=1}^N \ssigma^{(i)}_x + \frac{B(t)}{2}\left(\sum_{i=1}^N h_i \ssigma^{(i)}_z + \sum_{<i, j>} J_{ij} \ssigma^{(i)}_z \ssigma^{(j)}_z\right).
@@ -133,8 +134,8 @@ of all currently available D-Wave annealers
     Comparison of different generations of D-Wave annealers. For topologies, $C_n$,
     $P_n$ and $Z_n$ refers to Chimera, Pegasus and Zephyr of size $n$ respectively.
     The numbers of qubits and couplers are given for a perfectly manufactured chip
-    with full yield. Actual devices typically have a lower number
-    of qubits or couplers.}. \label{tab:dwave}
+    with full yield. Actual devices typically have a lower number of qubits or
+    couplers.}. \label{tab:dwave}
 \end{table}
 
 % \begin{figure}
@@ -203,8 +204,8 @@ will discuss next.
   \caption{
     Chimera $C_3$ topology drawn using different layouts.
     \subref{fig:chimera-cross} The cross layout. \subref{fig:chimera-shore-column}
-    The grid layout. The internal couplers are marked with {\color{RoyalBlue} blue},
-    and the external couplers are marked with bold {\color{Tan} orange}. }
+    The grid layout. The internal couplers are marked with {\color{RoyalBlue}
+      blue}, and the external couplers are marked with bold {\color{Tan} orange}. }
   \label{fig:chimera}
 \end{figure}
 
@@ -275,9 +276,9 @@ formalizing this idea, let us first present an example of minor embedding.
     \caption{
       Example of minor embedding. Spin--glasses defined on the graph $G$
       (\textbf{c.}) cannot be directly solved on an annealer with $C_1$ topology
-      (\textbf{a.}). By contracting neighboring vertices 4 and 0 one obtains a new logical graph
-      $C_1'$ (\textbf{b.}), which contains problem graph $G$ as a subgraph. }
-    \label{fig:minor-embedding}
+      (\textbf{a.}). By contracting neighboring vertices 4 and 0 one obtains a new
+      logical graph $C_1'$ (\textbf{b.}), which contains problem graph $G$ as a
+      subgraph. } \label{fig:minor-embedding}
   \end{figure}
 
   Consider an annealer with $C_1$ topology and an (arbitrary) Ising spin--glass
@@ -491,17 +492,17 @@ executed by some core as a part of a thread. In CUDA however, the very same
 kernel is executed by multiple threads. Executing a kernel requires specifying
 a \emph{grid} that will be used for running it. A grid can be 1, 2-- or
 3--dimensional and is itself divided into blocks. Each block is in turn also
-organized in 1, 2--, or 3-dimensional structure of threads, which has to be the same for every
-block in the grid. A schematic view of a two-dimensional grid is presented in
-Fig. \ref{fig:cuda_grid}.
+organized in 1, 2--, or 3-dimensional structure of threads, which has to be the
+same for every block in the grid. A schematic view of a two-dimensional grid is
+presented in Fig. \ref{fig:cuda_grid}.
 
 As already mentioned, each thread in the grid executes \emph{precisely the
   same} kernel with \emph{precisely the same} parameters. It might therefore seem
 surprising that, nevertheless, they can access different parts of memory or
 otherwise handle a different part of the computational task. This is possible
 because each thread is identified by its indices in both the grid and the
-block. Those indices can be used for computing offsets in arrays that are
-being processed or (as we will demonstrate in Chapter \ref{chapter:bruteforce})
+block. Those indices can be used for computing offsets in arrays that are being
+processed or (as we will demonstrate in Chapter \ref{chapter:bruteforce})
 otherwise used for performing computations.
 
 \begin{figure}[ht]
@@ -612,8 +613,8 @@ present a short example of the CUDA C/C++ and CUDA Fortran code.
   are declared as pointers, for which the memory has to be manually allocated and
   later deallocated using the combination of \texttt{cudaMalloc} and
   \texttt{cudaFree}. Lastly, C/C++ uses zero-based indexing, whereas Fortran uses
-  one-based indexing. This affects how the global thread index, stored in \texttt{tid}
-  variable, is computed.
+  one-based indexing. This affects how the global thread index, stored in
+  \texttt{tid} variable, is computed.
 
   \begin{listing}
     \inputminted{fortran}{code/cuda_fortran.cuf}
@@ -651,9 +652,9 @@ specialized libraries. Among others, those include:
   \item cuFFT \cite{cufft} -- CUDA Fast Fourier Transform library,
   \item cuRAND \cite{curand} -- CUDA Random Number Generation library,
   \item cuSPARSE \cite{cusparse} -- CUDA library for manipulating sparse matrices,
-  \item thrust \cite{thrust} -- parallel algorithms library. Thrust also
-    provides parallel implementations of its algorithms that can be run on
-    traditional CPU, making it usable even without CUDA.
+  \item thrust \cite{thrust} -- parallel algorithms library. Thrust also provides
+    parallel implementations of its algorithms that can be run on traditional CPU,
+    making it usable even without CUDA.
 \end{itemize}
 For some high-level languages, there exist third-party libraries enabling the
 usage of CUDA. For Python, one could mention e.g. \texttt{PyCUDA}
