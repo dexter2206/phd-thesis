@@ -4,7 +4,9 @@ In order to characterize the complexity of algorithms, it is useful to use
 asymptotic big-O notation. Consider two functions $f, g \colon \NN \to \RR$. We
 say that $f$ is $O(g)$ if and only if there exists a constant $C > 0$ and a
 natural number $n_{C}$ such that the inequality $0 \le f(n) \le C\cdot g(n)$
-holds for all $n > n_{C}$ \cite{clrs}. It is common to write $f=O(g)$ instead
+holds for all $n > n_{C}$ \cite{clrs}.
+
+It is common to write $f=O(g)$ instead
 of ``$f$ is $O(g)$'', slightly abusing the mathematical notation \cite{clrs}.
 One should notice that big-O notation does not provide a tight bound. For
 instance, we have $n + 1 = O(n)$ (since $n + 1 \le 2 \cdot n$) but also $n+1 =
