@@ -1,0 +1,48 @@
+\documentclass{standalone}
+%
+\usepackage{mathptmx}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.5}
+%
+\pgfplotsset{every axis/.append style={
+	font=\small,
+	line width=0.75pt,
+	tick style={line width=0.8pt}},
+	label style={font=\small},
+	tick label style={font=\small},
+}
+%
+\begin{document}
+
+\begin{tikzpicture}
+
+  \definecolor{color0}{rgb}{0.75,0,0.75}
+
+  \begin{axis}[
+      %
+      title={Annealing protocol}, title style={yshift=-0.2cm}, at={(0 pt,0 pt)},
+      %
+      width=4.3 cm, height=4.3 cm,
+      %
+      scale only axis=true,
+      %
+      xmin=0, xmax=1, ymin=0, ymax=45,
+      %
+      xtick={0, 0.25, 0.5, 0.75, 1.}, xticklabels={$0$, $1/4$, $1/2$, $3/4$, $1$},
+      %
+      ytick={0., 15., 30., 45.}, yticklabels={$0$, $15$, $30$, $45$},
+      %
+      xlabel={$t/\tau$}, xlabel style={yshift=+0.15cm}, ylabel={Frequency [GHz]},
+      %
+      legend cell align={left}, legend style={at={(0.25,0.98)},anchor=north west,
+        align=left, draw=white!15!black,font=\small,mark size=1.5pt,draw=none} ]
+    \addplot [thick, blue]
+    table {../data/g.txt};
+    \addlegendentry{$A(t/\tau)$};
+    \addplot[thick, red]
+    table {../data/delta.txt};
+    \addlegendentry{$B(t/\tau)$}
+  \end{axis}
+
+\end{tikzpicture}
+\end{document}
