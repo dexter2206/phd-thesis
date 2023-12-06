@@ -87,7 +87,20 @@ devices is of the form:
 where $t \in [0, \tau]$ \cite{dwavedocs}. The tunneling energy curve $A(t)$ is
 monotonically decreasing and it vanishes as $t$ approaches $\tau$. Similarly
 $B(t)$ is monotonically increasing, and the functions satisfy $A(0) \gg B(0)$
-and $B(\tau) \gg A(\tau)$.
+and $B(\tau) \gg A(\tau)$. The annealing functions $A$ and $B$ representative of
+the devices from the Advantage System generation are presented in Fig. \ref{fig:annealingfuncs}
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.8\textwidth]{figures/annealing-functions.png}
+  \caption{Annealing functions $A,B$ representative of the D-Wave Advantage Systems.
+    The functions might slightly vary between generations as well as between devices
+    from the same generation.
+  }
+  \label{fig:annealingfuncs}
+\end{figure}
+
+
 
 Since the variables in the spin--glass being solved have to correspond to the
 physical qubits, it is clear that the number of qubits of the device limits the
