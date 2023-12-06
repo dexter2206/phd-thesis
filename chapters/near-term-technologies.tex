@@ -38,10 +38,10 @@ between its ground energy and the energy of the first excited state, and is
 evolved slowly enough, it will stay in the ground state during the whole
 evolution. Knowing this we can finally discuss how AQC works. First, an
 optimization problem to be solved is encoded as a ground state of some
-Hamiltonian $\HH_{target}$. Then, a physical system is prepared in a ground
-state of some simpler Hamiltonian, $\HH_{initial}$. After that, the system is
-driven slowly from $\HH_{initial}$ to $\HH_{target}$. By adiabatic theorem, the
-system ends up in a ground state of $\HH_{target}$, and after the measurement
+Hamiltonian $\HH_{\text{target}}$. Then, a physical system is prepared in a ground
+state of some simpler Hamiltonian, $\HH_{\text{initial}}$. After that, the system is
+driven slowly from $\HH_{\text{initial}}$ to $\HH_{\text{target}}$. By adiabatic theorem, the
+system ends up in a ground state of $\HH_{\text{target}}$, and after the measurement
 is performed the solution to the original problem can be decoded.
 
 In Quantum Annealing (QA), one follows essentially the same procedure as in
@@ -68,7 +68,7 @@ annealing process, the (quantum) Hamiltonian of the annealer has to correspond
 to the classical Ising Hamiltonian of the spin-glass instance being solved,
 i.e.:
 \begin{equation}
-  \HH_{target} = \sum_{i=1}^N h_i \ssigma^{(i)}_z + \sum_{<i, j>} J_{ij} \ssigma^{(i)}_z \ssigma^{(j)}_z,
+  \HH_{\text{target}} = \sum_{i=1}^N h_i \ssigma^{(i)}_z + \sum_{<i, j>} J_{ij} \ssigma^{(i)}_z \ssigma^{(j)}_z,
 \end{equation}
 where $N$, as previously, is the number of spins, $\ssigma^{(i)}_x$,
 $\ssigma^{(i)}_z$ denote Pauli operators acting on $i$-th qubit, and $h_i,
@@ -92,8 +92,8 @@ and $B(\tau) \gg A(\tau)$. Illustrative plots of the functions $A$ and $B$ are p
 \begin{figure}
   \centering
   \includegraphics[width=0.7\textwidth]{figures/quench}
-  \caption{Shape of the $A$ and $B$ curves defining the annealing protocol on D-Wave annealers.
-    Actual values of the functions vary between the devices.
+  \caption{A typical shape of the $A$ and $B$ curves defining the annealing protocol on D-Wave annealers.
+    Here, $\tau$ denotes the annealing time. Actual values of the functions vary between the devices.
   }
   \label{fig:annealingfuncs}
 \end{figure}
